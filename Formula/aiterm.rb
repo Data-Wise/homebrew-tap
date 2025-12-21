@@ -10,7 +10,23 @@ class Aiterm < Formula
   depends_on "python@3.12"
 
   def install
-    virtualenv_install_with_resources
+    # Create virtualenv
+    virtualenv_create(libexec, "python3.12")
+
+    # Install the package and its dependencies
+    system libexec/"bin/pip", "install", "-v", "--no-deps",
+                              "--ignore-installed",
+                              buildpath
+
+    # Install dependencies
+    system libexec/"bin/pip", "install", "typer>=0.9.0"
+    system libexec/"bin/pip", "install", "rich>=13.0.0"
+    system libexec/"bin/pip", "install", "questionary>=2.0.0"
+    system libexec/"bin/pip", "install", "pyyaml>=6.0"
+
+    # Link binaries
+    bin.install_symlink libexec/"bin/aiterm"
+    bin.install_symlink libexec/"bin/ait"
   end
 
   test do
