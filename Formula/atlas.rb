@@ -1,8 +1,8 @@
 class Atlas < Formula
   desc "Project state engine - registry, sessions, capture, and context for ADHD-friendly workflow"
   homepage "https://github.com/Data-Wise/atlas"
-  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "13d200917f8130a3d49c0205846407618af3b564b6db03f8aa24565529ece7af"
+  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "97d596d1b0946655c401f20bd8396ab5aceaaee7745eaeb6cb155d760b89b98e"
   license "MIT"
 
   depends_on "node@20"
