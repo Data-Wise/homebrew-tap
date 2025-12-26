@@ -18,8 +18,8 @@ class Aiterm < Formula
     venv.pip_install "questionary>=2.0.0"
     venv.pip_install "pyyaml>=6.0"
 
-    # Install the package itself (--no-deps since deps are already installed)
-    system libexec/"bin/pip", "install", "--no-deps", buildpath
+    # Install the package itself
+    venv.pip_install buildpath
 
     bin.install_symlink libexec/"bin/aiterm"
     bin.install_symlink libexec/"bin/ait"
