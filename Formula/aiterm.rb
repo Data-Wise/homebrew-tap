@@ -12,15 +12,14 @@ class Aiterm < Formula
   def install
     venv = virtualenv_create(libexec, "python3.12", system_site_packages: false)
 
-    # Install dependencies first
-    system libexec/"bin/pip", "install",
-           "typer>=0.9.0",
-           "rich>=13.0.0",
-           "questionary>=2.0.0",
-           "pyyaml>=6.0"
+    # Install dependencies first (using venv.pip_install which handles pip bootstrapping)
+    venv.pip_install "typer>=0.9.0"
+    venv.pip_install "rich>=13.0.0"
+    venv.pip_install "questionary>=2.0.0"
+    venv.pip_install "pyyaml>=6.0"
 
-    # Install the package
-    venv.pip_install buildpath
+    # Install the package itself (--no-deps since deps are already installed)
+    system libexec/"bin/pip", "install", "--no-deps", buildpath
 
     bin.install_symlink libexec/"bin/aiterm"
     bin.install_symlink libexec/"bin/ait"
