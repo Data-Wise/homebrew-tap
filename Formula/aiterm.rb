@@ -12,10 +12,25 @@ class Aiterm < Formula
   def install
     venv = virtualenv_create(libexec, "python3.12", system_site_packages: false)
 
-    # Install dependencies first (using venv.pip_install which handles pip bootstrapping)
+    # Install all dependencies including transitive ones
+    # typer deps: click, shellingham, typing_extensions
+    venv.pip_install "click>=8.0.0"
+    venv.pip_install "shellingham>=1.3.0"
+    venv.pip_install "typing_extensions>=3.7.4.3"
     venv.pip_install "typer>=0.9.0"
+
+    # rich deps: markdown-it-py, pygments, mdurl
+    venv.pip_install "mdurl>=0.1"
+    venv.pip_install "markdown-it-py>=2.2.0"
+    venv.pip_install "pygments>=2.13.0"
     venv.pip_install "rich>=13.0.0"
+
+    # questionary deps: prompt_toolkit, wcwidth
+    venv.pip_install "wcwidth>=0.1.4"
+    venv.pip_install "prompt_toolkit>=2.0,<4.0"
     venv.pip_install "questionary>=2.0.0"
+
+    # Direct deps
     venv.pip_install "pyyaml>=6.0"
 
     # Install the package itself
