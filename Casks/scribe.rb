@@ -7,7 +7,7 @@ cask "scribe" do
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
   end
   on_arm do
-    sha256 "aa42b60726604194486461c6cd0ebdcfca55582bd7eadf4f6bb345badf3f1c02"
+    sha256 "a25e44a2ad3ff2b2659171d22693e593a7f70ccfb226d1f16eab23166d6571cf"
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
 
