@@ -12,7 +12,7 @@ cask "scribe" do
   end
 
   name "Scribe"
-  desc "ADHD-friendly distraction-free writer for academics and researchers"
+  desc "ADHD-friendly distraction-free writer with LaTeX, citations, and Pandoc export"
   homepage "https://github.com/Data-Wise/scribe"
 
   # Pre-release/beta channel
@@ -35,6 +35,11 @@ cask "scribe" do
     ohai "  • Command palette: ⌘K"
     ohai "  • Focus mode: ⌘⇧F"
     ohai ""
+    ohai "Academic Features:"
+    ohai "  • Type $...$ for inline math, $$...$$ for display math"
+    ohai "  • Type @ to insert citations from your .bib file"
+    ohai "  • Export to PDF/Word/LaTeX via Pandoc"
+    ohai ""
     ohai "⚠️  This is an ALPHA release. Please report issues at:"
     ohai "  https://github.com/Data-Wise/scribe/issues"
   end
@@ -51,10 +56,10 @@ cask "scribe" do
 
   caveats <<~EOS
     ⚠️  ALPHA RELEASE (v#{version})
-    
+
     This is a pre-release version intended for testing.
     Some features may be incomplete or unstable.
-    
+
     Features:
     • HybridEditor (Markdown + Preview)
     • 10 ADHD-friendly themes
@@ -62,13 +67,24 @@ cask "scribe" do
     • Wiki-links and tags
     • Focus mode
     • Global hotkey (⌘⇧N)
-    
+
+    Academic Features (NEW):
+    • LaTeX math rendering (MathJax 3)
+    • Citation autocomplete (@trigger)
+    • BibTeX/Zotero integration
+    • Export to PDF, Word, LaTeX, HTML (via Pandoc)
+    • 5 citation styles (APA, Chicago, MLA, IEEE, Harvard)
+
     Keyboard Shortcuts:
     • ⌘⇧N  Open Scribe from anywhere
     • ⌘K   Command palette
     • ⌘⇧F  Toggle focus mode
     • ⌘E   Toggle write/preview mode
-    
+
+    Optional Dependencies:
+    • Pandoc: brew install pandoc
+    • LaTeX: brew install --cask mactex (for PDF export)
+
     Report issues: https://github.com/Data-Wise/scribe/issues
   EOS
 end
