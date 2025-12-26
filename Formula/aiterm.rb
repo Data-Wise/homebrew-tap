@@ -10,8 +10,8 @@ class Aiterm < Formula
   depends_on "python@3.12"
 
   def install
-    virtualenv_create(libexec, "python3.12")
-    system libexec/"bin/pip", "install", buildpath
+    venv = virtualenv_create(libexec, "python3.12", system_site_packages: false)
+    venv.pip_install buildpath
     bin.install_symlink libexec/"bin/aiterm"
     bin.install_symlink libexec/"bin/ait"
   end
