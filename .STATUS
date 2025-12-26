@@ -1,0 +1,12 @@
+# Homebrew Tap
+
+## Status: Paused
+## Progress: 30
+## Focus: Custom Homebrew formulas for personal tools
+
+## Overview
+Homebrew tap for distributing CLI tools like atlas.
+
+## Next
+- Add atlas formula
+- Set up CI for formula testing
