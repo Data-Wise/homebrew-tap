@@ -14,12 +14,14 @@ brew tap data-wise/tap
 
 | Formula | Description |
 |---------|-------------|
+| **atlas** | ADHD-friendly project state engine with sessions, captures, and context |
 | **nexus-cli** | Knowledge workflow CLI for research, teaching, and writing |
 | **examify** | Create exams from Markdown and export to Canvas QTI format |
 | **examark** | Create exams from Markdown and export to Canvas QTI format |
 | **aiterm** | Terminal optimizer for AI-assisted development |
 
 ```bash
+brew install data-wise/tap/atlas
 brew install data-wise/tap/nexus-cli
 brew install data-wise/tap/aiterm
 ```
@@ -78,6 +80,7 @@ brew upgrade --cask scribe
 
 ## More Info
 
+- [Atlas Documentation](https://github.com/Data-Wise/atlas#readme)
 - [Nexus CLI Documentation](https://data-wise.github.io/nexus-cli/)
 - [Examify Documentation](https://data-wise.github.io/examify/)
 - [Examark Documentation](https://data-wise.github.io/examark/)
