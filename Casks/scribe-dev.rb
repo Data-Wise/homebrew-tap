@@ -1,6 +1,6 @@
 cask "scribe-dev" do
-  version "0.4.0-alpha.1"
-  sha256 "a25e44a2ad3ff2b2659171d22693e593a7f70ccfb226d1f16eab23166d6571cf"
+  version "0.5.0-beta.1"
+  sha256 "c31513bc8cc09f88806b8d341fa794b08bdb536c29db1fc3cca193429b33e62b"
 
   url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
 
@@ -38,8 +38,8 @@ cask "scribe-dev" do
   postflight do
     ohai "Scribe (Dev) installed successfully!"
     ohai ""
-    ohai "⚠️  This is a DEVELOPMENT build (v#{version})"
-    ohai "   Expect bugs and incomplete features."
+    ohai "⚠️  This is a BETA build (v#{version})"
+    ohai "   Nearing v1.0 stable release."
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -60,10 +60,10 @@ cask "scribe-dev" do
   ]
 
   caveats <<~EOS
-    ⚠️  DEVELOPMENT BUILD (v#{version})
+    ⚠️  BETA BUILD (v#{version})
 
-    This is a pre-release version from the development channel.
-    Features may be incomplete, unstable, or change without notice.
+    This is a beta version nearing v1.0 stable release.
+    Most features are complete. Please report any issues.
 
     To switch to stable (when available):
       brew uninstall --cask scribe-dev
