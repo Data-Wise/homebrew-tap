@@ -1,15 +1,12 @@
 cask "scribe" do
   version "0.4.0-alpha.1"
-  
-  # Architecture-specific downloads
-  on_intel do
-    sha256 "PLACEHOLDER_X64_SHA256"
-    url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
-  end
-  on_arm do
-    sha256 "a25e44a2ad3ff2b2659171d22693e593a7f70ccfb226d1f16eab23166d6571cf"
-    url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
-  end
+  sha256 "a25e44a2ad3ff2b2659171d22693e593a7f70ccfb226d1f16eab23166d6571cf"
+
+  url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
+
+  # Apple Silicon only for now (Intel builds coming soon)
+  arch arm: "aarch64"
+  depends_on arch: :arm64
 
   name "Scribe"
   desc "ADHD-friendly distraction-free writer with LaTeX, citations, and Pandoc export"

@@ -28,13 +28,15 @@ brew install data-wise/tap/aiterm
 
 ### Desktop Apps (Casks)
 
-| Cask | Description | Status |
-|------|-------------|--------|
-| **scribe** | ADHD-friendly distraction-free writer | 🧪 Alpha |
+| Cask | Description | Status | Arch |
+|------|-------------|--------|------|
+| **scribe** | ADHD-friendly distraction-free writer | 🧪 Alpha | Apple Silicon |
 
 ```bash
 brew install --cask data-wise/tap/scribe
 ```
+
+> **Note:** Scribe currently requires Apple Silicon (M1/M2/M3). Intel users can build from source.
 
 ## Scribe (Alpha)
 
