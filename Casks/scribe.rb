@@ -12,11 +12,23 @@ cask "scribe" do
   desc "ADHD-friendly distraction-free writer with LaTeX, citations, and Pandoc export"
   homepage "https://github.com/Data-Wise/scribe"
 
-  # Pre-release/beta channel
+  # Stable releases only (no alpha/beta/rc)
   livecheck do
-    url :url
-    regex(/^v?(\d+(?:\.\d+)*(?:-(?:alpha|beta|rc)\.\d+)?)$/i)
+    url "https://github.com/Data-Wise/scribe/releases"
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_releases do |json, regex|
+      json.filter_map do |release|
+        match = release["tag_name"]&.match(regex)
+        next unless match
+        next if release["draft"] || release["prerelease"]
+
+        match[1]
+      end
+    end
   end
+
+  # Conflicts with dev version
+  conflicts_with cask: "data-wise/tap/scribe-dev"
 
   # Require macOS 10.15+ (Catalina)
   depends_on macos: ">= :catalina"

@@ -28,21 +28,33 @@ brew install data-wise/tap/aiterm
 
 ### Desktop Apps (Casks)
 
-| Cask | Description | Status | Arch |
-|------|-------------|--------|------|
-| **scribe** | ADHD-friendly distraction-free writer | 🧪 Alpha | Apple Silicon |
+| Cask | Description | Channel | Arch |
+|------|-------------|---------|------|
+| **scribe** | ADHD-friendly distraction-free writer | Stable | Apple Silicon |
+| **scribe-dev** | ADHD-friendly distraction-free writer | Dev (alpha/beta) | Apple Silicon |
 
 ```bash
+# Stable (when available)
 brew install --cask data-wise/tap/scribe
+
+# Development channel (current)
+brew install --cask data-wise/tap/scribe-dev
 ```
 
 > **Note:** Scribe currently requires Apple Silicon (M1/M2/M3). Intel users can build from source.
 
-## Scribe (Alpha)
-
-> ⚠️ **Pre-release**: This is an alpha version intended for testing.
+## Scribe
 
 **Scribe** is an ADHD-friendly distraction-free writing app for academics and researchers.
+
+### Channels
+
+| Channel | Cask | Description |
+|---------|------|-------------|
+| **Stable** | `scribe` | Production releases (v1.0+) |
+| **Dev** | `scribe-dev` | Alpha/beta pre-releases |
+
+Currently only the dev channel has releases. Use `scribe-dev` for now.
 
 ### Features
 
@@ -52,6 +64,9 @@ brew install --cask data-wise/tap/scribe
 - Wiki-links and tags
 - Focus mode
 - Global hotkey (⌘⇧N)
+- LaTeX math (KaTeX)
+- Citation autocomplete (@trigger)
+- Export to PDF/Word/LaTeX via Pandoc
 
 ### Keyboard Shortcuts
 
@@ -68,11 +83,15 @@ brew install --cask data-wise/tap/scribe
 # Add tap (if not already added)
 brew tap data-wise/tap
 
-# Install Scribe
-brew install --cask data-wise/tap/scribe
+# Install dev channel (current)
+brew install --cask data-wise/tap/scribe-dev
 
 # Update to latest version
-brew upgrade --cask scribe
+brew upgrade --cask scribe-dev
+
+# Switch to stable (when v1.0 releases)
+brew uninstall --cask scribe-dev
+brew install --cask data-wise/tap/scribe
 ```
 
 ### Report Issues
