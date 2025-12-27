@@ -1,6 +1,6 @@
 cask "scribe-dev" do
-  version "0.5.0-beta.1"
-  sha256 "c31513bc8cc09f88806b8d341fa794b08bdb536c29db1fc3cca193429b33e62b"
+  version "1.1.0"
+  sha256 "bae1e26f1265abc733cd13ae6d612cdf655f5c2ce1aedc5a4b74418d508a6ce1"
 
   url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
 
@@ -12,19 +12,10 @@ cask "scribe-dev" do
   desc "ADHD-friendly distraction-free writer (development channel)"
   homepage "https://github.com/Data-Wise/scribe"
 
-  # Track pre-releases (alpha, beta, rc)
+  # Track all releases (stable + pre-releases)
   livecheck do
-    url "https://github.com/Data-Wise/scribe/releases"
-    regex(/^v?(\d+(?:\.\d+)*(?:-(?:alpha|beta|rc)\.\d+))$/i)
-    strategy :github_releases do |json, regex|
-      json.filter_map do |release|
-        match = release["tag_name"]&.match(regex)
-        next unless match
-        next if release["draft"]
-
-        match[1]
-      end
-    end
+    url :url
+    strategy :github_latest
   end
 
   # Conflicts with stable version
@@ -36,10 +27,12 @@ cask "scribe-dev" do
   app "Scribe.app"
 
   postflight do
-    ohai "Scribe (Dev) installed successfully!"
+    ohai "Scribe (Dev) v#{version} installed successfully!"
     ohai ""
-    ohai "⚠️  This is a BETA build (v#{version})"
-    ohai "   Nearing v1.0 stable release."
+    ohai "What's New in v1.1.0:"
+    ohai "  • Project System - organize notes by project"
+    ohai "  • Note Search - full-text search with FTS5"
+    ohai "  • Scribe CLI - terminal access (scribe help)"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -60,16 +53,14 @@ cask "scribe-dev" do
   ]
 
   caveats <<~EOS
-    ⚠️  BETA BUILD (v#{version})
+    Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    This is a beta version nearing v1.0 stable release.
-    Most features are complete. Please report any issues.
+    New in v1.1.0:
+    • Project System - organize notes by project
+    • Note Search - full-text search with FTS5
+    • Scribe CLI - terminal access (run: scribe help)
 
-    To switch to stable (when available):
-      brew uninstall --cask scribe-dev
-      brew install --cask data-wise/tap/scribe
-
-    Current Features:
+    Features:
     • HybridEditor (Markdown + Preview)
     • 10 ADHD-friendly themes
     • 14 recommended fonts
@@ -78,6 +69,9 @@ cask "scribe-dev" do
     • LaTeX math (KaTeX)
     • Citation autocomplete
     • Export via Pandoc
+
+    CLI Setup (optional):
+      source ~/.config/zsh/functions/scribe.zsh
 
     Report issues: https://github.com/Data-Wise/scribe/issues
   EOS
