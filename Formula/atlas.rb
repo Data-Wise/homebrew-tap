@@ -1,8 +1,8 @@
 class Atlas < Formula
   desc "Project state engine - registry, sessions, capture, and context for ADHD-friendly workflow"
   homepage "https://github.com/Data-Wise/atlas"
-  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.6.3.tar.gz"
-  sha256 "8aea54d11da08495c20e1646986748dbbfd17e0242f367d8525dd26a0df0af5e"
+  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.7.0.tar.gz"
+  sha256 "f9125afe8d2261d8ce945c79c31ee2d431b221433d58744eefecf1846ab71677"
   license "MIT"
 
   depends_on "node@20"
@@ -27,15 +27,17 @@ class Atlas < Formula
         atlas sync                    # Import from .STATUS files
         atlas session start PROJECT   # Start work session
         atlas catch "idea"            # Quick capture
-        atlas stats                   # Session analytics (NEW!)
-        atlas where                   # Show context
+        atlas stats                   # Session analytics
+        atlas dash                    # Interactive dashboard
+
+      New in v0.7.0:
+        atlas session export FILE     # Export to iCal for calendars
+        Dashboard: Press 'f' for Task-Based Focus (Pomodoro)
+        Dashboard: Press 'T' for Timeline View
 
       Shell completions have been installed for bash, zsh, and fish.
 
       Data is stored in: ~/.atlas/
-
-      For SQLite backend (better performance):
-        atlas --storage sqlite status
 
       Documentation: https://data-wise.github.io/atlas/
     EOS
