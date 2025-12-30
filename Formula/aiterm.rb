@@ -3,8 +3,8 @@ class Aiterm < Formula
 
   desc "Terminal optimizer for AI-assisted development with Claude Code and Gemini CLI"
   homepage "https://github.com/Data-Wise/aiterm"
-  url "https://github.com/Data-Wise/aiterm/archive/v0.3.9.tar.gz"
-  sha256 "3d48a4e3ffccaa165a66fa4d620edb47812ee720911758a83418991545ae2113"
+  url "https://github.com/Data-Wise/aiterm/archive/v0.3.10.tar.gz"
+  sha256 "c926fd17611fab7335ba1110682c298d66a9abdf0cc9b3bf32709261291d897d"
   license "MIT"
 
   depends_on "python@3.12"
