@@ -38,6 +38,47 @@ class Aiterm < Formula
 
     bin.install_symlink libexec/"bin/aiterm"
     bin.install_symlink libexec/"bin/ait"
+
+    # Install flow-cli integration files
+    (share/"aiterm/flow-integration").install "flow-integration/aiterm.zsh"
+    (share/"aiterm/flow-integration").install "flow-integration/install-symlink.sh"
+  end
+
+  def post_install
+    # Install flow-cli integration if flow-cli is present
+    flow_cli_paths = [
+      Pathname.new(Dir.home)/"projects/dev-tools/flow-cli",
+      Pathname.new(Dir.home)/".local/share/flow-cli",
+      Pathname.new(Dir.home)/".flow-cli",
+    ]
+
+    flow_cli_dir = flow_cli_paths.find { |p| p.directory? && (p/"flow.plugin.zsh").exist? }
+
+    if flow_cli_dir
+      target_dir = flow_cli_dir/"zsh/functions"
+      target_dir.mkpath
+      target = target_dir/"aiterm-integration.zsh"
+      source = prefix/"share/aiterm/flow-integration/aiterm.zsh"
+
+      if source.exist? && !target.exist?
+        target.make_symlink(source)
+        ohai "Installed flow-cli integration: tm command available"
+      end
+    end
+  end
+
+  def caveats
+    <<~EOS
+      To use the `tm` dispatcher with flow-cli:
+
+        #{prefix}/share/aiterm/flow-integration/install-symlink.sh
+
+      Or manually:
+        ln -sf #{prefix}/share/aiterm/flow-integration/aiterm.zsh \\
+          ~/projects/dev-tools/flow-cli/zsh/functions/aiterm-integration.zsh
+
+      Then restart your shell or run: source ~/.zshrc
+    EOS
   end
 
   test do
