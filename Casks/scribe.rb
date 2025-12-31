@@ -1,6 +1,6 @@
 cask "scribe" do
-  version "0.4.0-alpha.1"
-  sha256 "a25e44a2ad3ff2b2659171d22693e593a7f70ccfb226d1f16eab23166d6571cf"
+  version "1.1.0"
+  sha256 "bae1e26f1265abc733cd13ae6d612cdf655f5c2ce1aedc5a4b74418d508a6ce1"
 
   url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
 
@@ -35,22 +35,20 @@ cask "scribe" do
 
   app "Scribe.app"
 
-  # Register global hotkey after install
   postflight do
-    ohai "Scribe installed successfully!"
+    ohai "Scribe v#{version} installed successfully!"
+    ohai ""
+    ohai "What's New in v1.1.0:"
+    ohai "  • Project System - organize notes by project"
+    ohai "  • Note Search - full-text search with FTS5"
+    ohai "  • Scribe CLI - terminal access (scribe help)"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
     ohai "  • Command palette: ⌘K"
     ohai "  • Focus mode: ⌘⇧F"
     ohai ""
-    ohai "Academic Features:"
-    ohai "  • Type $...$ for inline math, $$...$$ for display math"
-    ohai "  • Type @ to insert citations from your .bib file"
-    ohai "  • Export to PDF/Word/LaTeX via Pandoc"
-    ohai ""
-    ohai "⚠️  This is an ALPHA release. Please report issues at:"
-    ohai "  https://github.com/Data-Wise/scribe/issues"
+    ohai "Report issues: https://github.com/Data-Wise/scribe/issues"
   end
 
   uninstall quit: "com.scribe.app"
@@ -64,25 +62,22 @@ cask "scribe" do
   ]
 
   caveats <<~EOS
-    ⚠️  ALPHA RELEASE (v#{version})
+    Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    This is a pre-release version intended for testing.
-    Some features may be incomplete or unstable.
+    New in v1.1.0:
+    • Project System - organize notes by project
+    • Note Search - full-text search with FTS5
+    • Scribe CLI - terminal access (run: scribe help)
 
     Features:
     • HybridEditor (Markdown + Preview)
     • 10 ADHD-friendly themes
-    • 14 recommended fonts with Homebrew install
+    • 14 recommended fonts
     • Wiki-links and tags
-    • Focus mode
-    • Global hotkey (⌘⇧N)
-
-    Academic Features (NEW):
-    • LaTeX math rendering (MathJax 3)
-    • Citation autocomplete (@trigger)
-    • BibTeX/Zotero integration
-    • Export to PDF, Word, LaTeX, HTML (via Pandoc)
-    • 5 citation styles (APA, Chicago, MLA, IEEE, Harvard)
+    • Focus mode & global hotkey (⌘⇧N)
+    • LaTeX math (KaTeX)
+    • Citation autocomplete
+    • Export via Pandoc
 
     Keyboard Shortcuts:
     • ⌘⇧N  Open Scribe from anywhere
