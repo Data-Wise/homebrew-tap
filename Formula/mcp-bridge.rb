@@ -1,8 +1,10 @@
 class McpBridge < Formula
   desc "MCP Bridge - Connect Claude.ai to local MCP servers via SSE"
   homepage "https://data-wise.github.io/mcp-bridge/"
-  head "https://github.com/Data-Wise/mcp-bridge.git", branch: "dev"
+  url "https://github.com/Data-Wise/mcp-bridge/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "b1e0b46e58e0a8714bc7893498231bfe1e5e0dde670f7bb55d3d998aa0ff939e"
   license "MIT"
+  head "https://github.com/Data-Wise/mcp-bridge.git", branch: "dev"
 
   depends_on "node"
 
