@@ -12,98 +12,119 @@ brew tap data-wise/tap
 
 ### CLI Tools (Formulas)
 
-| Formula | Description |
-|---------|-------------|
-| **atlas** | ADHD-friendly project state engine with sessions, captures, and context |
-| **nexus-cli** | Knowledge workflow CLI for research, teaching, and writing |
-| **examify** | Create exams from Markdown and export to Canvas QTI format |
-| **examark** | Create exams from Markdown and export to Canvas QTI format |
-| **aiterm** | Terminal optimizer for AI-assisted development |
+| Formula | Version | Description |
+|---------|---------|-------------|
+| **aiterm** | v0.6.0 | Terminal optimizer for AI-assisted development |
+| **atlas** | v0.8.0 | ADHD-friendly project state engine with sessions, captures, and context |
+| **examark** | v0.6.6 | Create exams from Markdown and export to Canvas QTI format |
+| **flow-cli** | v4.5.5 | ZSH workflow tools designed for ADHD brains |
+| **mcp-bridge** | v1.0.0 | Connect Claude.ai to local MCP servers via SSE |
+| **nexus-cli** | v0.5.1 | Knowledge workflow CLI for research, teaching, and writing |
+| **rforge-orchestrator** | v0.1.0 | Auto-delegation orchestrator for RForge MCP tools |
+| **workflow** | v0.1.0 | ADHD-friendly workflow automation - Claude Code plugin |
+| ~~examify~~ | v0.5.0 | *Deprecated: renamed to examark* |
 
 ```bash
-brew install data-wise/tap/atlas
-brew install data-wise/tap/nexus-cli
+# Install any formula
 brew install data-wise/tap/aiterm
+brew install data-wise/tap/atlas
+brew install data-wise/tap/flow-cli
+brew install data-wise/tap/mcp-bridge
+brew install data-wise/tap/nexus-cli
 ```
 
 ### Desktop Apps (Casks)
 
-| Cask | Description | Channel | Arch |
-|------|-------------|---------|------|
-| **scribe** | ADHD-friendly distraction-free writer | Stable | Apple Silicon |
-| **scribe-dev** | ADHD-friendly distraction-free writer | Dev (alpha/beta) | Apple Silicon |
+| Cask | Version | Description | Arch |
+|------|---------|-------------|------|
+| **scribe** | v1.1.0 | ADHD-friendly distraction-free writer (stable) | Apple Silicon |
+| **scribe-dev** | v1.1.0 | ADHD-friendly distraction-free writer (dev channel) | Apple Silicon |
 
 ```bash
-# Stable (when available)
+# Stable channel (recommended)
 brew install --cask data-wise/tap/scribe
 
-# Development channel (current)
+# Development channel (alpha/beta releases)
 brew install --cask data-wise/tap/scribe-dev
 ```
 
-> **Note:** Scribe currently requires Apple Silicon (M1/M2/M3). Intel users can build from source.
+> **Note:** Scribe requires Apple Silicon (M1/M2/M3). Intel support coming soon.
 
-## Scribe
+## Featured Tools
 
-**Scribe** is an ADHD-friendly distraction-free writing app for academics and researchers.
+### aiterm
 
-### Channels
+Terminal optimizer for AI-assisted development with Claude Code and Gemini CLI.
 
-| Channel | Cask | Description |
-|---------|------|-------------|
-| **Stable** | `scribe` | Production releases (v1.0+) |
-| **Dev** | `scribe-dev` | Alpha/beta pre-releases |
+```bash
+brew install data-wise/tap/aiterm
 
-Currently only the dev channel has releases. Use `scribe-dev` for now.
+# Usage
+ait doctor      # Check installation
+ait detect      # Show project context
+ait switch      # Apply context to terminal
+```
 
-### Features
+[Documentation](https://data-wise.github.io/aiterm/)
 
+### Scribe
+
+ADHD-friendly distraction-free writing app for academics and researchers.
+
+**Features:**
 - HybridEditor (Markdown + Preview)
 - 10 ADHD-friendly themes
-- 14 recommended fonts with one-click install
-- Wiki-links and tags
-- Focus mode
-- Global hotkey (⌘⇧N)
 - LaTeX math (KaTeX)
-- Citation autocomplete (@trigger)
-- Export to PDF/Word/LaTeX via Pandoc
+- Citation autocomplete
+- Export via Pandoc
 
-### Keyboard Shortcuts
-
+**Keyboard Shortcuts:**
 | Shortcut | Action |
 |----------|--------|
 | ⌘⇧N | Open Scribe from anywhere |
 | ⌘K | Command palette |
 | ⌘⇧F | Toggle focus mode |
-| ⌘E | Toggle write/preview mode |
 
-### Install Scribe
+[Documentation](https://github.com/Data-Wise/scribe)
+
+### MCP Bridge
+
+Chrome extension + SSE server for connecting Claude.ai to local MCP servers.
 
 ```bash
-# Add tap (if not already added)
-brew tap data-wise/tap
+brew install data-wise/tap/mcp-bridge
 
-# Install dev channel (current)
-brew install --cask data-wise/tap/scribe-dev
-
-# Update to latest version
-brew upgrade --cask scribe-dev
-
-# Switch to stable (when v1.0 releases)
-brew uninstall --cask scribe-dev
-brew install --cask data-wise/tap/scribe
+# Start the bridge server
+brew services start mcp-bridge
 ```
 
-### Report Issues
+[Documentation](https://data-wise.github.io/mcp-bridge/)
 
-- [Scribe Issues](https://github.com/Data-Wise/scribe/issues)
-- [Tap Issues](https://github.com/Data-Wise/homebrew-tap/issues)
+### flow-cli
+
+ZSH workflow tools designed for ADHD brains.
+
+```bash
+brew install data-wise/tap/flow-cli
+
+# Usage
+g status        # Git status
+g feature start # Start feature branch
+tm switch       # Context switching
+```
+
+[Documentation](https://data-wise.github.io/flow-cli/)
 
 ## More Info
 
-- [Atlas Documentation](https://github.com/Data-Wise/atlas#readme)
-- [Nexus CLI Documentation](https://data-wise.github.io/nexus-cli/)
-- [Examify Documentation](https://data-wise.github.io/examify/)
-- [Examark Documentation](https://data-wise.github.io/examark/)
-- [aiterm Repository](https://github.com/Data-Wise/aiterm)
-- [Scribe Repository](https://github.com/Data-Wise/scribe)
+- [aiterm](https://github.com/Data-Wise/aiterm) - Terminal optimizer
+- [Atlas](https://github.com/Data-Wise/atlas) - Project state engine
+- [Examark](https://data-wise.github.io/examark/) - Exam generator
+- [flow-cli](https://data-wise.github.io/flow-cli/) - ZSH workflow tools
+- [MCP Bridge](https://data-wise.github.io/mcp-bridge/) - Claude.ai MCP connector
+- [Nexus CLI](https://data-wise.github.io/nexus-cli/) - Knowledge workflow
+- [Scribe](https://github.com/Data-Wise/scribe) - Distraction-free writer
+
+## Issues
+
+- [Tap Issues](https://github.com/Data-Wise/homebrew-tap/issues)
