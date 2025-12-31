@@ -1,28 +1,10 @@
-# IMPORTANT: This formula is ready but requires nexus-cli to be published to PyPI first.
-#
-# To activate this formula:
-# 1. Publish nexus-cli 0.5.0 to PyPI using: uv build && uv publish
-# 2. Download: curl -sL https://files.pythonhosted.org/packages/source/n/nexus-cli/nexus_cli-0.5.0.tar.gz -o nexus-cli-0.5.0.tar.gz
-# 3. Calculate SHA256: shasum -a 256 nexus-cli-0.5.0.tar.gz
-# 4. Update the sha256 value below
-# 5. Uncomment the url line and remove the version line
-# 6. Remove this comment block
-# 7. Test: brew install --build-from-source data-wise/tap/nexus-cli
-
 class NexusCli < Formula
   include Language::Python::Virtualenv
 
   desc "Knowledge workflow CLI for research, teaching, and writing"
   homepage "https://data-wise.github.io/nexus-cli"
-  # Uncomment when published to PyPI:
-  # url "https://files.pythonhosted.org/packages/source/n/nexus-cli/nexus_cli-0.5.0.tar.gz"
-  # sha256 "REPLACE_WITH_ACTUAL_SHA256"
-  
-  # Temporary placeholder (remove when activating):
-  url "https://github.com/Data-Wise/homebrew-tap/raw/main/README.md"
-  version "0.5.0-dev"
-  sha256 "7c6e0c3b4b8f4d3e8f9e0b1c2a3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d"
-  
+  url "https://files.pythonhosted.org/packages/source/n/nexus-cli/nexus_cli-0.3.0.tar.gz"
+  sha256 "dd1fb4b80d4f0f2b9a7e9c514b682b45bd3913bf42a05d5931cba78e1136e8be"
   license "MIT"
 
   depends_on "python@3.12"
@@ -99,15 +81,11 @@ class NexusCli < Formula
   end
 
   def install
-    # This will fail until published to PyPI - that's intentional
-    # virtualenv_install_with_resources
-    
-    # Temporary install method (remove when activating):
-    odie "nexus-cli is not yet published to PyPI. See formula comments for activation steps."
+    virtualenv_install_with_resources
   end
 
   test do
-    assert_match "0.5.0", shell_output("#{bin}/nexus --version")
+    assert_match "0.3.0", shell_output("#{bin}/nexus --version")
     system bin/"nexus", "doctor"
   end
 
