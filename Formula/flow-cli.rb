@@ -5,13 +5,13 @@ class FlowCli < Formula
   desc "ZSH workflow tools designed for ADHD brains"
   homepage "https://data-wise.github.io/flow-cli/"
   url "https://github.com/Data-Wise/flow-cli/archive/refs/tags/v4.7.0.tar.gz"
-  sha256 "fc6f22a9c9273af759b6e6611a039a84f7f3b4c632a77c1f5ce24f517bca166c"
+  sha256 "fd34c5dc66df55348e9eb50639ced44cfce046d65989a00b8d1e7b277ee0c74c"
   license "MIT"
   head "https://github.com/Data-Wise/flow-cli.git", branch: "main"
 
-  depends_on "zsh"
-  depends_on "git"
   depends_on "fzf"
+  depends_on "git"
+  depends_on "zsh"
 
   def install
     # Install the plugin files
@@ -50,10 +50,10 @@ class FlowCli < Formula
 
   test do
     # Test that the plugin file exists
-    assert_predicate prefix/"flow.plugin.zsh", :exist?
+    assert_path_exists prefix/"flow.plugin.zsh"
 
     # Test that flow command is defined in the plugin
-    output = shell_output("grep -l 'flow()' #{prefix}/**/*.zsh", 0)
+    output = shell_output("grep -l 'flow()' #{prefix}/**/*.zsh")
     assert_match "flow", output
   end
 end
