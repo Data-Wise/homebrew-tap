@@ -4,8 +4,8 @@
 class FlowCli < Formula
   desc "ZSH workflow tools designed for ADHD brains"
   homepage "https://data-wise.github.io/flow-cli/"
-  url "https://github.com/Data-Wise/flow-cli/archive/refs/tags/v4.5.4.tar.gz"
-  sha256 "45cbf6bee0f4070f047dcac579b834f4c6328dc60b6b1991e8aed091629f8076"
+  url "https://github.com/Data-Wise/flow-cli/archive/refs/tags/v4.5.5.tar.gz"
+  sha256 "415d996c120606463b2ea089e735124b65a92c0a70521b58d0513b36700189ac"
   license "MIT"
   head "https://github.com/Data-Wise/flow-cli.git", branch: "main"
 
