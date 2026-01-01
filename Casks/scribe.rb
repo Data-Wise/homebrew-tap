@@ -1,6 +1,6 @@
 cask "scribe" do
-  version "1.1.0"
-  sha256 "bae1e26f1265abc733cd13ae6d612cdf655f5c2ce1aedc5a4b74418d508a6ce1"
+  version "1.9.0"
+  sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
 
   url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
 
@@ -38,10 +38,11 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.1.0:"
-    ohai "  • Project System - organize notes by project"
-    ohai "  • Note Search - full-text search with FTS5"
-    ohai "  • Scribe CLI - terminal access (scribe help)"
+    ohai "What's New in v1.9.0:"
+    ohai "  • Settings Enhancement - ⌘, fuzzy search, theme gallery"
+    ohai "  • Quick Actions Customization - drag-to-reorder, edit prompts, shortcuts"
+    ohai "  • Project Templates - Research+, Teaching+, Dev+, Writing+, Minimal"
+    ohai "  • 1033 tests passing - comprehensive test coverage"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -64,26 +65,30 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.1.0:
-    • Project System - organize notes by project
-    • Note Search - full-text search with FTS5
-    • Scribe CLI - terminal access (run: scribe help)
+    New in v1.9.0:
+    • Settings Enhancement - ⌘, fuzzy search, theme gallery
+    • Quick Actions Customization - drag-to-reorder, edit prompts, shortcuts
+    • Project Templates - Research+, Teaching+, Dev+, Writing+, Minimal
+    • 1033 tests passing - comprehensive test coverage
 
     Features:
     • HybridEditor (Markdown + Preview)
-    • 10 ADHD-friendly themes
+    • 8 ADHD-friendly themes (visual gallery)
     • 14 recommended fonts
     • Wiki-links and tags
     • Focus mode & global hotkey (⌘⇧N)
     • LaTeX math (KaTeX)
     • Citation autocomplete
     • Export via Pandoc
+    • Quick Actions (✨ Improve, 📝 Expand, 📋 Summarize, 💡 Explain, 🔍 Research)
 
     Keyboard Shortcuts:
-    • ⌘⇧N  Open Scribe from anywhere
-    • ⌘K   Command palette
-    • ⌘⇧F  Toggle focus mode
-    • ⌘E   Toggle write/preview mode
+    • ⌘⇧N    Open Scribe from anywhere
+    • ⌘,     Settings (fuzzy search)
+    • ⌘K     Command palette
+    • ⌘⇧F    Toggle focus mode
+    • ⌘E     Toggle write/preview mode
+    • ⌘⌥1-9  Quick Actions (customizable)
 
     Optional Dependencies:
     • Pandoc: brew install pandoc
