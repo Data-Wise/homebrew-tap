@@ -1,6 +1,6 @@
 cask "scribe" do
-  version "1.9.0"
-  sha256 "511bce4a7774be13837687cfffd5a60df6472f05835670a5bb1d491c16777043"
+  version "1.10.0"
+  sha256 "92a593045bccafccc566d7c256a151623d329446bcbf8a6c1b3bfb62ee9c2b99"
 
   url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
 
@@ -38,11 +38,12 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.9.0:"
-    ohai "  • Settings Enhancement - ⌘, fuzzy search, theme gallery"
-    ohai "  • Quick Actions Customization - drag-to-reorder, edit prompts, shortcuts"
-    ohai "  • Project Templates - Research+, Teaching+, Dev+, Writing+, Minimal"
-    ohai "  • 1033 tests passing - comprehensive test coverage"
+    ohai "What's New in v1.10.0:"
+    ohai "  • Live Preview Mode - Obsidian-style hidden syntax (⌘2)"
+    ohai "  • LaTeX Math Rendering - inline $...$ and display $$...$$"
+    ohai "  • Three Editor Modes - Source (⌘1), Live (⌘2), Reading (⌘3)"
+    ohai "  • ⌘E to cycle editor modes"
+    ohai "  • 930 unit + 12 E2E tests passing"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -65,11 +66,12 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.9.0:
-    • Settings Enhancement - ⌘, fuzzy search, theme gallery
-    • Quick Actions Customization - drag-to-reorder, edit prompts, shortcuts
-    • Project Templates - Research+, Teaching+, Dev+, Writing+, Minimal
-    • 1033 tests passing - comprehensive test coverage
+    New in v1.10.0:
+    • Live Preview Mode - Obsidian-style hidden syntax (⌘2)
+    • LaTeX Math Rendering - inline $...$ and display $$...$$
+    • Three Editor Modes - Source (⌘1), Live (⌘2), Reading (⌘3)
+    • ⌘E to cycle editor modes
+    • Bug fixes: race condition, tab opening
 
     Features:
     • HybridEditor (Markdown + Preview)
