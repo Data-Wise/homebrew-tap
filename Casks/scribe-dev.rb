@@ -1,6 +1,6 @@
 cask "scribe-dev" do
   version "1.9.0"
-  sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+  sha256 "511bce4a7774be13837687cfffd5a60df6472f05835670a5bb1d491c16777043"
 
   url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
 
