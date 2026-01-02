@@ -1,12 +1,16 @@
 cask "scribe" do
-  version "1.11.0"
-  sha256 "2f3dc6354025e7a0ab9421e45ccbae531e4916590c79baa766995a4526f63911"
+  version "1.12.0"
 
-  url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
+  # Architecture-specific SHA256 hashes
+  on_arm do
+    sha256 "bcf2f71c33f3f8b8144dcd1b773a7b7452225768d36ce05b96bf2d6caf5e6d45"
+    url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
+  end
 
-  # Apple Silicon only for now (Intel builds coming soon)
-  arch arm: "aarch64"
-  depends_on arch: :arm64
+  on_intel do
+    sha256 "ce81112ab2e2f27e25fb9a3cfe1d65c3c2755dc0ae1aac86e143aca6f316565a"
+    url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
+  end
 
   name "Scribe"
   desc "ADHD-friendly distraction-free writer with LaTeX, citations, and Pandoc export"
@@ -38,12 +42,12 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.11.0:"
-    ohai "  • Callout Support - 11 Obsidian-style callout types"
-    ohai "  • Type-specific colors (note, tip, warning, danger, etc.)"
-    ohai "  • Multi-line callouts with titles"
-    ohai "  • Works in all editor modes (Source/Live/Reading)"
-    ohai "  • 978 tests passing (930 unit + 48 E2E)"
+    ohai "What's New in v1.12.0:"
+    ohai "  • Browser Mode Fix - Wiki links and tags now indexed correctly"
+    ohai "  • Backlinks panel fully functional in browser mode"
+    ohai "  • Tag filtering working in browser mode"
+    ohai "  • 930 unit tests passing (21 new component tests)"
+    ohai "  • Intel Mac support added (both Apple Silicon and Intel)"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -66,12 +70,17 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.11.0:
+    New in v1.12.0:
+    • Browser Mode Fix - Wiki links and tags now indexed correctly
+    • Backlinks panel fully functional
+    • Tag filtering working
+    • 930 unit tests passing (21 new component tests)
+    • Universal Binary - Now supports both Apple Silicon and Intel Macs
+
+    Previous Release (v1.11.0):
     • Callout Support - 11 Obsidian-style callout types
     • Type-specific colors (note, tip, warning, danger, info, success, etc.)
     • Multi-line callouts with custom titles
-    • Works seamlessly in all three editor modes
-    • 978 tests passing (930 unit + 48 E2E)
 
     Features:
     • Three Editor Modes - Source (⌘1), Live Preview (⌘2), Reading (⌘3)
@@ -79,7 +88,7 @@ cask "scribe" do
     • LaTeX Math - KaTeX rendering ($...$ inline, $$...$$ display)
     • 8 ADHD-friendly themes (visual gallery)
     • 14 recommended fonts
-    • Wiki-links and tags
+    • Wiki-links and tags with backlinks
     • Focus mode & global hotkey (⌘⇧N)
     • Citation autocomplete
     • Export via Pandoc
