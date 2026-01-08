@@ -1,15 +1,16 @@
 cask "scribe" do
-  version "1.12.0"
+  version "1.14.0"
 
   # Architecture-specific SHA256 hashes
   on_arm do
-    sha256 "bcf2f71c33f3f8b8144dcd1b773a7b7452225768d36ce05b96bf2d6caf5e6d45"
+    sha256 "4e3e5f8b57a7533de3e863576bba4fd3df51a5f6d5a8c5c479534c32c02a7788"
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
 
+  # Intel build pending - use v1.12.0 for Intel Macs
   on_intel do
     sha256 "ce81112ab2e2f27e25fb9a3cfe1d65c3c2755dc0ae1aac86e143aca6f316565a"
-    url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
+    url "https://github.com/Data-Wise/scribe/releases/download/v1.12.0/Scribe_1.12.0_x64.dmg"
   end
 
   name "Scribe"
@@ -42,12 +43,12 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.12.0:"
-    ohai "  • Browser Mode Fix - Wiki links and tags now indexed correctly"
-    ohai "  • Backlinks panel fully functional in browser mode"
-    ohai "  • Tag filtering working in browser mode"
-    ohai "  • 930 unit tests passing (21 new component tests)"
-    ohai "  • Intel Mac support added (both Apple Silicon and Intel)"
+    ohai "What's New in v1.14.0:"
+    ohai "  • WikiLink Navigation - Single-click to navigate (was double-click)"
+    ohai "  • Cmd+Click in Source mode for WikiLink navigation"
+    ohai "  • Mode preservation when navigating via backlinks"
+    ohai "  • Cursor indicator shows pointer when Cmd is held"
+    ohai "  • 1984 tests passing"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -70,17 +71,18 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.12.0:
-    • Browser Mode Fix - Wiki links and tags now indexed correctly
-    • Backlinks panel fully functional
-    • Tag filtering working
-    • 930 unit tests passing (21 new component tests)
-    • Universal Binary - Now supports both Apple Silicon and Intel Macs
+    New in v1.14.0:
+    • WikiLink Navigation - Single-click to navigate (was double-click)
+    • Cmd+Click in Source mode for WikiLink navigation
+    • Mode preservation when navigating via backlinks
+    • Cursor indicator shows pointer when Cmd is held
+    • Live Preview polish (math spacing, syntax highlighting)
+    • 1984 tests passing
 
-    Previous Release (v1.11.0):
-    • Callout Support - 11 Obsidian-style callout types
-    • Type-specific colors (note, tip, warning, danger, info, success, etc.)
-    • Multi-line callouts with custom titles
+    Previous Release (v1.12.0):
+    • Browser Mode Fix - Wiki links and tags indexed correctly
+    • Backlinks panel fully functional in browser mode
+    • Tag filtering working in browser mode
 
     Features:
     • Three Editor Modes - Source (⌘1), Live Preview (⌘2), Reading (⌘3)
