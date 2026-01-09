@@ -6,7 +6,8 @@ class Scholar < Formula
 
   def install
     # Install plugin to libexec (Homebrew-managed location)
-    libexec.install Dir["*"]
+    # Include hidden files like .claude-plugin
+    libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
     (bin/"scholar-install").write <<~EOS
