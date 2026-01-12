@@ -3,13 +3,12 @@ class Scholar < Formula
   homepage "https://github.com/Data-Wise/scholar"
   url "https://github.com/Data-Wise/scholar/archive/refs/tags/v2.0.0-alpha.1.tar.gz"
   sha256 "97c187211b4f464f7516ed85fbaad3ae34fcb8f1d515d712062eb72391e72796"
-  version "2.0.0-alpha.1"
   license "MIT"
 
   def install
     # Install plugin to libexec (Homebrew-managed location)
     # Include hidden files like .claude-plugin
-    libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
     (bin/"scholar-install").write <<~EOS
@@ -90,12 +89,6 @@ class Scholar < Formula
     system bin/"scholar-uninstall" if (bin/"scholar-uninstall").exist?
   end
 
-  test do
-    assert_predicate libexec/".claude-plugin/plugin.json", :exist?
-    assert_predicate libexec/"src/plugin-api/commands", :directory?
-    assert_predicate libexec/"src/plugin-api/skills", :directory?
-  end
-
   def caveats
     <<~EOS
       The Scholar plugin has been installed to:
@@ -110,5 +103,11 @@ class Scholar < Formula
       For more information:
         https://github.com/Data-Wise/scholar
     EOS
+  end
+
+  test do
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists libexec/"src/plugin-api/commands"
+    assert_path_exists libexec/"src/plugin-api/skills"
   end
 end
