@@ -26,14 +26,20 @@ class Scholar < Formula
 
       # Create plugins directory if it doesn't exist
       mkdir -p "$HOME/.claude/plugins"
+      chmod 755 "$HOME/.claude/plugins"
 
       # Remove existing installation
-      if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
+      if [ -L "$TARGET_DIR" ]; then
+          rm -f "$TARGET_DIR"
+      elif [ -d "$TARGET_DIR" ]; then
           rm -rf "$TARGET_DIR"
       fi
 
       # Create symlink to Homebrew-managed files
-      ln -sf "$SOURCE_DIR" "$TARGET_DIR"
+      ln -sf "$SOURCE_DIR" "$TARGET_DIR" || {
+          echo "Failed to create symlink. Trying alternative approach..."
+          ln -sfh "$SOURCE_DIR" "$TARGET_DIR"
+      }
 
       echo "✅ Scholar plugin installed successfully!"
       echo ""
