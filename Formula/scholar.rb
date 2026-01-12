@@ -1,12 +1,16 @@
 class Scholar < Formula
   desc "Academic workflows for research and teaching - Claude Code plugin"
   homepage "https://github.com/Data-Wise/scholar"
-  head "https://github.com/Data-Wise/scholar.git", branch: "main"
+  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v2.0.0-alpha.1.tar.gz"
+  sha256 "7eb84e4840d6f1b4df0c94cefdbb0b31790cd3adafea4bf8e847ddf08800c94f"
+  version "2.0.0-alpha.1"
   license "MIT"
 
   def install
-    # Install plugin to libexec (Homebrew-managed location)
+    # Extract and install plugin to libexec (Homebrew-managed location)
+    # The archive has prefix "scholar-v2.0.0-alpha.1/"
     # Include hidden files like .claude-plugin
+    cd "scholar-v2.0.0-alpha.1"
     libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
