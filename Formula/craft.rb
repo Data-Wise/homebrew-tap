@@ -1,7 +1,8 @@
 class Craft < Formula
   desc "Full-stack developer toolkit - 86 commands, 8 agents, 21 skills - Claude Code plugin"
   homepage "https://github.com/Data-Wise/craft"
-  head "https://github.com/Data-Wise/craft.git", branch: "main"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v1.17.0.tar.gz"
+  sha256 "ae6781155dbfc16d07a83d0d0626fba1286a7edfcfac6077d6a2efb08a6f3be5"
   license "MIT"
 
   def install
@@ -80,6 +81,7 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
+    assert_match "1.17.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 
   def caveats
