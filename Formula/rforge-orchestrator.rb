@@ -12,36 +12,55 @@ class RforgeOrchestrator < Formula
     libexec.install Dir["rforge-orchestrator/*"]
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
+    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"rforge-orchestrator-install").write <<~EOS
       #!/bin/bash
-      set -e
+      # Note: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="rforge-orchestrator"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      SOURCE_DIR="#{libexec}"
+      # Use stable opt path - Homebrew maintains this symlink across upgrades
+      SOURCE_DIR="$(brew --prefix)/opt/rforge-orchestrator/libexec"
 
       echo "Installing RForge Orchestrator plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
-      mkdir -p "$HOME/.claude/plugins"
+      mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
-      # Remove existing installation
+      # Remove existing installation (handle macOS extended attributes)
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
-          rm -rf "$TARGET_DIR"
+          rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
       # Create symlink to Homebrew-managed files
-      ln -sf "$SOURCE_DIR" "$TARGET_DIR"
+      # Try multiple approaches for macOS compatibility
+      LINK_SUCCESS=false
 
-      echo "✅ RForge Orchestrator plugin installed successfully!"
-      echo ""
-      echo "The plugin is now available in Claude Code."
-      echo "Use these slash commands:"
-      echo "  /rforge:analyze  - Analyze R project and recommend tools"
-      echo "  /rforge:quick    - Quick project analysis"
-      echo "  /rforge:thorough - Thorough multi-stage analysis"
-      echo ""
-      echo "To uninstall: brew uninstall rforge-orchestrator"
+      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      fi
+
+      if [ "$LINK_SUCCESS" = true ]; then
+          echo "✅ RForge Orchestrator plugin installed successfully!"
+          echo ""
+          echo "The plugin is now available in Claude Code."
+          echo "Use these slash commands:"
+          echo "  /rforge:analyze  - Analyze R project and recommend tools"
+          echo "  /rforge:quick    - Quick project analysis"
+          echo "  /rforge:thorough - Thorough multi-stage analysis"
+      else
+          echo "⚠️  Automatic symlink failed (macOS permissions)."
+          echo ""
+          echo "Run this command manually to complete installation:"
+          echo ""
+          echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+          echo ""
+          exit 0  # Don't fail the brew install
+      fi
     EOS
 
     (bin/"rforge-orchestrator-uninstall").write <<~EOS
@@ -92,6 +111,9 @@ class RforgeOrchestrator < Formula
         /rforge:analyze  - Analyze R project and recommend tools
         /rforge:quick    - Quick project analysis
         /rforge:thorough - Thorough multi-stage analysis
+
+      If symlink failed (macOS permissions), run manually:
+        ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator
 
       For more information:
         https://github.com/Data-Wise/claude-plugins/tree/main/rforge-orchestrator

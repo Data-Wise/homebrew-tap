@@ -11,13 +11,15 @@ class Craft < Formula
     libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
+    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"craft-install").write <<~EOS
       #!/bin/bash
       # Note: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="craft"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      SOURCE_DIR="#{libexec}"
+      # Use stable opt path - Homebrew maintains this symlink across upgrades
+      SOURCE_DIR="$(brew --prefix)/opt/craft/libexec"
 
       echo "Installing Craft plugin to Claude Code..."
 
@@ -121,7 +123,7 @@ class Craft < Formula
       Or:  /brainstorm
 
       If symlink failed (macOS permissions), run manually:
-        ln -sf #{libexec} ~/.claude/plugins/craft
+        ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft
 
       For more information:
         https://github.com/Data-Wise/craft

@@ -11,13 +11,15 @@ class Scholar < Formula
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
+    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"scholar-install").write <<~EOS
       #!/bin/bash
       # Note: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="scholar"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      SOURCE_DIR="#{libexec}"
+      # Use stable opt path - Homebrew maintains this symlink across upgrades
+      SOURCE_DIR="$(brew --prefix)/opt/scholar/libexec"
 
       echo "Installing Scholar plugin to Claude Code..."
 
@@ -114,7 +116,7 @@ class Scholar < Formula
       Try: /arxiv "your research topic"
 
       If symlink failed (macOS permissions), run manually:
-        ln -sf #{libexec} ~/.claude/plugins/scholar
+        ln -sf $(brew --prefix)/opt/scholar/libexec ~/.claude/plugins/scholar
 
       For more information:
         https://github.com/Data-Wise/scholar
