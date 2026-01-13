@@ -13,7 +13,7 @@ class Scholar < Formula
     # Create wrapper script that symlinks to ~/.claude/plugins/
     (bin/"scholar-install").write <<~EOS
       #!/bin/bash
-      set -e
+      # Note: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="scholar"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
@@ -22,42 +22,55 @@ class Scholar < Formula
       echo "Installing Scholar plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
-      mkdir -p "$HOME/.claude/plugins"
-      chmod 755 "$HOME/.claude/plugins"
+      mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
-      # Remove existing installation
-      if [ -L "$TARGET_DIR" ]; then
-          rm -f "$TARGET_DIR"
-      elif [ -d "$TARGET_DIR" ]; then
-          rm -rf "$TARGET_DIR"
+      # Remove existing installation (handle macOS extended attributes)
+      if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
+          rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
       # Create symlink to Homebrew-managed files
-      ln -sf "$SOURCE_DIR" "$TARGET_DIR" || {
-          echo "Failed to create symlink. Trying alternative approach..."
-          ln -sfh "$SOURCE_DIR" "$TARGET_DIR"
-      }
+      # Try multiple approaches for macOS compatibility
+      LINK_SUCCESS=false
 
-      echo "✅ Scholar plugin installed successfully!"
-      echo ""
-      echo "21 commands available (14 research + 7 teaching):"
-      echo ""
-      echo "Literature Management:"
-      echo "  /arxiv <query>        - Search arXiv for papers"
-      echo "  /doi <doi>            - Look up paper by DOI"
-      echo "  /bib:search <query>   - Search BibTeX files"
-      echo "  /bib:add <file>       - Add BibTeX entries"
-      echo ""
-      echo "Teaching:"
-      echo "  /teaching:syllabus    - Generate course syllabus"
-      echo "  /teaching:assignment  - Create homework assignment"
-      echo "  /teaching:rubric      - Generate grading rubric"
-      echo "  /teaching:slides      - Create lecture slides"
-      echo "  /teaching:quiz        - Generate quiz questions"
-      echo "  /teaching:exam        - Create comprehensive exam"
-      echo "  /teaching:feedback    - Generate student feedback"
-      echo ""
-      echo "To uninstall: brew uninstall scholar"
+      # Method 1: Standard symlink
+      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 2: Remove and recreate (handles some edge cases)
+      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Use ln -sfh (macOS specific, replaces symlink atomically)
+      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      fi
+
+      if [ "$LINK_SUCCESS" = true ]; then
+          echo "✅ Scholar plugin installed successfully!"
+          echo ""
+          echo "21 commands available (14 research + 7 teaching):"
+          echo ""
+          echo "Literature Management:"
+          echo "  /arxiv <query>        - Search arXiv for papers"
+          echo "  /doi <doi>            - Look up paper by DOI"
+          echo "  /bib:search <query>   - Search BibTeX files"
+          echo "  /bib:add <file>       - Add BibTeX entries"
+          echo ""
+          echo "Teaching:"
+          echo "  /teach:syllabus       - Generate course syllabus"
+          echo "  /teach:homework       - Create homework assignment"
+          echo "  /teach:rubric         - Generate grading rubric"
+          echo "  /teach:quiz           - Generate quiz questions"
+          echo "  /teach:exam           - Create comprehensive exam"
+          echo "  /teach:feedback       - Generate student feedback"
+      else
+          echo "⚠️  Automatic symlink failed (macOS permissions)."
+          echo ""
+          echo "Run this command manually to complete installation:"
+          echo ""
+          echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+          echo ""
+          exit 0  # Don't fail the brew install
+      fi
     EOS
 
     (bin/"scholar-uninstall").write <<~EOS
@@ -99,6 +112,9 @@ class Scholar < Formula
         - 7 teaching commands (syllabus, assignments, exams, feedback)
 
       Try: /arxiv "your research topic"
+
+      If symlink failed (macOS permissions), run manually:
+        ln -sf #{libexec} ~/.claude/plugins/scholar
 
       For more information:
         https://github.com/Data-Wise/scholar

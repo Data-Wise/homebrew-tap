@@ -13,7 +13,7 @@ class Craft < Formula
     # Create wrapper script that symlinks to ~/.claude/plugins/
     (bin/"craft-install").write <<~EOS
       #!/bin/bash
-      set -e
+      # Note: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="craft"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
@@ -22,29 +22,49 @@ class Craft < Formula
       echo "Installing Craft plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
-      mkdir -p "$HOME/.claude/plugins"
+      mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
-      # Remove existing installation
+      # Remove existing installation (handle macOS extended attributes)
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
-          rm -rf "$TARGET_DIR"
+          rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
       # Create symlink to Homebrew-managed files
-      ln -sf "$SOURCE_DIR" "$TARGET_DIR"
+      # Try multiple approaches for macOS compatibility
+      LINK_SUCCESS=false
 
-      echo "✅ Craft plugin installed successfully!"
-      echo ""
-      echo "86 commands available (74 craft + 12 workflow):"
-      echo ""
-      echo "Quick Commands:"
-      echo "  /craft:do <task>      - Universal task router"
-      echo "  /craft:orchestrate    - Launch orchestrator mode"
-      echo "  /brainstorm           - ADHD-friendly brainstorming"
-      echo "  /craft:check          - Pre-flight validation"
-      echo ""
-      echo "Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
-      echo ""
-      echo "To uninstall: brew uninstall craft"
+      # Method 1: Standard symlink
+      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 2: Remove and recreate (handles some edge cases)
+      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Use ln -sfh (macOS specific, replaces symlink atomically)
+      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      fi
+
+      if [ "$LINK_SUCCESS" = true ]; then
+          echo "✅ Craft plugin installed successfully!"
+          echo ""
+          echo "86 commands available (74 craft + 12 workflow):"
+          echo ""
+          echo "Quick Commands:"
+          echo "  /craft:do <task>      - Universal task router"
+          echo "  /craft:orchestrate    - Launch orchestrator mode"
+          echo "  /brainstorm           - ADHD-friendly brainstorming"
+          echo "  /craft:check          - Pre-flight validation"
+          echo ""
+          echo "Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
+      else
+          echo "⚠️  Automatic symlink failed (macOS permissions)."
+          echo ""
+          echo "Run this command manually to complete installation:"
+          echo ""
+          echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+          echo ""
+          exit 0  # Don't fail the brew install
+      fi
     EOS
 
     (bin/"craft-uninstall").write <<~EOS
@@ -99,6 +119,9 @@ class Craft < Formula
 
       Try: /craft:do "your task"
       Or:  /brainstorm
+
+      If symlink failed (macOS permissions), run manually:
+        ln -sf #{libexec} ~/.claude/plugins/craft
 
       For more information:
         https://github.com/Data-Wise/craft
