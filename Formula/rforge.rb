@@ -45,19 +45,36 @@ class Rforge < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
+          # Also create symlink in local-marketplace for plugin discovery
+          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
+          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+
+          # Try to auto-enable via jq if available
+          SETTINGS_FILE="$HOME/.claude/settings.json"
+          AUTO_ENABLED=false
+          if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$SETTINGS_FILE"
+                  AUTO_ENABLED=true
+              else
+                  rm -f "$TEMP_FILE" 2>/dev/null
+              fi
+          fi
+
           echo "✅ RForge plugin installed successfully!"
           echo ""
+          if [ "$AUTO_ENABLED" = true ]; then
+              echo "Plugin auto-enabled in Claude Code."
+          else
+              echo "To enable, run: claude plugin install rforge@local-plugins"
+          fi
+          echo ""
           echo "15 commands for R package ecosystem management:"
-          echo ""
-          echo "Core Commands:"
-          echo "  /rforge:analyze      - Analyze R project structure"
-          echo "  /rforge:status       - Get ecosystem status"
-          echo "  /rforge:detect       - Auto-detect project type"
-          echo "  /rforge:cascade      - Plan coordinated updates"
-          echo "  /rforge:deps         - Build dependency graph"
-          echo ""
-          echo "Modes: default, debug, optimize, release"
-          echo "Formats: terminal, json, markdown"
+          echo "  /rforge:analyze, /rforge:status, /rforge:detect"
+          echo "  /rforge:cascade, /rforge:deps"
+          echo "  Modes: default, debug, optimize, release"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -109,6 +126,9 @@ class Rforge < Formula
       The RForge plugin has been installed to:
         ~/.claude/plugins/rforge
 
+      If not auto-enabled, run:
+        claude plugin install rforge@local-plugins
+
       Requirements:
         - Claude Code CLI must be installed
         - RForge MCP server must be configured in ~/.claude/settings.json
@@ -118,7 +138,6 @@ class Rforge < Formula
         - Auto-detect single package vs ecosystem
         - Dependency analysis and cascade planning
         - Mode system: default, debug, optimize, release
-        - Format options: terminal, json, markdown
 
       Try: /rforge:status
 

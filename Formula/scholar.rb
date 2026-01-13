@@ -5,6 +5,8 @@ class Scholar < Formula
   sha256 "157edc9c8ff1126d36ec6d87b486dedac02c35d7574df6f3eec8009fdb3a6225"
   license "MIT"
 
+  depends_on "jq" => :optional
+
   def install
     # Install plugin to libexec (Homebrew-managed location)
     # Include hidden files like .claude-plugin
@@ -47,23 +49,35 @@ class Scholar < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
+          # Also create symlink in local-marketplace for plugin discovery
+          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
+          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+
+          # Try to auto-enable via jq if available
+          SETTINGS_FILE="$HOME/.claude/settings.json"
+          AUTO_ENABLED=false
+          if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$SETTINGS_FILE"
+                  AUTO_ENABLED=true
+              else
+                  rm -f "$TEMP_FILE" 2>/dev/null
+              fi
+          fi
+
           echo "✅ Scholar plugin installed successfully!"
           echo ""
+          if [ "$AUTO_ENABLED" = true ]; then
+              echo "Plugin auto-enabled in Claude Code."
+          else
+              echo "To enable, run: claude plugin install scholar@local-plugins"
+          fi
+          echo ""
           echo "21 commands available (14 research + 7 teaching):"
-          echo ""
-          echo "Literature Management:"
-          echo "  /arxiv <query>        - Search arXiv for papers"
-          echo "  /doi <doi>            - Look up paper by DOI"
-          echo "  /bib:search <query>   - Search BibTeX files"
-          echo "  /bib:add <file>       - Add BibTeX entries"
-          echo ""
-          echo "Teaching:"
-          echo "  /teach:syllabus       - Generate course syllabus"
-          echo "  /teach:homework       - Create homework assignment"
-          echo "  /teach:rubric         - Generate grading rubric"
-          echo "  /teach:quiz           - Generate quiz questions"
-          echo "  /teach:exam           - Create comprehensive exam"
-          echo "  /teach:feedback       - Generate student feedback"
+          echo "  /arxiv, /doi, /bib:search, /bib:add"
+          echo "  /teach:exam, /teach:quiz, /teach:syllabus, /teach:homework"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -108,6 +122,9 @@ class Scholar < Formula
     <<~EOS
       The Scholar plugin has been installed to:
         ~/.claude/plugins/scholar
+
+      If not auto-enabled, run:
+        claude plugin install scholar@local-plugins
 
       21 commands available for academic workflows:
         - 14 research commands (literature, manuscript, simulation)

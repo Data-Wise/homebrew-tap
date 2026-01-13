@@ -5,6 +5,8 @@ class Craft < Formula
   sha256 "ae6781155dbfc16d07a83d0d0626fba1286a7edfcfac6077d6a2efb08a6f3be5"
   license "MIT"
 
+  depends_on "jq" => :optional
+
   def install
     # Install plugin to libexec (Homebrew-managed location)
     # Include hidden files like .claude-plugin
@@ -47,17 +49,35 @@ class Craft < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
+          # Also create symlink in local-marketplace for plugin discovery
+          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
+          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+
+          # Try to auto-enable via jq if available
+          SETTINGS_FILE="$HOME/.claude/settings.json"
+          AUTO_ENABLED=false
+          if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$SETTINGS_FILE"
+                  AUTO_ENABLED=true
+              else
+                  rm -f "$TEMP_FILE" 2>/dev/null
+              fi
+          fi
+
           echo "✅ Craft plugin installed successfully!"
           echo ""
+          if [ "$AUTO_ENABLED" = true ]; then
+              echo "Plugin auto-enabled in Claude Code."
+          else
+              echo "To enable, run: claude plugin install craft@local-plugins"
+          fi
+          echo ""
           echo "86 commands available (74 craft + 12 workflow):"
-          echo ""
-          echo "Quick Commands:"
-          echo "  /craft:do <task>      - Universal task router"
-          echo "  /craft:orchestrate    - Launch orchestrator mode"
-          echo "  /brainstorm           - ADHD-friendly brainstorming"
-          echo "  /craft:check          - Pre-flight validation"
-          echo ""
-          echo "Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
+          echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
+          echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -110,6 +130,9 @@ class Craft < Formula
     <<~EOS
       The Craft plugin has been installed to:
         ~/.claude/plugins/craft
+
+      If not auto-enabled, run:
+        claude plugin install craft@local-plugins
 
       86 commands for full-stack development:
         - Architecture & planning

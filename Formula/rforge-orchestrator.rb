@@ -45,13 +45,33 @@ class RforgeOrchestrator < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
+          # Also create symlink in local-marketplace for plugin discovery
+          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
+          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+
+          # Try to auto-enable via jq if available
+          SETTINGS_FILE="$HOME/.claude/settings.json"
+          AUTO_ENABLED=false
+          if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$SETTINGS_FILE"
+                  AUTO_ENABLED=true
+              else
+                  rm -f "$TEMP_FILE" 2>/dev/null
+              fi
+          fi
+
           echo "✅ RForge Orchestrator plugin installed successfully!"
           echo ""
-          echo "The plugin is now available in Claude Code."
-          echo "Use these slash commands:"
-          echo "  /rforge:analyze  - Analyze R project and recommend tools"
-          echo "  /rforge:quick    - Quick project analysis"
-          echo "  /rforge:thorough - Thorough multi-stage analysis"
+          if [ "$AUTO_ENABLED" = true ]; then
+              echo "Plugin auto-enabled in Claude Code."
+          else
+              echo "To enable, run: claude plugin install rforge-orchestrator@local-plugins"
+          fi
+          echo ""
+          echo "Commands: /rforge:analyze, /rforge:quick, /rforge:thorough"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -102,6 +122,9 @@ class RforgeOrchestrator < Formula
     <<~EOS
       The RForge Orchestrator plugin has been installed to:
         ~/.claude/plugins/rforge-orchestrator
+
+      If not auto-enabled, run:
+        claude plugin install rforge-orchestrator@local-plugins
 
       Requirements:
         - Claude Code CLI must be installed
