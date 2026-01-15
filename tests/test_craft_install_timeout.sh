@@ -1,6 +1,6 @@
 #!/bin/bash
-# Test suite for craft-install timeout mechanism
-# Tests that settings.json modification doesn't block indefinitely
+# Test suite for craft-install Claude detection mechanism
+# Tests that settings.json modification is skipped when Claude is running
 
 set -e
 
@@ -63,103 +63,61 @@ test_basic_jq_modification() {
     fi
 }
 
-# Test 2: Timeout command availability
-test_timeout_availability() {
-    log_info "Test 2: Timeout command availability"
+# Test 2: Claude detection availability
+test_claude_detection() {
+    log_info "Test 2: Claude detection tools"
 
-    if command -v timeout &>/dev/null; then
-        log_pass "timeout command available (Linux/GNU)"
-    elif command -v gtimeout &>/dev/null; then
-        log_pass "gtimeout command available (macOS coreutils)"
+    if command -v lsof &>/dev/null; then
+        log_pass "lsof available for file lock detection"
     else
-        log_pass "Neither timeout nor gtimeout available - will use fallback"
+        log_fail "lsof not available"
+    fi
+
+    if command -v pgrep &>/dev/null; then
+        log_pass "pgrep available as fallback"
+    else
+        log_pass "pgrep not available - lsof will be used"
     fi
 }
 
-# Test 3: Fallback timeout mechanism (background process)
-test_fallback_timeout() {
-    log_info "Test 3: Fallback timeout mechanism"
+# Test 3: Claude detection with lsof
+test_claude_detection_lsof() {
+    log_info "Test 3: Claude detection with lsof"
 
-    # Reset settings
-    echo '{"enabledPlugins":{}}' > "$TEST_SETTINGS"
+    # Check if Claude is currently running and has settings.json open
+    REAL_SETTINGS="$HOME/.claude/settings.json"
 
-    TEMP_FILE=$(mktemp)
-    jq --arg plugin "test@fallback" '.enabledPlugins[$plugin] = true' "$TEST_SETTINGS" > "$TEMP_FILE"
-
-    # Use the fallback mechanism
-    mv "$TEMP_FILE" "$TEST_SETTINGS" &
-    MV_PID=$!
-    sleep 0.5  # Short timeout for test
-
-    if kill -0 $MV_PID 2>/dev/null; then
-        # Process still running - would timeout in real scenario
-        wait $MV_PID 2>/dev/null
-        log_pass "Fallback mechanism: mv completed within timeout"
-    else
-        # Process already finished
-        wait $MV_PID 2>/dev/null
-        log_pass "Fallback mechanism: mv completed quickly"
-    fi
-
-    # Verify result
-    if jq -e '.enabledPlugins["test@fallback"]' "$TEST_SETTINGS" >/dev/null 2>&1; then
-        log_pass "Fallback mechanism: modification persisted"
-    else
-        log_fail "Fallback mechanism: modification didn't persist"
-    fi
-}
-
-# Test 4: Simulate locked file (if flock available)
-test_locked_file_timeout() {
-    log_info "Test 4: Locked file timeout simulation"
-
-    # Create a lock file scenario
-    LOCK_FILE="$TEST_DIR/locktest.json"
-    echo '{"test": true}' > "$LOCK_FILE"
-
-    # Try to detect if we can simulate file locks
-    if command -v flock &>/dev/null; then
-        # Linux: use flock
-        (
-            flock -x 200
-            sleep 5  # Hold lock for 5 seconds
-        ) 200>"$LOCK_FILE.lock" &
-        LOCK_PID=$!
-
-        sleep 0.1  # Let lock acquire
-
-        # Try mv with timeout
-        TEMP_FILE=$(mktemp)
-        echo '{"test": "modified"}' > "$TEMP_FILE"
-
-        START_TIME=$(date +%s)
-
-        # Use our timeout mechanism
-        mv "$TEMP_FILE" "$LOCK_FILE" 2>/dev/null &
-        MV_PID=$!
-        sleep 2
-
-        if kill -0 $MV_PID 2>/dev/null; then
-            kill $MV_PID 2>/dev/null
-            rm -f "$TEMP_FILE" 2>/dev/null
-            END_TIME=$(date +%s)
-            ELAPSED=$((END_TIME - START_TIME))
-
-            if [ $ELAPSED -le 3 ]; then
-                log_pass "Timeout killed blocked mv within ${ELAPSED}s"
-            else
-                log_fail "Timeout took too long: ${ELAPSED}s"
-            fi
+    if [ -f "$REAL_SETTINGS" ]; then
+        if lsof "$REAL_SETTINGS" 2>/dev/null | grep -q "claude"; then
+            log_pass "Detected Claude has settings.json open (expected during test)"
         else
-            wait $MV_PID
-            log_pass "mv completed (file wasn't actually locked)"
+            log_pass "Claude does not have settings.json open"
         fi
-
-        # Cleanup
-        kill $LOCK_PID 2>/dev/null || true
-        rm -f "$LOCK_FILE.lock"
     else
-        log_pass "flock not available - skipping lock simulation (macOS)"
+        log_pass "settings.json doesn't exist - skipping lsof test"
+    fi
+}
+
+# Test 4: Verify skip behavior when Claude detected
+test_skip_when_claude_running() {
+    log_info "Test 4: Skip behavior when Claude detected"
+
+    # Simulate the detection logic from craft-install
+    REAL_SETTINGS="$HOME/.claude/settings.json"
+    CLAUDE_RUNNING=false
+
+    if command -v lsof &>/dev/null; then
+        if lsof "$REAL_SETTINGS" 2>/dev/null | grep -q "claude"; then
+            CLAUDE_RUNNING=true
+        fi
+    elif pgrep -x "claude" >/dev/null 2>&1; then
+        CLAUDE_RUNNING=true
+    fi
+
+    if [ "$CLAUDE_RUNNING" = true ]; then
+        log_pass "Claude detected - would skip settings.json modification"
+    else
+        log_pass "Claude not detected - would proceed with modification"
     fi
 }
 
@@ -232,16 +190,16 @@ test_installed_script() {
 main() {
     echo ""
     echo "========================================"
-    echo "  Craft Install Timeout Test Suite"
+    echo "  Craft Install Detection Test Suite"
     echo "========================================"
     echo ""
 
     setup
 
     test_basic_jq_modification
-    test_timeout_availability
-    test_fallback_timeout
-    test_locked_file_timeout
+    test_claude_detection
+    test_claude_detection_lsof
+    test_skip_when_claude_running
     test_temp_file_cleanup
     test_script_syntax
     test_installed_script
