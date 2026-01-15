@@ -72,16 +72,31 @@ class Craft < Formula
           fi
 
           # Try to auto-enable via jq if available
+          # Note: Use timeout to prevent blocking if Claude Code has file locks
           SETTINGS_FILE="$HOME/.claude/settings.json"
           AUTO_ENABLED=false
           if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
               TEMP_FILE=$(mktemp)
               if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                  mv "$TEMP_FILE" "$SETTINGS_FILE"
-                  AUTO_ENABLED=true
-              else
-                  rm -f "$TEMP_FILE" 2>/dev/null
+                  # Use timeout to avoid blocking if Claude Code holds file locks
+                  if command -v timeout &>/dev/null; then
+                      timeout 2 mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
+                  elif command -v gtimeout &>/dev/null; then
+                      gtimeout 2 mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
+                  else
+                      # Fallback: try mv in background with sleep-based timeout
+                      mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null &
+                      MV_PID=$!
+                      sleep 2
+                      if kill -0 $MV_PID 2>/dev/null; then
+                          kill $MV_PID 2>/dev/null
+                          rm -f "$TEMP_FILE" 2>/dev/null
+                      else
+                          wait $MV_PID 2>/dev/null && AUTO_ENABLED=true
+                      fi
+                  fi
               fi
+              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
 
           echo "✅ Craft plugin installed successfully!"
