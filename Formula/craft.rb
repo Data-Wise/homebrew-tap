@@ -72,29 +72,25 @@ class Craft < Formula
           fi
 
           # Try to auto-enable via jq if available
-          # Note: Use timeout to prevent blocking if Claude Code has file locks
+          # Skip if Claude Code is running (holds file locks that can block mv)
           SETTINGS_FILE="$HOME/.claude/settings.json"
           AUTO_ENABLED=false
-          if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+          CLAUDE_RUNNING=false
+
+          # Check if Claude Code has settings.json open
+          if command -v lsof &>/dev/null; then
+              if lsof "$SETTINGS_FILE" 2>/dev/null | grep -q "claude"; then
+                  CLAUDE_RUNNING=true
+              fi
+          elif pgrep -x "claude" >/dev/null 2>&1; then
+              # Fallback: check if claude process is running
+              CLAUDE_RUNNING=true
+          fi
+
+          if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
               TEMP_FILE=$(mktemp)
               if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                  # Use timeout to avoid blocking if Claude Code holds file locks
-                  if command -v timeout &>/dev/null; then
-                      timeout 2 mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
-                  elif command -v gtimeout &>/dev/null; then
-                      gtimeout 2 mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
-                  else
-                      # Fallback: try mv in background with sleep-based timeout
-                      mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null &
-                      MV_PID=$!
-                      sleep 2
-                      if kill -0 $MV_PID 2>/dev/null; then
-                          kill $MV_PID 2>/dev/null
-                          rm -f "$TEMP_FILE" 2>/dev/null
-                      else
-                          wait $MV_PID 2>/dev/null && AUTO_ENABLED=true
-                      fi
-                  fi
+                  mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
               fi
               [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
@@ -103,6 +99,9 @@ class Craft < Formula
           echo ""
           if [ "$AUTO_ENABLED" = true ]; then
               echo "Plugin auto-enabled in Claude Code."
+          elif [ "$CLAUDE_RUNNING" = true ]; then
+              echo "Claude Code is running - skipped auto-enable to avoid conflicts."
+              echo "Run: claude plugin install craft@local-plugins"
           else
               echo "To enable, run: claude plugin install craft@local-plugins"
           fi
