@@ -72,22 +72,35 @@ class Scholar < Formula
           fi
 
           # Try to auto-enable via jq if available
+          # Skip if Claude Code is running (holds file locks that can block mv)
           SETTINGS_FILE="$HOME/.claude/settings.json"
           AUTO_ENABLED=false
-          if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+          CLAUDE_RUNNING=false
+
+          # Check if Claude Code has settings.json open
+          if command -v lsof &>/dev/null; then
+              if lsof "$SETTINGS_FILE" 2>/dev/null | grep -q "claude"; then
+                  CLAUDE_RUNNING=true
+              fi
+          elif pgrep -x "claude" >/dev/null 2>&1; then
+              CLAUDE_RUNNING=true
+          fi
+
+          if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
               TEMP_FILE=$(mktemp)
               if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                  mv "$TEMP_FILE" "$SETTINGS_FILE"
-                  AUTO_ENABLED=true
-              else
-                  rm -f "$TEMP_FILE" 2>/dev/null
+                  mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
               fi
+              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
 
           echo "✅ Scholar plugin installed successfully!"
           echo ""
           if [ "$AUTO_ENABLED" = true ]; then
               echo "Plugin auto-enabled in Claude Code."
+          elif [ "$CLAUDE_RUNNING" = true ]; then
+              echo "Claude Code is running - skipped auto-enable to avoid conflicts."
+              echo "Run: claude plugin install scholar@local-plugins"
           else
               echo "To enable, run: claude plugin install scholar@local-plugins"
           fi
