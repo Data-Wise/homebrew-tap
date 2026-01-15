@@ -1,5 +1,5 @@
 class Craft < Formula
-  desc "Full-stack developer toolkit - 86 commands, 8 agents, 21 skills - Claude Code plugin"
+  desc "Full-stack developer toolkit - 89 commands, 8 agents, 21 skills - Claude Code plugin"
   homepage "https://github.com/Data-Wise/craft"
   url "https://github.com/Data-Wise/craft/archive/refs/tags/v1.17.1.tar.gz"
   sha256 "36cef1df69fe4d0007dec134736c5f2652519ca9c00fc2a1f301505e97d96b27"
@@ -92,9 +92,11 @@ class Craft < Formula
               echo "To enable, run: claude plugin install craft@local-plugins"
           fi
           echo ""
-          echo "86 commands available (74 craft + 12 workflow):"
+          echo "89 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
+          echo ""
+          echo "After upgrades, sync with: claude plugin update craft@local-plugins"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -128,6 +130,15 @@ class Craft < Formula
   def post_install
     # Auto-install plugin after brew install
     system bin/"craft-install"
+
+    # Sync Claude Code plugin registry with new version
+    # This updates the cache so Claude Code loads the correct version
+    if which("claude")
+      system "claude", "plugin", "update", "craft@local-plugins"
+    end
+  rescue
+    # Don't fail if claude CLI not available or update fails
+    nil
   end
 
   def post_uninstall
@@ -151,7 +162,7 @@ class Craft < Formula
       If not auto-enabled, run:
         claude plugin install craft@local-plugins
 
-      86 commands for full-stack development:
+      89 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
@@ -161,6 +172,9 @@ class Craft < Formula
 
       Try: /craft:do "your task"
       Or:  /brainstorm
+
+      After upgrades, sync Claude Code registry:
+        claude plugin update craft@local-plugins
 
       If symlink failed (macOS permissions), run manually:
         ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft
