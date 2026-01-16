@@ -141,6 +141,15 @@ class Scholar < Formula
   def post_install
     # Auto-install plugin after brew install
     system bin/"scholar-install"
+
+    # Sync Claude Code plugin registry with new version
+    # This updates the cache so Claude Code loads the correct version
+    if which("claude")
+      system "claude", "plugin", "update", "scholar@local-plugins"
+    end
+  rescue
+    # Don't fail if claude CLI not available or update fails
+    nil
   end
 
   def post_uninstall
