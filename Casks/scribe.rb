@@ -1,9 +1,9 @@
 cask "scribe" do
-  version "1.14.0"
+  version "1.16.2"
 
   # Architecture-specific SHA256 hashes
   on_arm do
-    sha256 "4e3e5f8b57a7533de3e863576bba4fd3df51a5f6d5a8c5c479534c32c02a7788"
+    sha256 "5ca34fd366f9cd7b17669880b861d4d38ad37fd230a6d86e9435c36d438440fd"
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
 
@@ -43,12 +43,11 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.14.0:"
-    ohai "  • WikiLink Navigation - Single-click to navigate (was double-click)"
-    ohai "  • Cmd+Click in Source mode for WikiLink navigation"
-    ohai "  • Mode preservation when navigating via backlinks"
-    ohai "  • Cursor indicator shows pointer when Cmd is held"
-    ohai "  • 1984 tests passing"
+    ohai "What's New in v1.16.2:"
+    ohai "  • Technical Debt Remediation - 364 lines of dead code removed"
+    ohai "  • Extracted KeyboardShortcutHandler, EditorOrchestrator"
+    ohai "  • Extracted GeneralSettingsTab, EditorSettingsTab"
+    ohai "  • 2,163 tests passing (98.5%)"
     ohai ""
     ohai "Quick Start:"
     ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
@@ -71,18 +70,17 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.14.0:
-    • WikiLink Navigation - Single-click to navigate (was double-click)
-    • Cmd+Click in Source mode for WikiLink navigation
-    • Mode preservation when navigating via backlinks
-    • Cursor indicator shows pointer when Cmd is held
-    • Live Preview polish (math spacing, syntax highlighting)
-    • 1984 tests passing
+    New in v1.16.2:
+    • Technical Debt Remediation Phase 1 complete
+    • Removed 364 lines of unused code from production files
+    • Extracted KeyboardShortcutHandler, EditorOrchestrator from App.tsx
+    • Extracted GeneralSettingsTab, EditorSettingsTab from SettingsModal
+    • 2,163 tests passing (98.5%)
 
-    Previous Release (v1.12.0):
-    • Browser Mode Fix - Wiki links and tags indexed correctly
-    • Backlinks panel fully functional in browser mode
-    • Tag filtering working in browser mode
+    Previous Release (v1.16.0):
+    • Icon-Centric Sidebar - Per-icon expansion with accordion pattern
+    • Each icon remembers compact/card mode preference
+    • Smooth 200ms animations for expansion
 
     Features:
     • Three Editor Modes - Source (⌘1), Live Preview (⌘2), Reading (⌘3)
