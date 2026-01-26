@@ -1,15 +1,16 @@
 cask "scribe" do
-  version "1.16.2"
+  version "1.16.3"
 
   # Architecture-specific SHA256 hashes
   on_arm do
-    sha256 "390574f67891240fdc6786e6616407784c0955be62a1b9b8bd362c623e1cbe13"
+    sha256 "43173008228c5dd8a367110fc1f936e50d41bcb82b4b8794ac00c089034ebdb3"
+
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
-
   # Intel build pending - use v1.12.0 for Intel Macs
   on_intel do
-    sha256 "ce81112ab2e2f27e25fb9a3cfe1d65c3c2755dc0ae1aac86e143aca6f316565a"
+    sha256 "7fdf9319418afc71a9a3749ce69ede54600c47df21b43db028afbcbd0747863c"
+
     url "https://github.com/Data-Wise/scribe/releases/download/v1.12.0/Scribe_1.12.0_x64.dmg"
   end
 
@@ -34,7 +35,6 @@ cask "scribe" do
 
   # Conflicts with dev version
   conflicts_with cask: "data-wise/tap/scribe-dev"
-
   # Require macOS 10.15+ (Catalina)
   depends_on macos: ">= :catalina"
 
