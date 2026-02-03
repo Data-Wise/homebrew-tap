@@ -1,8 +1,8 @@
 class Scholar < Formula
   desc "Academic workflows for research and teaching - Claude Code plugin"
   homepage "https://github.com/Data-Wise/scholar"
-  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v2.6.1.tar.gz"
-  sha256 "754f95a6d74d016f4c97fcc37c71a169d9a48d6563457c93a3411f2d129ddd5f"
+  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v2.6.2.tar.gz"
+  sha256 "2a6c13b693fbc893fd1b9344d3fa8152ffd09d5b44be0407367b02b7bda9c188"
   license "MIT"
 
   depends_on "jq" => :optional
