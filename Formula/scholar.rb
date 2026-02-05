@@ -105,9 +105,9 @@ class Scholar < Formula
               echo "To enable, run: claude plugin install scholar@local-plugins"
           fi
           echo ""
-          echo "22 commands available (10 research + 12 teaching):"
+          echo "27 commands available (14 research + 13 teaching):"
           echo "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*"
-          echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:migrate (NEW)"
+          echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -165,9 +165,9 @@ class Scholar < Formula
       If not auto-enabled, run:
         claude plugin install scholar@local-plugins
 
-      22 commands available for academic workflows:
-        - 10 research commands (literature, manuscript, simulation, planning)
-        - 12 teaching commands (syllabus, assignments, exams, feedback, validation, migration)
+      27 commands available for academic workflows:
+        - 14 research commands (literature, manuscript, simulation, planning)
+        - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)
 
       Try: /arxiv "your research topic"
 
