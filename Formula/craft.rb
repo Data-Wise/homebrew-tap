@@ -23,6 +23,18 @@ class Craft < Formula
       # Use stable opt path - Homebrew maintains this symlink across upgrades
       SOURCE_DIR="$(brew --prefix)/opt/craft/libexec"
 
+      # Strip unrecognized keys from plugin.json (Claude Code rejects them)
+      PLUGIN_JSON="$SOURCE_DIR/.claude-plugin/plugin.json"
+      if grep -q 'claude_md_budget' "$PLUGIN_JSON" 2>/dev/null; then
+          python3 -c "
+import json, sys
+p = sys.argv[1]
+with open(p) as f: data = json.load(f)
+clean = {k: v for k, v in data.items() if k in ('name','version','description','author')}
+with open(p, 'w') as f: json.dump(clean, f, indent=2); f.write('\n')
+" "$PLUGIN_JSON" 2>/dev/null || true
+      fi
+
       echo "Installing Craft plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
@@ -142,30 +154,34 @@ class Craft < Formula
   end
 
   def post_install
-    # Strip keys not recognized by Claude Code's strict plugin.json schema
+    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
     # (e.g. claude_md_budget was in v2.13.0 tarball but breaks plugin loading)
-    require "json"
-    plugin_json = libexec/".claude-plugin/plugin.json"
-    if plugin_json.exist?
-      allowed_keys = %w[name version description author]
-      data = JSON.parse(plugin_json.read)
-      cleaned = data.select { |k, _| allowed_keys.include?(k) }
-      if cleaned.size < data.size
-        plugin_json.write(JSON.pretty_generate(cleaned) + "\n")
+    begin
+      require "json"
+      plugin_json = libexec/".claude-plugin/plugin.json"
+      if plugin_json.exist?
+        allowed_keys = %w[name version description author]
+        data = JSON.parse(plugin_json.read)
+        cleaned = data.select { |k, _| allowed_keys.include?(k) }
+        if cleaned.size < data.size
+          plugin_json.write(JSON.pretty_generate(cleaned) + "\n")
+        end
       end
+    rescue
+      # Non-fatal: plugin may still work if key issue is fixed in source
+      nil
     end
 
-    # Auto-install plugin after brew install
+    # Step 2: Auto-install plugin (always runs regardless of step 1)
     system bin/"craft-install"
 
-    # Sync Claude Code plugin registry with new version
-    # This updates the cache so Claude Code loads the correct version
-    if which("claude")
-      system "claude", "plugin", "update", "craft@local-plugins"
+    # Step 3: Sync Claude Code plugin registry (optional)
+    begin
+      system "claude", "plugin", "update", "craft@local-plugins" if which("claude")
+    rescue
+      # Don't fail if claude CLI not available or update fails
+      nil
     end
-  rescue
-    # Don't fail if claude CLI not available or update fails
-    nil
   end
 
   def post_uninstall
