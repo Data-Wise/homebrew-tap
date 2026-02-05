@@ -39,6 +39,21 @@ on:
         required: false
         type: boolean
         default: false
+      command_count:
+        description: 'Dynamic command count for formula strings (optional)'
+        required: false
+        type: string
+        default: ''
+      agent_count:
+        description: 'Dynamic agent count for formula strings (optional)'
+        required: false
+        type: string
+        default: ''
+      skill_count:
+        description: 'Dynamic skill count for formula strings (optional)'
+        required: false
+        type: string
+        default: ''
     secrets:
       tap_token:
         description: 'GitHub token with repo access to homebrew-tap'
@@ -63,6 +78,9 @@ jobs:
           VERSION: ${{ inputs.version }}
           SHA256: ${{ inputs.sha256 }}
           SOURCE_TYPE: ${{ inputs.source_type }}
+          CMD_COUNT: ${{ inputs.command_count }}
+          AGENT_COUNT: ${{ inputs.agent_count }}
+          SKILL_COUNT: ${{ inputs.skill_count }}
         run: |
           FORMULA="Formula/${FORMULA_NAME}.rb"
 
@@ -87,6 +105,23 @@ jobs:
 
           # Update version in test block if present
           sed -i "s|assert_match \"[0-9.]*\"|assert_match \"${VERSION}\"|g" "$FORMULA"
+
+          # Update dynamic metadata if provided (backward-compatible: no-op when empty)
+          if [ -n "$CMD_COUNT" ]; then
+            # Update desc line: "NNN commands" pattern
+            sed -i "s|[0-9]\+ commands|${CMD_COUNT} commands|g" "$FORMULA"
+            echo "  Updated command count to $CMD_COUNT"
+          fi
+
+          if [ -n "$AGENT_COUNT" ]; then
+            sed -i "s|[0-9]\+ agents|${AGENT_COUNT} agents|g" "$FORMULA"
+            echo "  Updated agent count to $AGENT_COUNT"
+          fi
+
+          if [ -n "$SKILL_COUNT" ]; then
+            sed -i "s|[0-9]\+ skills|${SKILL_COUNT} skills|g" "$FORMULA"
+            echo "  Updated skill count to $SKILL_COUNT"
+          fi
 
           echo ""
           echo "✅ Updated formula:"
