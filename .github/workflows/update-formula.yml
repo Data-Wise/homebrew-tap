@@ -35,7 +35,7 @@ on:
         type: string
         default: 'github'
       auto_merge:
-        description: 'Auto-merge the PR (requires admin token)'
+        description: 'Auto-merge: true = direct push to main, false = create PR'
         required: false
         type: boolean
         default: false
@@ -58,38 +58,69 @@ jobs:
           ref: main
 
       - name: Update formula version and SHA
+        env:
+          FORMULA_NAME: ${{ inputs.formula_name }}
+          VERSION: ${{ inputs.version }}
+          SHA256: ${{ inputs.sha256 }}
+          SOURCE_TYPE: ${{ inputs.source_type }}
         run: |
-          FORMULA="Formula/${{ inputs.formula_name }}.rb"
+          FORMULA="Formula/${FORMULA_NAME}.rb"
 
           if [ ! -f "$FORMULA" ]; then
             echo "❌ Formula not found: $FORMULA"
             exit 1
           fi
 
-          echo "📦 Updating $FORMULA to v${{ inputs.version }}"
+          echo "📦 Updating $FORMULA to v${VERSION}"
 
-          if [ "${{ inputs.source_type }}" = "pypi" ]; then
+          if [ "$SOURCE_TYPE" = "pypi" ]; then
             # PyPI package - update version in URL pattern
-            # Example: nexus_cli-0.5.0.tar.gz → nexus_cli-0.5.1.tar.gz
-            PACKAGE_NAME=$(echo "${{ inputs.formula_name }}" | tr '-' '_')
-            sed -i "s|/${PACKAGE_NAME}-[0-9][^/]*\.tar\.gz|/${PACKAGE_NAME}-${{ inputs.version }}.tar.gz|g" "$FORMULA"
+            PACKAGE_NAME=$(echo "$FORMULA_NAME" | tr '-' '_')
+            sed -i "s|/${PACKAGE_NAME}-[0-9][^/]*\.tar\.gz|/${PACKAGE_NAME}-${VERSION}.tar.gz|g" "$FORMULA"
           else
             # GitHub tarball - update version in URL
-            sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${{ inputs.version }}.tar.gz|g" "$FORMULA"
+            sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${VERSION}.tar.gz|g" "$FORMULA"
           fi
 
           # Update SHA256 (first occurrence - main package)
-          sed -i "0,/sha256 \"[^\"]*\"/s|sha256 \"[^\"]*\"|sha256 \"${{ inputs.sha256 }}\"|" "$FORMULA"
+          sed -i "0,/sha256 \"[^\"]*\"/s|sha256 \"[^\"]*\"|sha256 \"${SHA256}\"|" "$FORMULA"
 
           # Update version in test block if present
-          sed -i "s|assert_match \"[0-9.]*\"|assert_match \"${{ inputs.version }}\"|g" "$FORMULA"
+          sed -i "s|assert_match \"[0-9.]*\"|assert_match \"${VERSION}\"|g" "$FORMULA"
 
           echo ""
           echo "✅ Updated formula:"
           head -15 "$FORMULA"
 
+      # When auto_merge is true, commit directly to main (no PR race condition)
+      - name: Direct push to main
+        if: inputs.auto_merge
+        env:
+          FORMULA_NAME: ${{ inputs.formula_name }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "Formula/${FORMULA_NAME}.rb"
+          git commit -m "${FORMULA_NAME}: update to v${VERSION}"
+
+          # Retry loop handles concurrent pushes (pull --rebase between attempts)
+          for attempt in 1 2 3; do
+            if git push origin main; then
+              echo "✅ Pushed to main (attempt $attempt)"
+              exit 0
+            fi
+            echo "⚠️ Push failed (attempt $attempt/3), rebasing..."
+            git pull --rebase origin main
+          done
+
+          echo "❌ Failed to push after 3 attempts"
+          exit 1
+
+      # When auto_merge is false, create a PR for manual review
       - name: Create Pull Request
         id: create-pr
+        if: ${{ !inputs.auto_merge }}
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.tap_token }}
@@ -109,32 +140,22 @@ jobs:
           base: main
           delete-branch: true
 
-      - name: Auto-merge PR
-        if: inputs.auto_merge && steps.create-pr.outputs.pull-request-number
-        env:
-          GH_TOKEN: ${{ secrets.tap_token }}
-        run: |
-          PR_NUMBER="${{ steps.create-pr.outputs.pull-request-number }}"
-          echo "🔀 Auto-merging PR #$PR_NUMBER"
-
-          # Wait for any checks to complete
-          sleep 5
-
-          # Merge the PR
-          gh pr merge "$PR_NUMBER" --squash --delete-branch --repo Data-Wise/homebrew-tap
-
-          echo "✅ PR #$PR_NUMBER merged successfully"
-
       - name: Summary
+        env:
+          FORMULA_NAME: ${{ inputs.formula_name }}
+          VERSION: ${{ inputs.version }}
+          SOURCE_TYPE: ${{ inputs.source_type }}
+          AUTO_MERGE: ${{ inputs.auto_merge }}
+          PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
         run: |
           echo "## 🍺 Homebrew Formula Updated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Formula | \`${{ inputs.formula_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Version | \`v${{ inputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Source | ${{ inputs.source_type }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Auto-merge | ${{ inputs.auto_merge }} |" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ steps.create-pr.outputs.pull-request-url }}" ]; then
-            echo "| PR | ${{ steps.create-pr.outputs.pull-request-url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Formula | \`${FORMULA_NAME}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`v${VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Source | ${SOURCE_TYPE} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Method | $([ "$AUTO_MERGE" = "true" ] && echo "Direct push" || echo "Pull request") |" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$PR_URL" ]; then
+            echo "| PR | ${PR_URL} |" >> $GITHUB_STEP_SUMMARY
           fi
