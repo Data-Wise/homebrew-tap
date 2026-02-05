@@ -1,5 +1,5 @@
 class Craft < Formula
-  desc "Full-stack developer toolkit - 89 commands, 8 agents, 21 skills - Claude Code plugin"
+  desc "Full-stack developer toolkit - 106 commands, 8 agents, 21 skills - Claude Code plugin"
   homepage "https://github.com/Data-Wise/craft"
   url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.13.0.tar.gz"
   sha256 "d17684c1aa732ea4ccd509d59b3d0ae8e654dd8526572d004da400e254325402"
@@ -106,7 +106,7 @@ class Craft < Formula
               echo "To enable, run: claude plugin install craft@local-plugins"
           fi
           echo ""
-          echo "89 commands available:"
+          echo "106 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
           echo ""
@@ -176,7 +176,7 @@ class Craft < Formula
       If not auto-enabled, run:
         claude plugin install craft@local-plugins
 
-      89 commands for full-stack development:
+      106 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
