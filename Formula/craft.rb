@@ -142,6 +142,19 @@ class Craft < Formula
   end
 
   def post_install
+    # Strip keys not recognized by Claude Code's strict plugin.json schema
+    # (e.g. claude_md_budget was in v2.13.0 tarball but breaks plugin loading)
+    require "json"
+    plugin_json = libexec/".claude-plugin/plugin.json"
+    if plugin_json.exist?
+      allowed_keys = %w[name version description author]
+      data = JSON.parse(plugin_json.read)
+      cleaned = data.select { |k, _| allowed_keys.include?(k) }
+      if cleaned.size < data.size
+        plugin_json.write(JSON.pretty_generate(cleaned) + "\n")
+      end
+    end
+
     # Auto-install plugin after brew install
     system bin/"craft-install"
 
