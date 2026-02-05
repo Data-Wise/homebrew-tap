@@ -31,7 +31,7 @@ import json, sys
 p = sys.argv[1]
 with open(p) as f: data = json.load(f)
 clean = {k: v for k, v in data.items() if k in ('name','version','description','author')}
-with open(p, 'w') as f: json.dump(clean, f, indent=2); f.write('\n')
+with open(p, 'w') as f: json.dump(clean, f, indent=2); f.write(chr(10))
 " "$PLUGIN_JSON" 2>/dev/null || true
       fi
 
