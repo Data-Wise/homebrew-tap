@@ -101,6 +101,46 @@ class Craft < Formula
               [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
 
+          # --- Branch Guard Hook Installation ---
+          HOOK_SRC="$SOURCE_DIR/scripts/branch-guard.sh"
+          HOOK_DIR="$HOME/.claude/hooks"
+          HOOK_DEST="$HOOK_DIR/branch-guard.sh"
+          HOOK_INSTALLED=false
+
+          if [ -f "$HOOK_SRC" ]; then
+              mkdir -p "$HOOK_DIR" 2>/dev/null || true
+
+              # Copy hook (skip if symlink — dev setup)
+              if [ -L "$HOOK_DEST" ]; then
+                  HOOK_INSTALLED=true
+              elif [ -f "$HOOK_DEST" ]; then
+                  if ! diff -q "$HOOK_SRC" "$HOOK_DEST" >/dev/null 2>&1; then
+                      cp "$HOOK_SRC" "$HOOK_DEST" && chmod +x "$HOOK_DEST" && HOOK_INSTALLED=true
+                  else
+                      HOOK_INSTALLED=true
+                  fi
+              else
+                  cp "$HOOK_SRC" "$HOOK_DEST" && chmod +x "$HOOK_DEST" && HOOK_INSTALLED=true
+              fi
+
+              # Register in settings.json (if jq available and not already registered)
+              if [ "$HOOK_INSTALLED" = true ] && [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+                  if ! jq -e '.hooks.PreToolUse // [] | map(.hooks[]?.command) | any(test("branch-guard"))' "$SETTINGS_FILE" >/dev/null 2>&1; then
+                      HOOK_CMD="/bin/bash $HOME/.claude/hooks/branch-guard.sh"
+                      TEMP_FILE=$(mktemp)
+                      if jq --arg cmd "$HOOK_CMD" '
+                          .hooks.PreToolUse = (.hooks.PreToolUse // []) + [
+                              {"matcher": "Edit|Write", "hooks": [{"type": "command", "command": $cmd, "timeout": 5000}]},
+                              {"matcher": "Bash", "hooks": [{"type": "command", "command": $cmd, "timeout": 5000}]}
+                          ]
+                      ' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                          mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null
+                      fi
+                      [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
+                  fi
+              fi
+          fi
+
           echo "✅ Craft plugin installed successfully!"
           echo ""
           if [ "$AUTO_ENABLED" = true ]; then
@@ -110,6 +150,9 @@ class Craft < Formula
               echo "Run: claude plugin install craft@local-plugins"
           else
               echo "To enable, run: claude plugin install craft@local-plugins"
+          fi
+          if [ "$HOOK_INSTALLED" = true ]; then
+              echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
           echo "106 commands available:"
@@ -135,6 +178,28 @@ class Craft < Formula
       PLUGIN_NAME="craft"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
+      # --- Remove Branch Guard Hook ---
+      HOOK_DEST="$HOME/.claude/hooks/branch-guard.sh"
+      if [ -f "$HOOK_DEST" ] || [ -L "$HOOK_DEST" ]; then
+          rm -f "$HOOK_DEST"
+          echo "✅ Branch guard hook removed"
+      fi
+
+      # Remove hook entries from settings.json
+      SETTINGS_FILE="$HOME/.claude/settings.json"
+      if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+          TEMP_FILE=$(mktemp)
+          if jq '
+              .hooks.PreToolUse = [.hooks.PreToolUse[]? | select(
+                  (.hooks // []) | map(.command // "" | test("branch-guard")) | any | not
+              )]
+          ' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+              mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null
+          fi
+          [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
+      fi
+
+      # --- Remove Plugin Symlink ---
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
           rm -rf "$TARGET_DIR"
           echo "✅ Craft plugin uninstalled"
@@ -204,8 +269,11 @@ class Craft < Formula
         - Code generation & refactoring
         - Testing & CI/CD
         - Documentation & site generation
-        - Git workflows
+        - Git workflows & branch protection
         - ADHD-friendly task management
+
+      Branch guard protects main/dev from accidental edits.
+      Bypass: /craft:git:unprotect (session-scoped)
 
       Try: /craft:do "your task"
       Or:  /brainstorm
