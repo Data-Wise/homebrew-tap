@@ -1,8 +1,8 @@
 class Craft < Formula
-  desc "Full-stack developer toolkit - 106 commands, 8 agents, 21 skills - Claude Code plugin"
+  desc "Full-stack developer toolkit - 108 commands, 8 agents, 21 skills - Claude Code plugin"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.15.0.tar.gz"
-  sha256 "dd5f5122c294f89c53a8da79a257e4abe56ee7453b2b171c84794b37b9cf0a79"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.16.0.tar.gz"
+  sha256 "7dccb3d6ca5c628648af823707043f6c80d122048beb028971a33012ef690ab7"
   license "MIT"
 
   depends_on "jq" => :optional
@@ -155,7 +155,7 @@ class Craft < Formula
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-          echo "106 commands available:"
+          echo "108 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
           echo ""
@@ -253,7 +253,7 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
-    assert_match "2.15.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
+    assert_match "2.16.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 
   def caveats
@@ -264,7 +264,7 @@ class Craft < Formula
       If not auto-enabled, run:
         claude plugin install craft@local-plugins
 
-      106 commands for full-stack development:
+      108 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
