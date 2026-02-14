@@ -1,5 +1,5 @@
 class Craft < Formula
-  desc "Full-stack developer toolkit - 108 commands, 8 agents, 23 skills - Claude Code plugin"
+  desc "Full-stack developer toolkit for Claude Code with 108 commands"
   homepage "https://github.com/Data-Wise/craft"
   url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.18.0.tar.gz"
   sha256 "ac9834976753e35656892af3419ceb7d7c1c8d549515f097116fd337441867ac"
@@ -10,7 +10,7 @@ class Craft < Formula
   def install
     # Install plugin to libexec (Homebrew-managed location)
     # Include hidden files like .claude-plugin
-    libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
     # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
@@ -221,10 +221,8 @@ class Craft < Formula
       if plugin_json.exist?
         allowed_keys = %w[name version description author]
         data = JSON.parse(plugin_json.read)
-        cleaned = data.select { |k, _| allowed_keys.include?(k) }
-        if cleaned.size < data.size
-          plugin_json.write(JSON.pretty_generate(cleaned) + "\n")
-        end
+        cleaned = data.slice(*allowed_keys)
+        plugin_json.write(JSON.pretty_generate(cleaned) + "\n") if cleaned.size < data.size
       end
     rescue
       # Non-fatal: plugin may still work if key issue is fixed in source
@@ -246,14 +244,6 @@ class Craft < Formula
   def post_uninstall
     # Auto-uninstall plugin after brew uninstall
     system bin/"craft-uninstall" if (bin/"craft-uninstall").exist?
-  end
-
-  test do
-    assert_predicate libexec/".claude-plugin/plugin.json", :exist?
-    assert_predicate libexec/"commands", :directory?
-    assert_predicate libexec/"skills", :directory?
-    assert_predicate libexec/"agents", :directory?
-    assert_match "2.18.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 
   def caveats
@@ -287,5 +277,13 @@ class Craft < Formula
       For more information:
         https://github.com/Data-Wise/craft
     EOS
+  end
+
+  test do
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_predicate libexec/"commands", :directory?
+    assert_predicate libexec/"skills", :directory?
+    assert_predicate libexec/"agents", :directory?
+    assert_match "2.18.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 end
