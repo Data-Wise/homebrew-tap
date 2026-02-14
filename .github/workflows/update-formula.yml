@@ -139,6 +139,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Remove extraheader that actions/checkout sets (it sends the caller's
+          # GITHUB_TOKEN which doesn't have write access to this repo)
+          git config --unset-all http.https://github.com/.extraheader || true
           git remote set-url origin "https://x-access-token:${TAP_TOKEN}@github.com/Data-Wise/homebrew-tap.git"
           git add "Formula/${FORMULA_NAME}.rb"
           git commit -m "${FORMULA_NAME}: update to v${VERSION}"
