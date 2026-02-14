@@ -145,6 +145,11 @@ jobs:
           git add "Formula/${FORMULA_NAME}.rb"
           git commit -m "${FORMULA_NAME}: update to v${VERSION}"
 
+          # Unset GITHUB_TOKEN so the runner's credential helper doesn't
+          # intercept and use the caller workflow's token (which lacks push
+          # access to homebrew-tap). Auth comes from the URL-embedded TAP_TOKEN.
+          unset GITHUB_TOKEN
+
           for attempt in 1 2 3; do
             if git push origin HEAD:main; then
               echo "✅ Pushed to main (attempt $attempt)"
