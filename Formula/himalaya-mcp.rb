@@ -11,7 +11,7 @@ class HimalayaMcp < Formula
 
   def install
     # Build the project: install all deps (including devDependencies for tsc), then bundle
-    system "npm", "install", "--production=false"
+    system "npm", "install", *std_npm_args(prefix: false)
     system "npm", "run", "build:bundle"
 
     # Install only the essential directories to libexec (no node_modules)
@@ -120,11 +120,12 @@ class HimalayaMcp < Formula
               echo "To enable, run: claude plugin install himalaya-mcp@local-plugins"
           fi
           echo ""
-          echo "4 email skills available:"
+          echo "5 email skills available:"
           echo "  /email:inbox   - List and browse inbox"
           echo "  /email:triage  - Classify emails (actionable/FYI/skip)"
           echo "  /email:digest  - Daily email digest"
           echo "  /email:reply   - Draft and send replies"
+          echo "  /email:help    - Help hub for all commands"
           echo ""
           echo "After upgrades, sync with: claude plugin update himalaya-mcp@local-plugins"
       else
@@ -180,10 +181,8 @@ class HimalayaMcp < Formula
       if plugin_json.exist?
         allowed_keys = %w[name version description author]
         data = JSON.parse(plugin_json.read)
-        cleaned = data.select { |k, _| allowed_keys.include?(k) }
-        if cleaned.size < data.size
-          plugin_json.write(JSON.pretty_generate(cleaned) + "\n")
-        end
+        cleaned = data.slice(*allowed_keys)
+        plugin_json.write(JSON.pretty_generate(cleaned) + "\n") if cleaned.size < data.size
       end
     rescue
       # Non-fatal: plugin may still work if key issue is fixed in source
@@ -207,12 +206,6 @@ class HimalayaMcp < Formula
     system bin/"himalaya-mcp-uninstall" if (bin/"himalaya-mcp-uninstall").exist?
   end
 
-  test do
-    assert_predicate libexec/".claude-plugin/plugin.json", :exist?
-    assert_predicate libexec/"dist/index.js", :exist?
-    assert_predicate libexec/"plugin/skills", :directory?
-  end
-
   def caveats
     <<~EOS
       The himalaya-mcp plugin has been installed to:
@@ -221,11 +214,12 @@ class HimalayaMcp < Formula
       If not auto-enabled, run:
         claude plugin install himalaya-mcp@local-plugins
 
-      4 email skills for Claude Code:
+      5 email skills for Claude Code:
         /email:inbox   - List and browse inbox
         /email:triage  - Classify emails (actionable/FYI/skip)
         /email:digest  - Daily email digest
         /email:reply   - Draft and send replies
+        /email:help    - Help hub for all commands
 
       11 MCP tools for email operations:
         list_emails, search_emails, read_email, read_email_html,
@@ -244,5 +238,11 @@ class HimalayaMcp < Formula
       Requires himalaya CLI configured with at least one account.
       See: https://github.com/Data-Wise/himalaya-mcp
     EOS
+  end
+
+  test do
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists libexec/"dist/index.js"
+    assert_path_exists libexec/"plugin/skills"
   end
 end
