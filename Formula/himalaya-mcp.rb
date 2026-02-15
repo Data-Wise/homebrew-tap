@@ -190,42 +190,34 @@ class HimalayaMcp < Formula
       nil
     end
 
-    # Step 2: Auto-install plugin (always runs regardless of step 1)
-    system bin/"himalaya-mcp-install"
-  end
-
-  def post_uninstall
-    # Auto-uninstall plugin after brew uninstall
-    system bin/"himalaya-mcp-uninstall" if (bin/"himalaya-mcp-uninstall").exist?
+    # Note: Cannot symlink to ~/.claude/ from post_install — Homebrew's macOS
+    # sandbox (sandbox-exec) blocks all writes outside Homebrew-managed paths.
+    # The user must run himalaya-mcp-install manually after brew install.
   end
 
   def caveats
     <<~EOS
-      The himalaya-mcp plugin has been installed to:
-        ~/.claude/plugins/himalaya-mcp
+      To complete setup, run:
+        himalaya-mcp-install
 
-      If not auto-enabled, run:
-        claude plugin install himalaya-mcp@local-plugins
+      This creates the Claude Code plugin symlink and enables the plugin.
+      (Homebrew's sandbox prevents this from running automatically.)
+
+      To uninstall the plugin:
+        himalaya-mcp-uninstall
 
       5 email skills for Claude Code:
-        /email:inbox   - List and browse inbox
-        /email:triage  - Classify emails (actionable/FYI/skip)
-        /email:digest  - Daily email digest
-        /email:reply   - Draft and send replies
-        /email:help    - Help hub for all commands
+        /email:inbox   /email:triage   /email:digest
+        /email:reply   /email:help
 
-      11 MCP tools for email operations:
+      11 MCP tools:
         list_emails, search_emails, read_email, read_email_html,
         flag_email, move_email, draft_reply, send_email,
         export_to_markdown, create_action_item, copy_to_clipboard
 
-      For Claude Desktop setup (future):
-        himalaya-mcp setup
+      For Claude Desktop: himalaya-mcp setup
 
-      If symlink failed (macOS permissions), run manually:
-        ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
-
-      Requires himalaya CLI configured with at least one account.
+      Requires himalaya CLI with at least one configured account.
       See: https://github.com/Data-Wise/himalaya-mcp
     EOS
   end
