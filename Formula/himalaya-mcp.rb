@@ -97,11 +97,19 @@ class HimalayaMcp < Formula
               SETTINGS_FILE="$HOME/.claude/settings.json"
               if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
                   TEMP_FILE=$(mktemp)
-                  if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  # Migrate: remove old marketplace scope, add local-plugins scope
+                  if jq --arg new "${PLUGIN_NAME}@local-plugins" \
+                      --arg old "${PLUGIN_NAME}@himalaya-mcp-marketplace" \
+                      '.enabledPlugins[$new] = true | del(.enabledPlugins[$old])' \
+                      "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
                       mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
                   fi
                   [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
               fi
+
+              # Clean up stale marketplace cache from old scope
+              OLD_CACHE="$HOME/.claude/plugins/cache/himalaya-mcp-marketplace"
+              [ -d "$OLD_CACHE" ] && rm -rf "$OLD_CACHE" 2>/dev/null || true
           fi
 
           echo "✅ himalaya-mcp plugin installed successfully!"
@@ -122,7 +130,6 @@ class HimalayaMcp < Formula
           echo "  /email:reply   - Draft and send replies"
           echo "  /email:help    - Help hub for all commands"
           echo ""
-          echo "After upgrades, sync with: claude plugin update himalaya-mcp@local-plugins"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -189,13 +196,9 @@ class HimalayaMcp < Formula
     # Step 2: Auto-install plugin (always runs regardless of step 1)
     system bin/"himalaya-mcp-install"
 
-    # Step 3: Sync Claude Code plugin registry (optional)
-    begin
-      system "claude", "plugin", "update", "himalaya-mcp@local-plugins" if which("claude")
-    rescue
-      # Don't fail if claude CLI not available or update fails
-      nil
-    end
+    # Note: claude plugin update is unreliable from post_install context
+    # (nested session detection, scope mismatches). The install script
+    # handles settings.json directly via jq instead.
   end
 
   def post_uninstall
@@ -225,9 +228,6 @@ class HimalayaMcp < Formula
 
       For Claude Desktop setup (future):
         himalaya-mcp setup
-
-      After upgrades, sync Claude Code registry:
-        claude plugin update himalaya-mcp@local-plugins
 
       If symlink failed (macOS permissions), run manually:
         ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
