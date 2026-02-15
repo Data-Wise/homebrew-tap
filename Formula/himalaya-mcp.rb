@@ -177,7 +177,7 @@ class HimalayaMcp < Formula
   end
 
   def post_install
-    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
+    # Strip keys not recognized by Claude Code's strict plugin.json schema
     begin
       require "json"
       plugin_json = libexec/".claude-plugin/plugin.json"
@@ -188,19 +188,16 @@ class HimalayaMcp < Formula
         plugin_json.write(JSON.pretty_generate(cleaned) + "\n") if cleaned.size < data.size
       end
     rescue
-      # Non-fatal: plugin may still work if key issue is fixed in source
       nil
     end
-
-    # Step 2: Auto-install plugin symlink
-    system bin/"himalaya-mcp-install"
+    # Note: No symlink attempt here — macOS sandbox-exec blocks ALL
+    # post_install writes to $HOME, regardless of formula build steps.
+    # Users run `himalaya-mcp-install` after `brew install`.
   end
 
   def caveats
     <<~EOS
-      Plugin auto-installed to ~/.claude/plugins/himalaya-mcp
-
-      If auto-install failed, run manually:
+      To complete installation, run:
         himalaya-mcp-install
 
       To uninstall the plugin:
