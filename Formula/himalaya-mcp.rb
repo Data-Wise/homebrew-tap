@@ -28,8 +28,9 @@ class HimalayaMcp < Formula
 
       PLUGIN_NAME="himalaya-mcp"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use stable opt path - Homebrew maintains this symlink across upgrades
-      SOURCE_DIR="$(brew --prefix)/opt/himalaya-mcp/libexec"
+      # Use HOMEBREW_PREFIX (available in post_install context where brew is not in PATH)
+      # Falls back to brew --prefix for manual runs, then /opt/homebrew as last resort
+      SOURCE_DIR="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null || echo /opt/homebrew)}/opt/himalaya-mcp/libexec"
 
       # Strip unrecognized keys from plugin.json (Claude Code rejects them)
       PLUGIN_JSON="$SOURCE_DIR/.claude-plugin/plugin.json"
@@ -40,22 +41,21 @@ class HimalayaMcp < Formula
       echo "Installing himalaya-mcp plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
-      mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
+      /bin/mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
       # Remove existing installation (handle macOS extended attributes)
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
-          rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
+          /bin/rm -rf "$TARGET_DIR" 2>/dev/null || /bin/rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
       # Create symlink to Homebrew-managed files
+      # Use full paths — Homebrew post_install has a restricted PATH that may not include /bin
       # Use -h to avoid following existing symlinks (prevents circular libexec/libexec)
       LINK_SUCCESS=false
 
-      # Method 1: ln -sfh (macOS, don't follow existing symlink)
-      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      if /bin/ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
-      # Method 2: Remove and recreate (Linux fallback)
-      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      elif /bin/rm -f "$TARGET_DIR" 2>/dev/null && /bin/ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
       fi
 
@@ -70,8 +70,8 @@ class HimalayaMcp < Formula
 
           # Also create symlink in local-marketplace for plugin discovery
           MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
-          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
-          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+          /bin/mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          /bin/ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
 
           # Add to marketplace.json manifest (skip if Claude is running — holds file locks)
           if [ "$CLAUDE_RUNNING" = false ]; then
@@ -192,10 +192,6 @@ class HimalayaMcp < Formula
 
     # Step 2: Auto-install plugin (always runs regardless of step 1)
     system bin/"himalaya-mcp-install"
-
-    # Note: claude plugin update is unreliable from post_install context
-    # (nested session detection, scope mismatches). The install script
-    # handles settings.json directly via jq instead.
   end
 
   def post_uninstall
