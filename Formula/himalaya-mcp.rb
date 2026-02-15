@@ -63,50 +63,45 @@ class HimalayaMcp < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
+          # Detect if Claude Code is running — skip all JSON file writes to avoid
+          # hangs from file locks (mv blocks indefinitely on locked files)
+          CLAUDE_RUNNING=false
+          AUTO_ENABLED=false
+          if pgrep -x "claude" >/dev/null 2>&1; then
+              CLAUDE_RUNNING=true
+          fi
+
           # Also create symlink in local-marketplace for plugin discovery
           MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
           mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
           ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
 
-          # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
-          MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-          PLUGIN_DESC="Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
-          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
-              # Check if plugin already exists in manifest
-              if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
-                  TEMP_FILE=$(mktemp)
-                  if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
-                      '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
-                      "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                      mv "$TEMP_FILE" "$MANIFEST_FILE"
-                  else
-                      rm -f "$TEMP_FILE" 2>/dev/null
+          # Add to marketplace.json manifest (skip if Claude is running — holds file locks)
+          if [ "$CLAUDE_RUNNING" = false ]; then
+              MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
+              PLUGIN_DESC="Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
+              if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
+                  if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
+                      TEMP_FILE=$(mktemp)
+                      if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
+                          '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
+                          "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                          mv "$TEMP_FILE" "$MANIFEST_FILE"
+                      else
+                          rm -f "$TEMP_FILE" 2>/dev/null
+                      fi
                   fi
               fi
-          fi
 
-          # Try to auto-enable via jq if available
-          # Skip if Claude Code is running (holds file locks that can block mv)
-          SETTINGS_FILE="$HOME/.claude/settings.json"
-          AUTO_ENABLED=false
-          CLAUDE_RUNNING=false
-
-          # Check if Claude Code has settings.json open
-          if command -v lsof &>/dev/null; then
-              if lsof "$SETTINGS_FILE" 2>/dev/null | grep -q "claude"; then
-                  CLAUDE_RUNNING=true
+              # Try to auto-enable via jq if available
+              SETTINGS_FILE="$HOME/.claude/settings.json"
+              if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+                  TEMP_FILE=$(mktemp)
+                  if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                      mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
+                  fi
+                  [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
               fi
-          elif pgrep -x "claude" >/dev/null 2>&1; then
-              # Fallback: check if claude process is running
-              CLAUDE_RUNNING=true
-          fi
-
-          if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
-              TEMP_FILE=$(mktemp)
-              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                  mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
-              fi
-              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
 
           echo "✅ himalaya-mcp plugin installed successfully!"
@@ -146,15 +141,17 @@ class HimalayaMcp < Formula
       PLUGIN_NAME="himalaya-mcp"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
-      # Remove from marketplace.json manifest
+      # Remove from marketplace.json manifest (skip if Claude is running — holds file locks)
       MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
       MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-      if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
-          TEMP_FILE=$(mktemp)
-          if jq --arg name "$PLUGIN_NAME" '.plugins = [.plugins[]? | select(.name != $name)]' "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
-              mv "$TEMP_FILE" "$MANIFEST_FILE" 2>/dev/null
+      if ! pgrep -x "claude" >/dev/null 2>&1; then
+          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              if jq --arg name "$PLUGIN_NAME" '.plugins = [.plugins[]? | select(.name != $name)]' "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$MANIFEST_FILE" 2>/dev/null
+              fi
+              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
-          [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
       fi
 
       # Remove marketplace symlink
