@@ -28,9 +28,8 @@ class HimalayaMcp < Formula
 
       PLUGIN_NAME="himalaya-mcp"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use HOMEBREW_PREFIX (available in post_install context where brew is not in PATH)
-      # Falls back to brew --prefix for manual runs, then /opt/homebrew as last resort
-      SOURCE_DIR="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null || echo /opt/homebrew)}/opt/himalaya-mcp/libexec"
+      # Use stable opt path — Homebrew maintains this symlink across upgrades
+      SOURCE_DIR="$(brew --prefix)/opt/himalaya-mcp/libexec"
 
       # Strip unrecognized keys from plugin.json (Claude Code rejects them)
       PLUGIN_JSON="$SOURCE_DIR/.claude-plugin/plugin.json"
@@ -41,73 +40,76 @@ class HimalayaMcp < Formula
       echo "Installing himalaya-mcp plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
-      /bin/mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
+      mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
       # Remove existing installation (handle macOS extended attributes)
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
-          /bin/rm -rf "$TARGET_DIR" 2>/dev/null || /bin/rm -f "$TARGET_DIR" 2>/dev/null || true
+          rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
       # Create symlink to Homebrew-managed files
-      # Use full paths — Homebrew post_install has a restricted PATH that may not include /bin
-      # Use -h to avoid following existing symlinks (prevents circular libexec/libexec)
+      # Try multiple approaches for macOS compatibility
       LINK_SUCCESS=false
 
-      if /bin/ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
+      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
-      elif /bin/rm -f "$TARGET_DIR" 2>/dev/null && /bin/ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      # Method 2: Standard symlink
+      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Remove and recreate
+      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
-          # Detect if Claude Code is running — skip all JSON file writes to avoid
-          # hangs from file locks (mv blocks indefinitely on locked files)
-          CLAUDE_RUNNING=false
+          # Also create symlink in local-marketplace for plugin discovery
+          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
+          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+
+          # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
+          MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
+          PLUGIN_DESC="Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
+          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
+              # Check if plugin already exists in manifest
+              if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
+                  TEMP_FILE=$(mktemp)
+                  if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
+                      '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
+                      "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                      mv "$TEMP_FILE" "$MANIFEST_FILE"
+                  else
+                      rm -f "$TEMP_FILE" 2>/dev/null
+                  fi
+              fi
+          fi
+
+          # Try to auto-enable via jq if available
+          # Skip if Claude Code is running (holds file locks that can block mv)
+          SETTINGS_FILE="$HOME/.claude/settings.json"
           AUTO_ENABLED=false
+          CLAUDE_RUNNING=false
+
           if pgrep -x "claude" >/dev/null 2>&1; then
               CLAUDE_RUNNING=true
           fi
 
-          # Also create symlink in local-marketplace for plugin discovery
-          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
-          /bin/mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
-          /bin/ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
-
-          # Add to marketplace.json manifest (skip if Claude is running — holds file locks)
-          if [ "$CLAUDE_RUNNING" = false ]; then
-              MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-              PLUGIN_DESC="Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
-              if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
-                  if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
-                      TEMP_FILE=$(mktemp)
-                      if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
-                          '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
-                          "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                          mv "$TEMP_FILE" "$MANIFEST_FILE"
-                      else
-                          rm -f "$TEMP_FILE" 2>/dev/null
-                      fi
-                  fi
+          if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              # Migrate: remove old marketplace scope, add local-plugins scope
+              if jq --arg new "${PLUGIN_NAME}@local-plugins" \
+                  --arg old "${PLUGIN_NAME}@himalaya-mcp-marketplace" \
+                  '.enabledPlugins[$new] = true | del(.enabledPlugins[$old])' \
+                  "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
               fi
-
-              # Try to auto-enable via jq if available
-              SETTINGS_FILE="$HOME/.claude/settings.json"
-              if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
-                  TEMP_FILE=$(mktemp)
-                  # Migrate: remove old marketplace scope, add local-plugins scope
-                  if jq --arg new "${PLUGIN_NAME}@local-plugins" \
-                      --arg old "${PLUGIN_NAME}@himalaya-mcp-marketplace" \
-                      '.enabledPlugins[$new] = true | del(.enabledPlugins[$old])' \
-                      "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                      mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
-                  fi
-                  [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
-              fi
-
-              # Clean up stale marketplace cache from old scope
-              OLD_CACHE="$HOME/.claude/plugins/cache/himalaya-mcp-marketplace"
-              [ -d "$OLD_CACHE" ] && rm -rf "$OLD_CACHE" 2>/dev/null || true
+              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
+
+          # Clean up stale marketplace cache from old scope
+          OLD_CACHE="$HOME/.claude/plugins/cache/himalaya-mcp-marketplace"
+          [ -d "$OLD_CACHE" ] && rm -rf "$OLD_CACHE" 2>/dev/null || true
 
           echo "✅ himalaya-mcp plugin installed successfully!"
           echo ""
@@ -190,18 +192,16 @@ class HimalayaMcp < Formula
       nil
     end
 
-    # Note: Cannot symlink to ~/.claude/ from post_install — Homebrew's macOS
-    # sandbox (sandbox-exec) blocks all writes outside Homebrew-managed paths.
-    # The user must run himalaya-mcp-install manually after brew install.
+    # Step 2: Auto-install plugin symlink
+    system bin/"himalaya-mcp-install"
   end
 
   def caveats
     <<~EOS
-      To complete setup, run:
-        himalaya-mcp-install
+      Plugin auto-installed to ~/.claude/plugins/himalaya-mcp
 
-      This creates the Claude Code plugin symlink and enables the plugin.
-      (Homebrew's sandbox prevents this from running automatically.)
+      If auto-install failed, run manually:
+        himalaya-mcp-install
 
       To uninstall the plugin:
         himalaya-mcp-uninstall
