@@ -122,12 +122,14 @@ class HimalayaMcp < Formula
               echo "To enable, run: claude plugin install himalaya-mcp@local-plugins"
           fi
           echo ""
-          echo "5 email skills available:"
-          echo "  /email:inbox   - List and browse inbox"
-          echo "  /email:triage  - Classify emails (actionable/FYI/skip)"
-          echo "  /email:digest  - Daily email digest"
-          echo "  /email:reply   - Draft and send replies"
-          echo "  /email:help    - Help hub for all commands"
+          echo "7 email skills available:"
+          echo "  /email:inbox       - List and browse inbox"
+          echo "  /email:triage      - Classify emails (actionable/FYI/skip)"
+          echo "  /email:digest      - Daily email digest"
+          echo "  /email:reply       - Draft and send replies"
+          echo "  /email:compose     - Compose new emails"
+          echo "  /email:attachments - Manage attachments"
+          echo "  /email:help        - Help hub for all commands"
           echo ""
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
@@ -203,14 +205,18 @@ class HimalayaMcp < Formula
       To uninstall the plugin:
         himalaya-mcp-uninstall
 
-      5 email skills for Claude Code:
+      7 email skills for Claude Code:
         /email:inbox   /email:triage   /email:digest
-        /email:reply   /email:help
+        /email:reply   /email:compose  /email:attachments
+        /email:help
 
-      11 MCP tools:
+      19 MCP tools:
         list_emails, search_emails, read_email, read_email_html,
         flag_email, move_email, draft_reply, send_email,
-        export_to_markdown, create_action_item, copy_to_clipboard
+        compose_email, list_folders, create_folder, delete_folder,
+        list_attachments, download_attachment, extract_calendar_event,
+        create_calendar_event, export_to_markdown, create_action_item,
+        copy_to_clipboard
 
       For Claude Desktop: himalaya-mcp setup
 
