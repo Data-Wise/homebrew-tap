@@ -48,17 +48,14 @@ class HimalayaMcp < Formula
       fi
 
       # Create symlink to Homebrew-managed files
-      # Try multiple approaches for macOS compatibility
+      # Use -h to avoid following existing symlinks (prevents circular libexec/libexec)
       LINK_SUCCESS=false
 
-      # Method 1: Standard symlink
-      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      # Method 1: ln -sfh (macOS, don't follow existing symlink)
+      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
-      # Method 2: Remove and recreate (handles some edge cases)
+      # Method 2: Remove and recreate (Linux fallback)
       elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 3: Use ln -sfh (macOS specific, replaces symlink atomically)
-      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
       fi
 
