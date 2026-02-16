@@ -18,7 +18,7 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 |-------|----------|----------|--------|--------|
 | 1 | Security & Reliability Fixes | Critical | < 2h | ✅ Complete |
 | 3 | Python Formula Generator | High | 4-8h | ✅ Complete |
-| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | ✅ Complete (except manual App creation) |
+| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | ✅ Complete |
 | 5 | Retrofit Plugin Formulas | Medium | 2-4h | ✅ Complete |
 
 ## Phase 1: Security & Reliability Fixes
@@ -112,7 +112,7 @@ generator/
 
 ### GitHub App setup (manual)
 
-- [ ] 4.2 Create GitHub App "Data-Wise Homebrew Automation" (Contents + PR permissions)
+- [x] 4.2 Create GitHub App "Data-Wise Homebrew Automation" (App ID: 2874502, secrets deployed to 8 repos)
 
 ## Phase 5: Retrofit Plugin Formulas
 
@@ -153,8 +153,9 @@ generator/
 | ~~`brew audit --strict` all 14~~ | **Done** | 14/14 pass |
 | ~~4.4a-d Caller workflows~~ | **Done** | Pushed to 3 repos via gh API |
 
-**Not this branch** (manual):
-- 4.2 Create GitHub App (manual, github.com UI)
+| ~~4.2 GitHub App creation~~ | **Done** | App ID 2874502, secrets on 8 repos |
+
+**All tasks complete.** Branch is ready for PR.
 
 ## Rebase Strategy (CRITICAL)
 
