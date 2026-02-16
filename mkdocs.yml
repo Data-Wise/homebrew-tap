@@ -79,6 +79,7 @@ nav:
     - Casks: formulas/casks.md
   - Generator:
     - Overview: generator/index.md
+    - Help: generator/help.md
     - Manifest: generator/manifest.md
     - Blocks: generator/blocks.md
   - CI/CD:
