@@ -94,9 +94,14 @@ jobs:
 
     steps:
       # Prefer GitHub App token (short-lived, scoped) over PAT
+      # Note: secrets can't be referenced in if: conditions for reusable
+      # workflows called cross-repo — use env vars to check availability
       - name: Generate GitHub App token
         id: app-token
-        if: ${{ secrets.app_id != '' && secrets.app_private_key != '' }}
+        env:
+          HAS_APP_ID: ${{ secrets.app_id }}
+          HAS_APP_KEY: ${{ secrets.app_private_key }}
+        if: env.HAS_APP_ID != '' && env.HAS_APP_KEY != ''
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.app_id }}
