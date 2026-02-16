@@ -15,6 +15,28 @@
 name: Update Formula
 
 on:
+  # Manual trigger for testing (no inputs required = dry-run safe)
+  workflow_dispatch:
+    inputs:
+      formula_name:
+        description: 'Formula name (e.g., aiterm)'
+        required: true
+        type: string
+      version:
+        description: 'Version (without v prefix)'
+        required: true
+        type: string
+      sha256:
+        description: 'SHA256 of release tarball'
+        required: true
+        type: string
+      source_type:
+        description: 'Source type'
+        required: false
+        type: string
+        default: 'github'
+
+  # Reusable workflow (called by other repos on release)
   workflow_call:
     inputs:
       formula_name:
