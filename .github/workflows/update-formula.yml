@@ -56,8 +56,14 @@ on:
         default: ''
     secrets:
       tap_token:
-        description: 'GitHub token with repo access to homebrew-tap'
-        required: true
+        description: 'GitHub PAT with repo access to homebrew-tap (fallback if no GitHub App)'
+        required: false
+      app_id:
+        description: 'GitHub App ID for Data-Wise Homebrew Automation'
+        required: false
+      app_private_key:
+        description: 'GitHub App private key (PEM)'
+        required: false
 
 jobs:
   update-formula:
@@ -65,11 +71,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Prefer GitHub App token (short-lived, scoped) over PAT
+      - name: Generate GitHub App token
+        id: app-token
+        if: ${{ secrets.app_id != '' && secrets.app_private_key != '' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.app_id }}
+          private-key: ${{ secrets.app_private_key }}
+          owner: Data-Wise
+          repositories: homebrew-tap
+
       - name: Checkout homebrew-tap
         uses: actions/checkout@v4
         with:
           repository: Data-Wise/homebrew-tap
-          token: ${{ secrets.tap_token }}
+          token: ${{ steps.app-token.outputs.token || secrets.tap_token }}
           ref: main
           persist-credentials: false
 
@@ -154,7 +171,7 @@ jobs:
         env:
           FORMULA_NAME: ${{ inputs.formula_name }}
           VERSION: ${{ inputs.version }}
-          TAP_TOKEN: ${{ secrets.tap_token }}
+          TAP_TOKEN: ${{ steps.app-token.outputs.token || secrets.tap_token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -186,7 +203,7 @@ jobs:
         if: ${{ !inputs.auto_merge }}
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.tap_token }}
+          token: ${{ steps.app-token.outputs.token || secrets.tap_token }}
           commit-message: "${{ inputs.formula_name }}: update to v${{ inputs.version }}"
           title: "${{ inputs.formula_name }}: update to v${{ inputs.version }}"
           body: |

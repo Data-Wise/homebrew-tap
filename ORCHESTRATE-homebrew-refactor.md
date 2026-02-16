@@ -99,7 +99,7 @@ generator/
 ### This repo
 
 - [x] 4.1 Add `npm` and `cran` source types to `update-formula.yml`
-- [ ] 4.3 Update `update-formula.yml` to use `actions/create-github-app-token@v1`
+- [x] 4.3 Update `update-formula.yml` to use `actions/create-github-app-token@v1`
 - [x] 4.5 Create weekly validation workflow (`validate-formulas.yml`)
 - [x] 4.6 Add `brew style` step to `update-formula.yml` (non-blocking initially)
 
@@ -147,7 +147,7 @@ generator/
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 4.3 GitHub App token in workflow | Pending | Blocked on manual GitHub App creation (4.2) |
+| ~~4.3 GitHub App token in workflow~~ | **Done** | Workflow supports both App + PAT fallback |
 | 5.6 Local `brew install --build-from-source` test | Pending | Optional verification before merge |
 | Rebase on main | Before merge | CI may have pushed version bumps |
 | Final `brew audit --strict` all 14 | Before merge | Full audit (not just style) |
