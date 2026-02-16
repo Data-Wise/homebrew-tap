@@ -14,21 +14,17 @@ class HimalayaMcp < Formula
   depends_on "jq" => :optional
 
   def install
-    # Build the project: install all deps (including devDependencies for tsc), then bundle
     system "npm", "install", *std_npm_args(prefix: false)
     system "npm", "run", "build:bundle"
 
-    # Install only the essential directories to libexec (no node_modules)
     libexec.install ".claude-plugin"
     libexec.install ".mcp.json"
     libexec.install "plugin"
     libexec.install "dist"
 
-    # Create wrapper script that symlinks to ~/.claude/plugins/
-    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"himalaya-mcp-install").write <<~EOS
       #!/bin/bash
-      # Note: Not using set -e to handle permission errors gracefully
+      # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="himalaya-mcp"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
@@ -41,7 +37,7 @@ class HimalayaMcp < Formula
           python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));c={k:v for k,v in d.items() if k in('name','version','description','author')};f=open(p,'w');json.dump(c,f,indent=2);f.write(chr(10));f.close()" "$PLUGIN_JSON" 2>/dev/null || true
       fi
 
-      echo "Installing himalaya-mcp plugin to Claude Code..."
+      echo "Installing Himalaya MCP plugin to Claude Code..."
 
       # Create plugins directory if it doesn't exist
       mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
@@ -101,21 +97,13 @@ class HimalayaMcp < Formula
 
           if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
               TEMP_FILE=$(mktemp)
-              # Migrate: remove old marketplace scope, add local-plugins scope
-              if jq --arg new "${PLUGIN_NAME}@local-plugins" \
-                  --arg old "${PLUGIN_NAME}@himalaya-mcp-marketplace" \
-                  '.enabledPlugins[$new] = true | del(.enabledPlugins[$old])' \
-                  "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
                   mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
               fi
               [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
 
-          # Clean up stale marketplace cache from old scope
-          OLD_CACHE="$HOME/.claude/plugins/cache/himalaya-mcp-marketplace"
-          [ -d "$OLD_CACHE" ] && rm -rf "$OLD_CACHE" 2>/dev/null || true
-
-          echo "✅ himalaya-mcp plugin installed successfully!"
+          echo "✅ Himalaya MCP plugin installed successfully!"
           echo ""
           if [ "$AUTO_ENABLED" = true ]; then
               echo "Plugin auto-enabled in Claude Code."
@@ -125,8 +113,9 @@ class HimalayaMcp < Formula
           else
               echo "To enable, run: claude plugin install himalaya-mcp@local-plugins"
           fi
+
           echo ""
-          echo "7 email skills available:"
+              echo "7 email skills available:"
           echo "  /email:inbox       - List and browse inbox"
           echo "  /email:triage      - Classify emails (actionable/FYI/skip)"
           echo "  /email:digest      - Daily email digest"
@@ -134,7 +123,6 @@ class HimalayaMcp < Formula
           echo "  /email:compose     - Compose new emails"
           echo "  /email:attachments - Manage attachments"
           echo "  /email:help        - Help hub for all commands"
-          echo ""
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -144,6 +132,7 @@ class HimalayaMcp < Formula
           echo ""
           exit 0  # Don't fail the brew install
       fi
+
     EOS
 
     (bin/"himalaya-mcp-uninstall").write <<~EOS
@@ -153,29 +142,13 @@ class HimalayaMcp < Formula
       PLUGIN_NAME="himalaya-mcp"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
-      # Remove from marketplace.json manifest (skip if Claude is running — holds file locks)
-      MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
-      MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-      if ! pgrep -x "claude" >/dev/null 2>&1; then
-          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
-              TEMP_FILE=$(mktemp)
-              if jq --arg name "$PLUGIN_NAME" '.plugins = [.plugins[]? | select(.name != $name)]' "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                  mv "$TEMP_FILE" "$MANIFEST_FILE" 2>/dev/null
-              fi
-              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
-          fi
-      fi
-
-      # Remove marketplace symlink
-      rm -f "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
-
-      # Remove plugin symlink
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
           rm -rf "$TARGET_DIR"
-          echo "✅ himalaya-mcp plugin uninstalled"
+          echo "✅ Himalaya MCP plugin uninstalled"
       else
           echo "Plugin not found at $TARGET_DIR"
       fi
+
     EOS
 
     chmod "+x", bin/"himalaya-mcp-install"
@@ -183,7 +156,7 @@ class HimalayaMcp < Formula
   end
 
   def post_install
-    # Strip keys not recognized by Claude Code's strict plugin.json schema
+    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
     require "json"
     plugin_json = libexec/".claude-plugin/plugin.json"
     if plugin_json.exist?
@@ -194,9 +167,10 @@ class HimalayaMcp < Formula
     end
   rescue
     nil
-    # NOTE: No symlink attempt here — macOS sandbox-exec blocks ALL
-    # post_install writes to $HOME, regardless of formula build steps.
-    # Users run `himalaya-mcp-install` after `brew install`.
+  end
+
+  def post_uninstall
+    system bin/"himalaya-mcp-uninstall" if (bin/"himalaya-mcp-uninstall").exist?
   end
 
   def caveats
@@ -212,24 +186,21 @@ class HimalayaMcp < Formula
         /email:reply   /email:compose  /email:attachments
         /email:help
 
-      19 MCP tools:
-        list_emails, search_emails, read_email, read_email_html,
-        flag_email, move_email, draft_reply, send_email,
-        compose_email, list_folders, create_folder, delete_folder,
-        list_attachments, download_attachment, extract_calendar_event,
-        create_calendar_event, export_to_markdown, create_action_item,
-        copy_to_clipboard
+      19 MCP tools available.
 
       For Claude Desktop: himalaya-mcp setup
 
       Requires himalaya CLI with at least one configured account.
       See: https://github.com/Data-Wise/himalaya-mcp
+
+      For more information:
+        https://github.com/Data-Wise/himalaya-mcp
     EOS
   end
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
     assert_path_exists libexec/"dist/index.js"
-    assert_path_exists libexec/"plugin/skills"
+    assert_predicate libexec/"plugin/skills", :directory?
   end
 end

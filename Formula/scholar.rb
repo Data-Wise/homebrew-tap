@@ -12,19 +12,15 @@ class Scholar < Formula
   depends_on "jq" => :optional
 
   def install
-    # Install plugin to libexec (Homebrew-managed location)
-    # Include hidden files like .claude-plugin
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
-    # Create wrapper script that symlinks to ~/.claude/plugins/
-    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"scholar-install").write <<~EOS
       #!/bin/bash
-      # Note: Not using set -e to handle permission errors gracefully
+      # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="scholar"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use stable opt path - Homebrew maintains this symlink across upgrades
+      # Use stable opt path — Homebrew maintains this symlink across upgrades
       SOURCE_DIR="$(brew --prefix)/opt/scholar/libexec"
 
       echo "Installing Scholar plugin to Claude Code..."
@@ -41,14 +37,14 @@ class Scholar < Formula
       # Try multiple approaches for macOS compatibility
       LINK_SUCCESS=false
 
-      # Method 1: Standard symlink
-      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
+      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
-      # Method 2: Remove and recreate (handles some edge cases)
+      # Method 2: Standard symlink
+      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Remove and recreate
       elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 3: Use ln -sfh (macOS specific, replaces symlink atomically)
-      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
       fi
 
@@ -81,12 +77,7 @@ class Scholar < Formula
           AUTO_ENABLED=false
           CLAUDE_RUNNING=false
 
-          # Check if Claude Code has settings.json open
-          if command -v lsof &>/dev/null; then
-              if lsof "$SETTINGS_FILE" 2>/dev/null | grep -q "claude"; then
-                  CLAUDE_RUNNING=true
-              fi
-          elif pgrep -x "claude" >/dev/null 2>&1; then
+          if pgrep -x "claude" >/dev/null 2>&1; then
               CLAUDE_RUNNING=true
           fi
 
@@ -108,8 +99,9 @@ class Scholar < Formula
           else
               echo "To enable, run: claude plugin install scholar@local-plugins"
           fi
+
           echo ""
-          echo "28 commands available (14 research + 13 teaching):"
+              echo "28 commands available (14 research + 13 teaching):"
           echo "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*"
           echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       else
@@ -121,6 +113,7 @@ class Scholar < Formula
           echo ""
           exit 0  # Don't fail the brew install
       fi
+
     EOS
 
     (bin/"scholar-uninstall").write <<~EOS
@@ -136,6 +129,7 @@ class Scholar < Formula
       else
           echo "Plugin not found at $TARGET_DIR"
       fi
+
     EOS
 
     chmod "+x", bin/"scholar-install"
@@ -144,24 +138,19 @@ class Scholar < Formula
 
   def post_install
     begin
-      # Auto-install plugin after brew install
       system bin/"scholar-install"
     rescue
       nil
     end
 
     begin
-      # Sync Claude Code plugin registry with new version
-      # This updates the cache so Claude Code loads the correct version
       system "claude", "plugin", "update", "scholar@local-plugins" if which("claude")
     rescue
-      # Don't fail if claude CLI not available or update fails
       nil
     end
   end
 
   def post_uninstall
-    # Auto-uninstall plugin after brew uninstall
     system bin/"scholar-uninstall" if (bin/"scholar-uninstall").exist?
   end
 
@@ -189,7 +178,7 @@ class Scholar < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
-    assert_path_exists libexec/"src/plugin-api/commands"
-    assert_path_exists libexec/"src/plugin-api/skills"
+    assert_predicate libexec/"src/plugin-api/commands", :directory?
+    assert_predicate libexec/"src/plugin-api/skills", :directory?
   end
 end

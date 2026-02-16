@@ -139,11 +139,7 @@ def generate_formula(formula_name, config, defaults):
     features = config.get("features", {})
     deps = config.get("dependencies", {})
 
-    # URL
-    if "url_override" in config:
-        url = config["url_override"].replace("{version}", config["version"])
-    else:
-        url = f"https://github.com/{config['repo']}/archive/refs/tags/v{config['version']}.tar.gz"
+    head_only = config.get("head_only", False)
 
     # Build the formula
     lines = [
@@ -154,14 +150,24 @@ def generate_formula(formula_name, config, defaults):
         f"class {class_name} < Formula",
         f'  desc "{config["desc"]}"',
         f'  homepage "{config["homepage"]}"',
-        f'  url "{url}"',
-        f'  sha256 "{config["sha256"]}"',
-        f'  license "{defaults["license"]}"',
     ]
 
-    # Head (if present)
-    if "head" in config:
+    if head_only:
+        lines.append(f'  license "{defaults["license"]}"')
         lines.append(f'  head "{config["head"]}", branch: "main"')
+    else:
+        # URL
+        if "url_override" in config:
+            url = config["url_override"].replace("{version}", config["version"])
+        else:
+            url = f"https://github.com/{config['repo']}/archive/refs/tags/v{config['version']}.tar.gz"
+        lines.append(f'  url "{url}"')
+        lines.append(f'  sha256 "{config["sha256"]}"')
+        lines.append(f'  license "{defaults["license"]}"')
+
+        # Head (if present — i.e., formula has both url and head)
+        if "head" in config:
+            lines.append(f'  head "{config["head"]}", branch: "main"')
 
     lines.append("")
 

@@ -6,7 +6,7 @@
   "formulas": {
     "craft": {
       "type": "claude-plugin",
-      "desc": "Full-stack developer toolkit for Claude Code with {command_count} commands",
+      "desc": "Full-stack developer toolkit for Claude Code with 109 commands",
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
@@ -114,8 +114,7 @@
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
-      "version": "1.2.0",
-      "sha256": "placeholder",
+      "head_only": true,
       "head": "https://github.com/Data-Wise/rforge.git",
       "dependencies": {
         "optional": ["jq"]

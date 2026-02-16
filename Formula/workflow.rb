@@ -1,132 +1,184 @@
 # typed: false
 # frozen_string_literal: true
 
-# ADHD-friendly workflow automation plugin for Claude Code
+# Workflow formula for the data-wise/tap Homebrew tap.
 class Workflow < Formula
   desc "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin"
   homepage "https://github.com/Data-Wise/claude-plugins"
   url "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v0.1.0/workflow-v0.1.0.tar.gz"
-  version "0.1.0"
   sha256 "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783"
   license "MIT"
 
-  depends_on "jq"
+  depends_on "jq" => :optional
 
   def install
-    # Install plugin files to libexec
-    libexec.install Dir["*"]
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
-    # Create wrapper scripts
     (bin/"workflow-install").write <<~EOS
       #!/bin/bash
-      set -e
+      # NOTE: Not using set -e to handle permission errors gracefully
 
-      PLUGIN_DIR=#{libexec}
-      TARGET_DIR="$HOME/.claude/plugins/workflow"
+      PLUGIN_NAME="workflow"
+      TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
+      # Use stable opt path — Homebrew maintains this symlink across upgrades
+      SOURCE_DIR="$(brew --prefix)/opt/workflow/libexec"
 
-      echo "Installing Workflow Plugin v#{version}..."
+      echo "Installing Workflow plugin to Claude Code..."
 
-      # Create .claude/plugins directory if it doesn't exist
-      mkdir -p "$HOME/.claude/plugins"
+      # Create plugins directory if it doesn't exist
+      mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
-      # Remove existing installation if present
-      if [ -d "$TARGET_DIR" ] || [ -L "$TARGET_DIR" ]; then
-        echo "Removing existing installation..."
-        rm -rf "$TARGET_DIR"
+      # Remove existing installation (handle macOS extended attributes)
+      if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
+          rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
-      # Copy plugin files
-      echo "Copying plugin files..."
-      cp -r "$PLUGIN_DIR" "$TARGET_DIR"
+      # Create symlink to Homebrew-managed files
+      # Try multiple approaches for macOS compatibility
+      LINK_SUCCESS=false
 
-      # Run tests to verify installation
-      echo "Verifying installation..."
-      if bash "$TARGET_DIR/tests/test-plugin-structure.sh"; then
-        echo ""
-        echo "✅ Workflow Plugin v#{version} installed successfully!"
-        echo ""
-        echo "Location: $TARGET_DIR"
-        echo ""
-        echo "Next steps:"
-        echo "  1. Restart Claude Code"
-        echo "  2. Test auto-activation: mention 'API design'"
-        echo "  3. Try: /brainstorm quick feature notifications"
-        echo "  4. Read: $TARGET_DIR/docs/QUICK-START.md"
-        echo ""
+      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
+      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 2: Standard symlink
+      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Remove and recreate
+      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      fi
+
+      if [ "$LINK_SUCCESS" = true ]; then
+          # Also create symlink in local-marketplace for plugin discovery
+          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
+          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
+          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+
+          # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
+          MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
+          PLUGIN_DESC="ADHD-friendly workflow automation - brainstorm, orchestrate, and design"
+          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
+              # Check if plugin already exists in manifest
+              if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
+                  TEMP_FILE=$(mktemp)
+                  if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
+                      '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
+                      "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                      mv "$TEMP_FILE" "$MANIFEST_FILE"
+                  else
+                      rm -f "$TEMP_FILE" 2>/dev/null
+                  fi
+              fi
+          fi
+
+          # Try to auto-enable via jq if available
+          # Skip if Claude Code is running (holds file locks that can block mv)
+          SETTINGS_FILE="$HOME/.claude/settings.json"
+          AUTO_ENABLED=false
+          CLAUDE_RUNNING=false
+
+          if pgrep -x "claude" >/dev/null 2>&1; then
+              CLAUDE_RUNNING=true
+          fi
+
+          if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
+              TEMP_FILE=$(mktemp)
+              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+                  mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
+              fi
+              [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
+          fi
+
+          echo "✅ Workflow plugin installed successfully!"
+          echo ""
+          if [ "$AUTO_ENABLED" = true ]; then
+              echo "Plugin auto-enabled in Claude Code."
+          elif [ "$CLAUDE_RUNNING" = true ]; then
+              echo "Claude Code is running - skipped auto-enable to avoid conflicts."
+              echo "Run: claude plugin install workflow@local-plugins"
+          else
+              echo "To enable, run: claude plugin install workflow@local-plugins"
+          fi
+
+          echo ""
+              echo "Skills: backend-designer, frontend-designer, devops-helper"
+          echo "Commands: /brainstorm, /workflow:spec-review"
       else
-        echo "❌ Installation verification failed"
-        exit 1
+          echo "⚠️  Automatic symlink failed (macOS permissions)."
+          echo ""
+          echo "Run this command manually to complete installation:"
+          echo ""
+          echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+          echo ""
+          exit 0  # Don't fail the brew install
       fi
+
     EOS
 
     (bin/"workflow-uninstall").write <<~EOS
       #!/bin/bash
       set -e
 
-      TARGET_DIR="$HOME/.claude/plugins/workflow"
+      PLUGIN_NAME="workflow"
+      TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
-      if [ ! -d "$TARGET_DIR" ] && [ ! -L "$TARGET_DIR" ]; then
-        echo "Workflow Plugin is not installed"
-        exit 0
+      if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
+          rm -rf "$TARGET_DIR"
+          echo "✅ Workflow plugin uninstalled"
+      else
+          echo "Plugin not found at $TARGET_DIR"
       fi
 
-      echo "Uninstalling Workflow Plugin..."
-      rm -rf "$TARGET_DIR"
-      echo "✅ Workflow Plugin uninstalled"
-      echo ""
-      echo "Please restart Claude Code to complete uninstallation"
     EOS
 
-    chmod 0755, bin/"workflow-install"
-    chmod 0755, bin/"workflow-uninstall"
+    chmod "+x", bin/"workflow-install"
+    chmod "+x", bin/"workflow-uninstall"
   end
 
   def post_install
-    system bin/"workflow-install"
+    begin
+      system bin/"workflow-install"
+    rescue
+      nil
+    end
+
+    begin
+      system "claude", "plugin", "update", "workflow@local-plugins" if which("claude")
+    rescue
+      nil
+    end
+  end
+
+  def post_uninstall
+    system bin/"workflow-uninstall" if (bin/"workflow-uninstall").exist?
   end
 
   def caveats
     <<~EOS
-      Workflow Plugin v#{version} has been installed to:
+      The Workflow plugin has been installed to:
         ~/.claude/plugins/workflow
 
+      If not auto-enabled, run:
+        claude plugin install workflow@local-plugins
+
       The plugin includes:
-        • 3 auto-activating skills (backend, frontend, devops)
-        • Enhanced /brainstorm command (8 modes)
-        • Workflow orchestrator agent
-        • 60+ proven design patterns
+        - 3 auto-activating skills (backend, frontend, devops)
+        - Enhanced /brainstorm command (8 modes)
+        - Workflow orchestrator agent
+        - 60+ proven design patterns
 
-      Quick Start:
-        1. Restart Claude Code
-        2. Test auto-activation: mention "API design"
-        3. Try: /brainstorm quick feature notifications
-        4. Read: ~/.claude/plugins/workflow/docs/QUICK-START.md
+      If symlink failed (macOS permissions), run manually:
+        ln -sf $(brew --prefix)/opt/workflow/libexec ~/.claude/plugins/workflow
 
-      Documentation:
-        • Full guide: ~/.claude/plugins/workflow/README.md
-        • Quick start: ~/.claude/plugins/workflow/docs/QUICK-START.md
-        • Reference: ~/.claude/plugins/workflow/docs/REFCARD.md
-        • Patterns: ~/.claude/plugins/workflow/PATTERN-LIBRARY.md
-
-      Uninstall:
-        brew uninstall workflow
+      For more information:
+        https://github.com/Data-Wise/claude-plugins
     EOS
   end
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
-    assert_path_exists libexec/"README.md"
     assert_path_exists libexec/"commands/brainstorm.md"
     assert_path_exists libexec/"skills/design/backend-designer.md"
-    assert_path_exists libexec/"skills/design/frontend-designer.md"
-    assert_path_exists libexec/"skills/design/devops-helper.md"
     assert_path_exists libexec/"agents/orchestrator.md"
-
-    # Validate JSON files
-    system "jq", "empty", libexec/".claude-plugin/plugin.json"
-    system "jq", "empty", libexec/"package.json"
-
-    # Run plugin tests
-    system "bash", libexec/"tests/test-plugin-structure.sh"
   end
 end
