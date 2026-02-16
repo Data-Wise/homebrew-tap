@@ -1,3 +1,7 @@
+# typed: false
+# frozen_string_literal: true
+
+# Craft formula for the data-wise/tap Homebrew tap.
 class Craft < Formula
   desc "Full-stack developer toolkit for Claude Code with 109 commands"
   homepage "https://github.com/Data-Wise/craft"
@@ -8,19 +12,15 @@ class Craft < Formula
   depends_on "jq" => :optional
 
   def install
-    # Install plugin to libexec (Homebrew-managed location)
-    # Include hidden files like .claude-plugin
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
-    # Create wrapper script that symlinks to ~/.claude/plugins/
-    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"craft-install").write <<~EOS
       #!/bin/bash
-      # Note: Not using set -e to handle permission errors gracefully
+      # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="craft"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use stable opt path - Homebrew maintains this symlink across upgrades
+      # Use stable opt path — Homebrew maintains this symlink across upgrades
       SOURCE_DIR="$(brew --prefix)/opt/craft/libexec"
 
       # Strip unrecognized keys from plugin.json (Claude Code rejects them)
@@ -43,14 +43,14 @@ class Craft < Formula
       # Try multiple approaches for macOS compatibility
       LINK_SUCCESS=false
 
-      # Method 1: Standard symlink
-      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
+      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
-      # Method 2: Remove and recreate (handles some edge cases)
+      # Method 2: Standard symlink
+      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Remove and recreate
       elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 3: Use ln -sfh (macOS specific, replaces symlink atomically)
-      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
       fi
 
@@ -83,13 +83,7 @@ class Craft < Formula
           AUTO_ENABLED=false
           CLAUDE_RUNNING=false
 
-          # Check if Claude Code has settings.json open
-          if command -v lsof &>/dev/null; then
-              if lsof "$SETTINGS_FILE" 2>/dev/null | grep -q "claude"; then
-                  CLAUDE_RUNNING=true
-              fi
-          elif pgrep -x "claude" >/dev/null 2>&1; then
-              # Fallback: check if claude process is running
+          if pgrep -x "claude" >/dev/null 2>&1; then
               CLAUDE_RUNNING=true
           fi
 
@@ -158,8 +152,6 @@ class Craft < Formula
           echo "109 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
-          echo ""
-          echo "After upgrades, sync with: claude plugin update craft@local-plugins"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -169,6 +161,7 @@ class Craft < Formula
           echo ""
           exit 0  # Don't fail the brew install
       fi
+
     EOS
 
     (bin/"craft-uninstall").write <<~EOS
@@ -178,34 +171,13 @@ class Craft < Formula
       PLUGIN_NAME="craft"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
-      # --- Remove Branch Guard Hook ---
-      HOOK_DEST="$HOME/.claude/hooks/branch-guard.sh"
-      if [ -f "$HOOK_DEST" ] || [ -L "$HOOK_DEST" ]; then
-          rm -f "$HOOK_DEST"
-          echo "✅ Branch guard hook removed"
-      fi
-
-      # Remove hook entries from settings.json
-      SETTINGS_FILE="$HOME/.claude/settings.json"
-      if command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
-          TEMP_FILE=$(mktemp)
-          if jq '
-              .hooks.PreToolUse = [.hooks.PreToolUse[]? | select(
-                  (.hooks // []) | map(.command // "" | test("branch-guard")) | any | not
-              )]
-          ' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
-              mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null
-          fi
-          [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
-      fi
-
-      # --- Remove Plugin Symlink ---
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
           rm -rf "$TARGET_DIR"
           echo "✅ Craft plugin uninstalled"
       else
           echo "Plugin not found at $TARGET_DIR"
       fi
+
     EOS
 
     chmod "+x", bin/"craft-install"
@@ -214,7 +186,6 @@ class Craft < Formula
 
   def post_install
     # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
-    # (e.g. claude_md_budget was in v2.13.0 tarball but breaks plugin loading)
     begin
       require "json"
       plugin_json = libexec/".claude-plugin/plugin.json"
@@ -222,38 +193,33 @@ class Craft < Formula
         allowed_keys = %w[name version description author]
         data = JSON.parse(plugin_json.read)
         cleaned = data.slice(*allowed_keys)
-        plugin_json.write(JSON.pretty_generate(cleaned) + "\n") if cleaned.size < data.size
+        plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
       end
     rescue
-      # Non-fatal: plugin may still work if key issue is fixed in source
       nil
     end
 
     # Step 2: Auto-install plugin (always runs regardless of step 1)
-    system bin/"craft-install"
+    begin
+      system bin/"craft-install"
+    rescue
+      nil
+    end
 
     # Step 3: Sync Claude Code plugin registry (optional)
     begin
       system "claude", "plugin", "update", "craft@local-plugins" if which("claude")
     rescue
-      # Don't fail if claude CLI not available or update fails
       nil
     end
   end
 
   def post_uninstall
-    # Auto-uninstall plugin after brew uninstall
     system bin/"craft-uninstall" if (bin/"craft-uninstall").exist?
   end
 
   def caveats
     <<~EOS
-      The Craft plugin has been installed to:
-        ~/.claude/plugins/craft
-
-      If not auto-enabled, run:
-        claude plugin install craft@local-plugins
-
       109 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring

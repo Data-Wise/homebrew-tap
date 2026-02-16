@@ -30,7 +30,7 @@ on:
         required: true
         type: string
       source_type:
-        description: 'Source type: github or pypi'
+        description: 'Source type: github, pypi, npm, or cran'
         required: false
         type: string
         default: 'github'
@@ -56,8 +56,14 @@ on:
         default: ''
     secrets:
       tap_token:
-        description: 'GitHub token with repo access to homebrew-tap'
-        required: true
+        description: 'GitHub PAT with repo access to homebrew-tap (fallback if no GitHub App)'
+        required: false
+      app_id:
+        description: 'GitHub App ID for Data-Wise Homebrew Automation'
+        required: false
+      app_private_key:
+        description: 'GitHub App private key (PEM)'
+        required: false
 
 jobs:
   update-formula:
@@ -65,11 +71,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Prefer GitHub App token (short-lived, scoped) over PAT
+      - name: Generate GitHub App token
+        id: app-token
+        if: ${{ secrets.app_id != '' && secrets.app_private_key != '' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.app_id }}
+          private-key: ${{ secrets.app_private_key }}
+          owner: Data-Wise
+          repositories: homebrew-tap
+
       - name: Checkout homebrew-tap
         uses: actions/checkout@v4
         with:
           repository: Data-Wise/homebrew-tap
-          token: ${{ secrets.tap_token }}
+          token: ${{ steps.app-token.outputs.token || secrets.tap_token }}
           ref: main
           persist-credentials: false
 
@@ -92,14 +109,25 @@ jobs:
 
           echo "📦 Updating $FORMULA to v${VERSION}"
 
-          if [ "$SOURCE_TYPE" = "pypi" ]; then
-            # PyPI package - update version in URL pattern
-            PACKAGE_NAME=$(echo "$FORMULA_NAME" | tr '-' '_')
-            sed -i "s|/${PACKAGE_NAME}-[0-9][^/]*\.tar\.gz|/${PACKAGE_NAME}-${VERSION}.tar.gz|g" "$FORMULA"
-          else
-            # GitHub tarball - update version in URL
-            sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${VERSION}.tar.gz|g" "$FORMULA"
-          fi
+          case "$SOURCE_TYPE" in
+            pypi)
+              # PyPI package - update version in URL pattern
+              PACKAGE_NAME=$(echo "$FORMULA_NAME" | tr '-' '_')
+              sed -i "s|/${PACKAGE_NAME}-[0-9][^/]*\.tar\.gz|/${PACKAGE_NAME}-${VERSION}.tar.gz|g" "$FORMULA"
+              ;;
+            npm)
+              # npm package - update version in registry URL (tgz pattern)
+              sed -i "s|/-/${FORMULA_NAME}-[0-9][^/]*\.tgz|/-/${FORMULA_NAME}-${VERSION}.tgz|g" "$FORMULA"
+              ;;
+            cran)
+              # CRAN package - update version in archive URL
+              sed -i "s|/${FORMULA_NAME}_[0-9][^/]*\.tar\.gz|/${FORMULA_NAME}_${VERSION}.tar.gz|g" "$FORMULA"
+              ;;
+            *)
+              # GitHub tarball (default) - update version in URL
+              sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${VERSION}.tar.gz|g" "$FORMULA"
+              ;;
+          esac
 
           # Update SHA256 (first occurrence - main package)
           sed -i "0,/sha256 \"[^\"]*\"/s|sha256 \"[^\"]*\"|sha256 \"${SHA256}\"|" "$FORMULA"
@@ -128,6 +156,13 @@ jobs:
           echo "✅ Updated formula:"
           head -15 "$FORMULA"
 
+      - name: Validate formula syntax
+        continue-on-error: true
+        env:
+          FORMULA_NAME: ${{ inputs.formula_name }}
+        run: |
+          brew style "Formula/${FORMULA_NAME}.rb" || echo "⚠️ Style check found issues (non-blocking)"
+
       # When auto_merge is true, commit directly to main (no PR race condition)
       # persist-credentials: false above prevents actions/checkout from setting
       # an extraheader with the caller's GITHUB_TOKEN, so we auth via remote URL
@@ -136,7 +171,7 @@ jobs:
         env:
           FORMULA_NAME: ${{ inputs.formula_name }}
           VERSION: ${{ inputs.version }}
-          TAP_TOKEN: ${{ secrets.tap_token }}
+          TAP_TOKEN: ${{ steps.app-token.outputs.token || secrets.tap_token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -168,7 +203,7 @@ jobs:
         if: ${{ !inputs.auto_merge }}
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.tap_token }}
+          token: ${{ steps.app-token.outputs.token || secrets.tap_token }}
           commit-message: "${{ inputs.formula_name }}: update to v${{ inputs.version }}"
           title: "${{ inputs.formula_name }}: update to v${{ inputs.version }}"
           body: |

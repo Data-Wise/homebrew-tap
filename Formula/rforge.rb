@@ -1,25 +1,25 @@
+# typed: false
+# frozen_string_literal: true
+
+# Rforge formula for the data-wise/tap Homebrew tap.
 class Rforge < Formula
   desc "R package ecosystem orchestrator - 15 commands - Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  head "https://github.com/Data-Wise/rforge.git", branch: "main"
   license "MIT"
+  head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
   depends_on "jq" => :optional
 
   def install
-    # Install plugin to libexec (Homebrew-managed location)
-    # Include hidden files like .claude-plugin
-    libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
-    # Create wrapper script that symlinks to ~/.claude/plugins/
-    # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
     (bin/"rforge-install").write <<~EOS
       #!/bin/bash
-      # Note: Not using set -e to handle permission errors gracefully
+      # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="rforge"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use stable opt path - Homebrew maintains this symlink across upgrades
+      # Use stable opt path — Homebrew maintains this symlink across upgrades
       SOURCE_DIR="$(brew --prefix)/opt/rforge/libexec"
 
       echo "Installing RForge plugin to Claude Code..."
@@ -36,11 +36,14 @@ class Rforge < Formula
       # Try multiple approaches for macOS compatibility
       LINK_SUCCESS=false
 
-      if ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
+      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
+      # Method 2: Standard symlink
+      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
+          LINK_SUCCESS=true
+      # Method 3: Remove and recreate
       elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      elif ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
           LINK_SUCCESS=true
       fi
 
@@ -52,7 +55,7 @@ class Rforge < Formula
 
           # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
           MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-          PLUGIN_DESC="R package ecosystem orchestrator - commands for analysis, status, dependencies, and cascade updates"
+          PLUGIN_DESC="R package ecosystem orchestrator - analyze, test, release, cascade changes"
           if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
               # Check if plugin already exists in manifest
               if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
@@ -73,12 +76,7 @@ class Rforge < Formula
           AUTO_ENABLED=false
           CLAUDE_RUNNING=false
 
-          # Check if Claude Code has settings.json open
-          if command -v lsof &>/dev/null; then
-              if lsof "$SETTINGS_FILE" 2>/dev/null | grep -q "claude"; then
-                  CLAUDE_RUNNING=true
-              fi
-          elif pgrep -x "claude" >/dev/null 2>&1; then
+          if pgrep -x "claude" >/dev/null 2>&1; then
               CLAUDE_RUNNING=true
           fi
 
@@ -100,11 +98,11 @@ class Rforge < Formula
           else
               echo "To enable, run: claude plugin install rforge@local-plugins"
           fi
+
           echo ""
-          echo "15 commands for R package ecosystem management:"
-          echo "  /rforge:analyze, /rforge:status, /rforge:detect"
-          echo "  /rforge:cascade, /rforge:deps"
-          echo "  Modes: default, debug, optimize, release"
+          echo "15 commands available:"
+          echo "  /rforge:analyze, /rforge:status, /rforge:deps, /rforge:cascade"
+          echo "  /rforge:release, /rforge:impact, /rforge:next, /rforge:complete"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""
@@ -114,6 +112,7 @@ class Rforge < Formula
           echo ""
           exit 0  # Don't fail the brew install
       fi
+
     EOS
 
     (bin/"rforge-uninstall").write <<~EOS
@@ -129,6 +128,7 @@ class Rforge < Formula
       else
           echo "Plugin not found at $TARGET_DIR"
       fi
+
     EOS
 
     chmod "+x", bin/"rforge-install"
@@ -136,19 +136,21 @@ class Rforge < Formula
   end
 
   def post_install
-    # Auto-install plugin after brew install
-    system bin/"rforge-install"
+    begin
+      system bin/"rforge-install"
+    rescue
+      nil
+    end
+
+    begin
+      system "claude", "plugin", "update", "rforge@local-plugins" if which("claude")
+    rescue
+      nil
+    end
   end
 
   def post_uninstall
-    # Auto-uninstall plugin after brew uninstall
     system bin/"rforge-uninstall" if (bin/"rforge-uninstall").exist?
-  end
-
-  test do
-    assert_predicate libexec/".claude-plugin/plugin.json", :exist?
-    assert_predicate libexec/"commands", :directory?
-    assert_predicate libexec/"agents", :directory?
   end
 
   def caveats
@@ -159,17 +161,7 @@ class Rforge < Formula
       If not auto-enabled, run:
         claude plugin install rforge@local-plugins
 
-      Requirements:
-        - Claude Code CLI must be installed
-        - RForge MCP server must be configured in ~/.claude/settings.json
-          (npm install -g rforge-mcp)
-
-      15 commands for R package ecosystem management:
-        - Auto-detect single package vs ecosystem
-        - Dependency analysis and cascade planning
-        - Mode system: default, debug, optimize, release
-
-      Try: /rforge:status
+      15 commands for R package ecosystem management.
 
       If symlink failed (macOS permissions), run manually:
         ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge
@@ -177,5 +169,11 @@ class Rforge < Formula
       For more information:
         https://github.com/Data-Wise/rforge
     EOS
+  end
+
+  test do
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_predicate libexec/"commands", :directory?
+    assert_predicate libexec/"skills", :directory?
   end
 end

@@ -1,3 +1,7 @@
+# typed: false
+# frozen_string_literal: true
+
+# Examark formula for the data-wise/tap Homebrew tap.
 class Examark < Formula
   desc "Create exams from Markdown and export to Canvas QTI format"
   homepage "https://data-wise.github.io/examark/"
@@ -8,7 +12,7 @@ class Examark < Formula
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *std_npm_args
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 

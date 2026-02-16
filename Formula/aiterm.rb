@@ -1,9 +1,13 @@
+# typed: false
+# frozen_string_literal: true
+
+# Aiterm - Terminal optimizer for AI-assisted development
 class Aiterm < Formula
   include Language::Python::Virtualenv
 
   desc "Terminal optimizer for AI-assisted development with Claude Code and Gemini CLI"
   homepage "https://github.com/Data-Wise/aiterm"
-  url "https://github.com/Data-Wise/aiterm/archive/v0.7.2.tar.gz"
+  url "https://github.com/Data-Wise/aiterm/archive/refs/tags/v0.7.2.tar.gz"
   sha256 "14a8c8453cd5186a8fc1d5a2fbc4bf7bd2a3e67a546ecbee7644c32df2e1bc50"
   license "MIT"
 
@@ -40,8 +44,7 @@ class Aiterm < Formula
     bin.install_symlink libexec/"bin/ait"
 
     # Install flow-cli integration files
-    (share/"aiterm/flow-integration").install "flow-integration/aiterm.zsh"
-    (share/"aiterm/flow-integration").install "flow-integration/install-symlink.sh"
+    pkgshare.install "flow-integration"
   end
 
   def post_install
@@ -53,28 +56,28 @@ class Aiterm < Formula
     ]
 
     flow_cli_dir = flow_cli_paths.find { |p| p.directory? && (p/"flow.plugin.zsh").exist? }
+    return unless flow_cli_dir
 
-    if flow_cli_dir
-      target_dir = flow_cli_dir/"zsh/functions"
-      target_dir.mkpath
-      target = target_dir/"aiterm-integration.zsh"
-      source = prefix/"share/aiterm/flow-integration/aiterm.zsh"
+    target_dir = flow_cli_dir/"zsh/functions"
+    target_dir.mkpath
+    target = target_dir/"aiterm-integration.zsh"
+    source = pkgshare/"flow-integration/aiterm.zsh"
 
-      if source.exist? && !target.exist?
-        target.make_symlink(source)
-        ohai "Installed flow-cli integration: tm command available"
-      end
-    end
+    return unless source.exist?
+    return if target.exist?
+
+    target.make_symlink(source)
+    ohai "Installed flow-cli integration: tm command available"
   end
 
   def caveats
     <<~EOS
       To use the `tm` dispatcher with flow-cli:
 
-        #{prefix}/share/aiterm/flow-integration/install-symlink.sh
+        #{pkgshare}/flow-integration/install-symlink.sh
 
       Or manually:
-        ln -sf #{prefix}/share/aiterm/flow-integration/aiterm.zsh \\
+        ln -sf #{pkgshare}/flow-integration/aiterm.zsh \\
           ~/projects/dev-tools/flow-cli/zsh/functions/aiterm-integration.zsh
 
       Then restart your shell or run: source ~/.zshrc

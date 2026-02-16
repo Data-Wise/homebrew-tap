@@ -1,12 +1,17 @@
+# typed: false
+# frozen_string_literal: true
+
+# NexusCli - Knowledge workflow CLI
 class NexusCli < Formula
   include Language::Python::Virtualenv
 
   desc "Knowledge workflow CLI for research, teaching, and writing"
   homepage "https://data-wise.github.io/nexus-cli"
-  url "https://files.pythonhosted.org/packages/source/n/nexus-cli/nexus_cli-0.5.1.tar.gz"
+  url "https://files.pythonhosted.org/packages/a9/a5/78a41997c6cf506a3391f20b7c70095c4b0e87210a90db535c34566b45a6/nexus_cli-0.5.1.tar.gz"
   sha256 "eb4deb5b88d007fa9d5579240202915ef87a2f91d08c0bc7c0b3aa085d33437e"
   license "MIT"
 
+  depends_on "libyaml"
   depends_on "python@3.12"
 
   # Core dependencies
@@ -84,11 +89,6 @@ class NexusCli < Formula
     virtualenv_install_with_resources
   end
 
-  test do
-    assert_match "0.5.1", shell_output("#{bin}/nexus --version")
-    system bin/"nexus", "doctor"
-  end
-
   def caveats
     <<~EOS
       Nexus CLI requires additional setup for full functionality:
@@ -102,5 +102,10 @@ class NexusCli < Formula
 
       Run 'nexus doctor' to check your installation and configuration.
     EOS
+  end
+
+  test do
+    assert_match "0.5.1", shell_output("#{bin}/nexus --version")
+    system bin/"nexus", "doctor"
   end
 end

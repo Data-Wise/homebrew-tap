@@ -1,0 +1,24 @@
+preset: "adhd-focus"
+
+branding:
+  name: "Data-Wise Homebrew Tap"
+  tagline: "Homebrew formulas for CLI tools and Claude Code plugins"
+  logo: null
+
+colors:
+  primary: "#2d6a4f"
+  accent: "#95d5b2"
+  scheme: "auto"
+
+navigation:
+  style: "tabs"
+  max_depth: 3
+
+features:
+  search: true
+  dark_mode: true
+  code_copy: true
+  edit_on_github: true
+  navigation_instant: true
+  navigation_tracking: true
+  version_selector: false
