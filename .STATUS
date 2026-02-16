@@ -2,7 +2,19 @@ status: Active
 last_session: 2026-02-16
 milestone: Homebrew refactor complete
 
-progress: All phases merged to main (PR #91)
+progress: All phases merged to main, repo cleaned up, CI verified
+
+📋 Session 2026-02-16 (cont):
+- Fixed update-formula.yml false push triggers (PR #94)
+- Verified GitHub Pages docs site is live and deploying
+- Verified scribe-cli v0.3.0 not yet released (SHA placeholder waiting)
+- Cleaned up all stale branches (fix/workflow-triggers, feature/audit-fixes)
+
+📋 Session 2026-02-16:
+- Reviewed PR #91 (homebrew refactor — generator, CI/CD, docs site)
+- Fixed 5 code review issues: echo indentation, craft.rb post_install, validate workflow, workflow.rb set -e, scribe-cli SHA TODO
+- Merged PR #91 (+2875/-404, 50 files), PR #92 (docs sync), PR #93 (.STATUS), PR #94 (workflow fix)
+- Cleaned up: worktree removed, 10+ stale remote branches deleted
 
 📊 Tap Inventory: 14 formulas + 2 casks (14/14 pass brew audit --strict)
 
@@ -19,18 +31,10 @@ progress: All phases merged to main (PR #91)
 | nexus-cli | python | Yes | CLEAN |
 | flow-cli | shell | Yes | CLEAN |
 | examark | npm | Yes | CLEAN |
-| examify | npm (deprecated) | No | CLEAN |
 | mcp-bridge | node | Yes | CLEAN |
 | scribe-cli | swift | No | CLEAN (placeholder SHA) |
 
-🎯 What shipped (PR #91):
-- Formula generator (generator/generate.py + manifest.json + blocks/)
-- 6 plugin formulas retrofitted via generator
-- CI: npm/cran source types, GitHub App auth, weekly validation
-- MkDocs documentation site
-- 54+ brew audit issues fixed across all 14 formulas
-
 🎯 Next Action:
 → Replace scribe-cli placeholder SHA when v0.3.0 release is created
-→ Verify GitHub Pages deploys docs site
-→ Verify update-formula workflow uses App token correctly
+→ Verify update-formula workflow uses App token correctly (next time a project releases)
+→ Monitor: push-trigger suppression may need further investigation (PR #94 fix didn't fully resolve)
