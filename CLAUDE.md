@@ -2,24 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Active Work
-
-**Read `ORCHESTRATE-homebrew-refactor.md` in this repo root for the current implementation plan.**
-
-Full spec: `~/projects/dev-tools/craft/docs/specs/SPEC-homebrew-refactor-2026-02-15.md`
-
-**Rebase before every session:** `main` receives automated formula updates. Run `git fetch origin && git rebase origin/main` before starting work. See ORCHESTRATE for conflict resolution rules.
-
 ## What This Is
 
 A Homebrew tap (`brew tap data-wise/tap`) distributing CLI tools, Claude Code plugins, and desktop apps. All packages are for macOS.
 
 ## Repository Layout
 
-- `Formula/*.rb` — Homebrew formulas (CLI tools, plugins)
+- `Formula/*.rb` — 14 Homebrew formulas (CLI tools, plugins)
 - `Casks/*.rb` — Homebrew casks (desktop .app bundles)
+- `generator/` — Python formula generator for plugin formulas
+  - `generate.py` — Reads manifest, produces `Formula/*.rb`
+  - `manifest.json` — Single source of truth for all 14 formulas
+  - `blocks/` — Composable bash/ruby fragments (symlink, schema-cleanup, marketplace, etc.)
 - `tests/` — Shell-based test scripts
-- `.github/workflows/update-formula.yml` — Reusable workflow called by other repos to auto-update formulas on release
+- `.github/workflows/update-formula.yml` — Reusable workflow for auto-updates on release
+- `.github/workflows/validate-formulas.yml` — Weekly formula validation
 
 ## Formula Categories
 
@@ -52,16 +49,37 @@ brew style Formula/aiterm.rb
 brew install --build-from-source data-wise/tap/aiterm
 brew test data-wise/tap/aiterm
 
-# Audit all formulas at once
+# Audit all formulas (reads from /opt/homebrew/Library/Taps/, NOT worktree)
 for f in Formula/*.rb; do name=$(basename "$f" .rb); brew audit --strict "data-wise/tap/$name" 2>&1; done
+
+# To audit worktree changes: copy to tap dir first
+cp Formula/*.rb /opt/homebrew/Library/Taps/data-wise/homebrew-tap/Formula/
 
 # Run shell tests
 bash tests/test_craft_install_timeout.sh
 ```
 
+## Formula Generator
+
+6 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA.
+
+```bash
+python3 generator/generate.py              # Generate all 6 plugin formulas
+python3 generator/generate.py craft        # Generate one formula
+python3 generator/generate.py --diff       # Diff vs existing (no overwrite)
+python3 generator/generate.py --validate   # Validate output with ruby -c
+python3 generator/generate.py --list       # List all formulas in manifest
+```
+
+Generated formulas: craft, himalaya-mcp, scholar, rforge, rforge-orchestrator, workflow. The other 8 are hand-crafted (different enough to not benefit from generation).
+
+When editing a plugin formula, edit `manifest.json` + `blocks/` then regenerate — do NOT edit the generated `.rb` directly.
+
 ## Automated Updates
 
-Other Data-Wise repos call `.github/workflows/update-formula.yml` on release. It accepts `formula_name`, `version`, `sha256`, `source_type` (github|pypi), and `auto_merge`. The workflow uses `sed` to update version/SHA in the formula file, then either pushes directly to main or creates a PR. See `.github/WORKFLOW-TEMPLATES.md` for caller-side setup.
+Other Data-Wise repos call `.github/workflows/update-formula.yml` on release. It accepts `formula_name`, `version`, `sha256`, `source_type` (github|pypi|npm|cran), and `auto_merge`. The workflow uses `sed` to update version/SHA in the formula file, then either pushes directly to main or creates a PR. Authentication uses the GitHub App "Data-Wise Homebrew Automation" (App ID: 2874502) with PAT fallback.
+
+Weekly validation (`validate-formulas.yml`) runs `brew style` + `ruby -c` on all 14 formulas every Monday at 06:00 UTC.
 
 ## Cask Conventions
 

@@ -12,25 +12,33 @@ brew tap data-wise/tap
 
 ### CLI Tools (Formulas)
 
-| Formula | Version | Description |
-|---------|---------|-------------|
-| **aiterm** | v0.6.0 | Terminal optimizer for AI-assisted development |
-| **atlas** | v0.8.0 | ADHD-friendly project state engine with sessions, captures, and context |
-| **examark** | v0.6.6 | Create exams from Markdown and export to Canvas QTI format |
-| **flow-cli** | v4.5.5 | ZSH workflow tools designed for ADHD brains |
-| **mcp-bridge** | v1.0.0 | Connect Claude.ai to local MCP servers via SSE |
-| **nexus-cli** | v0.5.1 | Knowledge workflow CLI for research, teaching, and writing |
-| **rforge-orchestrator** | v0.1.0 | Auto-delegation orchestrator for RForge MCP tools |
-| **workflow** | v0.1.0 | ADHD-friendly workflow automation - Claude Code plugin |
-| ~~examify~~ | v0.5.0 | *Deprecated: renamed to examark* |
+| Formula | Description |
+|---------|-------------|
+| **aiterm** | Terminal optimizer for AI-assisted development |
+| **atlas** | ADHD-friendly project state engine with sessions, captures, and context |
+| **examark** | Create exams from Markdown and export to Canvas QTI format |
+| **flow-cli** | ZSH workflow tools designed for ADHD brains |
+| **mcp-bridge** | Connect Claude.ai to local MCP servers via SSE |
+| **nexus-cli** | Knowledge workflow CLI for research, teaching, and writing |
+| **scribe-cli** | Scribe document conversion CLI |
+| ~~examify~~ | *Deprecated: renamed to examark* |
+
+### Claude Code Plugins (Formulas)
+
+| Formula | Description |
+|---------|-------------|
+| **craft** | Workflow orchestration plugin (109 commands, 80+ skills) |
+| **himalaya-mcp** | Email MCP server for Claude Code via himalaya |
+| **rforge** | R package ecosystem orchestrator |
+| **rforge-orchestrator** | Auto-delegation orchestrator for RForge MCP tools |
+| **scholar** | Academic research toolkit (28 commands) |
+| **workflow** | ADHD-friendly workflow automation plugin |
 
 ```bash
 # Install any formula
 brew install data-wise/tap/aiterm
-brew install data-wise/tap/atlas
-brew install data-wise/tap/flow-cli
-brew install data-wise/tap/mcp-bridge
-brew install data-wise/tap/nexus-cli
+brew install data-wise/tap/craft
+brew install data-wise/tap/himalaya-mcp
 ```
 
 ### Desktop Apps (Casks)
@@ -115,12 +123,33 @@ tm switch       # Context switching
 
 [Documentation](https://data-wise.github.io/flow-cli/)
 
+## Formula Generator
+
+Plugin formulas are generated from a single manifest using the Python generator:
+
+```bash
+cd generator
+python3 generate.py              # Generate all plugin formulas
+python3 generate.py craft        # Generate one formula
+python3 generate.py --diff       # Show diff vs existing
+python3 generate.py --validate   # Validate with ruby -c
+```
+
+The generator reads `generator/manifest.json` and composes bash blocks from `generator/blocks/` to produce consistent Ruby formulas. CI workflows own version/SHA updates; the generator owns formula structure.
+
+## CI/CD
+
+- **update-formula.yml** — Reusable workflow called by project repos on release. Supports `github`, `pypi`, `npm`, and `cran` source types. Uses GitHub App token (Data-Wise Homebrew Automation) with PAT fallback.
+- **validate-formulas.yml** — Weekly `brew style` + `ruby -c` validation of all 14 formulas (Monday 06:00 UTC).
+
 ## More Info
 
 - [aiterm](https://github.com/Data-Wise/aiterm) - Terminal optimizer
 - [Atlas](https://github.com/Data-Wise/atlas) - Project state engine
+- [Craft](https://github.com/Data-Wise/craft) - Workflow orchestration plugin
 - [Examark](https://data-wise.github.io/examark/) - Exam generator
 - [flow-cli](https://data-wise.github.io/flow-cli/) - ZSH workflow tools
+- [Himalaya MCP](https://github.com/Data-Wise/himalaya-mcp) - Email MCP server
 - [MCP Bridge](https://data-wise.github.io/mcp-bridge/) - Claude.ai MCP connector
 - [Nexus CLI](https://data-wise.github.io/nexus-cli/) - Knowledge workflow
 - [Scribe](https://github.com/Data-Wise/scribe) - Distraction-free writer
