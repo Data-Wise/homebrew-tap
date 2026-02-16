@@ -18,7 +18,7 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 |-------|----------|----------|--------|--------|
 | 1 | Security & Reliability Fixes | Critical | < 2h | ✅ Complete |
 | 3 | Python Formula Generator | High | 4-8h | ✅ Complete |
-| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | 🔄 This-repo done; callers + app pending |
+| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | ✅ Complete (except manual App creation) |
 | 5 | Retrofit Plugin Formulas | Medium | 2-4h | ✅ Complete |
 
 ## Phase 1: Security & Reliability Fixes
@@ -105,10 +105,10 @@ generator/
 
 ### Other repos (new caller workflows)
 
-- [ ] 4.4a Create caller for `examark`
-- [ ] 4.4b Create caller for `mcp-bridge`
-- [ ] 4.4c Create caller for `rforge-orchestrator`
-- [ ] 4.4d Create caller for `workflow` (claude-plugins monorepo)
+- [x] 4.4a Create caller for `examark` (pushed via gh API)
+- [x] 4.4b Create caller for `mcp-bridge` (pushed via gh API)
+- [x] 4.4c Create caller for `rforge-orchestrator` (claude-plugins monorepo, pushed via gh API)
+- [x] 4.4d Create caller for `workflow` (claude-plugins monorepo, pushed via gh API)
 
 ### GitHub App setup (manual)
 
@@ -123,7 +123,7 @@ generator/
 - [x] 5.3 Generate `rforge.rb` (head-only, no versioned releases)
 - [x] 5.4 Rewrite `workflow.rb` from old-gen (cp -r) to new patterns
 - [x] 5.5 Verify all 6 plugin formulas pass `brew style` (14/14 total)
-- [ ] 5.6 Test with `brew install --build-from-source` locally
+- [x] 5.6 Test with `brew install --build-from-source` locally (scholar + craft verified)
 
 **Reference formula:** `Formula/himalaya-mcp.rb` (gold standard — passes audit, has all patterns)
 
@@ -148,13 +148,13 @@ generator/
 | Task | Status | Notes |
 |------|--------|-------|
 | ~~4.3 GitHub App token in workflow~~ | **Done** | Workflow supports both App + PAT fallback |
-| 5.6 Local `brew install --build-from-source` test | Pending | Optional verification before merge |
-| Rebase on main | Before merge | CI may have pushed version bumps |
-| Final `brew audit --strict` all 14 | Before merge | Full audit (not just style) |
+| ~~5.6 Local build-from-source test~~ | **Done** | scholar + craft verified |
+| ~~Rebase on main~~ | **Done** | Up to date |
+| ~~`brew audit --strict` all 14~~ | **Done** | 14/14 pass |
+| ~~4.4a-d Caller workflows~~ | **Done** | Pushed to 3 repos via gh API |
 
-**Not this branch** (lives in other repos):
+**Not this branch** (manual):
 - 4.2 Create GitHub App (manual, github.com UI)
-- 4.4a-d Create caller workflows (examark, mcp-bridge, rforge-orchestrator, workflow repos)
 
 ## Rebase Strategy (CRITICAL)
 
