@@ -138,7 +138,7 @@ generator/
 ## Acceptance Criteria (this repo)
 
 - [x] All 14 formulas pass `brew style` (14/14)
-- [ ] All 14 formulas pass `brew audit --strict` (need to verify post-merge)
+- [x] All 14 formulas pass `brew audit --strict` (14/14)
 - [x] Python generator produces valid formulas for 6 plugin archetypes
 - [x] Weekly validation workflow created (`validate-formulas.yml`)
 - [x] `update-formula.yml` supports github, pypi, npm, cran sources
