@@ -1,0 +1,88 @@
+site_name: Data-Wise Homebrew Tap
+site_description: Homebrew formulas for CLI tools and Claude Code plugins
+site_url: https://data-wise.github.io/homebrew-tap/
+
+repo_name: Data-Wise/homebrew-tap
+repo_url: https://github.com/Data-Wise/homebrew-tap
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Quick Start: QUICK-START.md
+  - Formulas:
+    - Overview: formulas/index.md
+    - CLI Tools: formulas/cli-tools.md
+    - Claude Code Plugins: formulas/plugins.md
+    - Casks: formulas/casks.md
+  - Generator:
+    - Overview: generator/index.md
+    - Manifest: generator/manifest.md
+    - Blocks: generator/blocks.md
+  - CI/CD:
+    - Overview: ci/index.md
+    - Update Workflow: ci/update-formula.md
+    - Validation: ci/validation.md
+  - Reference Card: REFCARD.md

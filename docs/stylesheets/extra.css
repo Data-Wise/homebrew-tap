@@ -1,0 +1,55 @@
+/* adhd-focus preset: calm forest green, minimal distractions */
+
+:root {
+  --md-primary-fg-color: #2d6a4f;
+  --md-primary-fg-color--light: #40916c;
+  --md-primary-fg-color--dark: #1b4332;
+  --md-accent-fg-color: #95d5b2;
+  --md-accent-fg-color--transparent: rgba(149, 213, 178, 0.1);
+}
+
+/* Reduce animations for focus */
+* {
+  transition-duration: 0.1s !important;
+}
+
+/* Calm header */
+.md-header {
+  background-color: var(--md-primary-fg-color);
+}
+
+/* Softer code blocks */
+.highlight code {
+  font-size: 0.85em;
+}
+
+/* Clear hierarchy - larger heading contrast */
+.md-typeset h1 {
+  font-weight: 700;
+  color: var(--md-primary-fg-color--dark);
+}
+
+.md-typeset h2 {
+  font-weight: 600;
+  border-bottom: 2px solid var(--md-accent-fg-color);
+  padding-bottom: 0.3em;
+}
+
+/* Calm admonitions */
+.md-typeset .admonition {
+  border-radius: 8px;
+}
+
+/* Dark mode overrides */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #40916c;
+  --md-accent-fg-color: #95d5b2;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1 {
+  color: #b7e4c7;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h2 {
+  border-bottom-color: #52b788;
+}
