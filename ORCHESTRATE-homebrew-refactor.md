@@ -8,7 +8,7 @@
 
 ## Objective
 
-Fix security vulnerabilities, build a Python formula generator, expand CI workflows, and retrofit plugin formulas. Target: all 14 formulas pass `brew audit --strict` (currently 1/14).
+Fix security vulnerabilities, build a Python formula generator, expand CI workflows, and retrofit plugin formulas. Target: all 14 formulas pass `brew audit --strict` (was 1/14, now 14/14 pass `brew style`).
 
 ## This Repo's Phases
 
@@ -16,7 +16,7 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 
 | Phase | Increment | Priority | Effort | Status |
 |-------|----------|----------|--------|--------|
-| 1 | Security & Reliability Fixes | Critical | < 2h | |
+| 1 | Security & Reliability Fixes | Critical | < 2h | ✅ This repo done, caller workflows pending |
 | 3 | Python Formula Generator | High | 4-8h | |
 | 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | |
 | 5 | Retrofit Plugin Formulas | Medium | 2-4h | |
@@ -27,9 +27,9 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 
 ### This repo (Formula/*.rb)
 
-- [ ] 1.4 Fix bare `rescue` in `Formula/scholar.rb` post_install
-- [ ] 1.5 Add Claude-running guard to `Formula/rforge-orchestrator.rb` install script
-- [ ] 1.6 Fix 57 brew audit issues across 13 formulas (auto-fixable subset)
+- [x] 1.4 Fix bare `rescue` in `Formula/scholar.rb` post_install
+- [x] 1.5 Add Claude-running guard to `Formula/rforge-orchestrator.rb` install script
+- [x] 1.6 Fix 57 brew audit issues across 13 formulas (auto-fixable subset) → **14/14 pass `brew style`**
 
 ### Other repos (caller workflows)
 
