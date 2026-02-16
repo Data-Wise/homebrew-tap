@@ -9,14 +9,17 @@ A Homebrew tap (`brew tap data-wise/tap`) distributing CLI tools, Claude Code pl
 ## Repository Layout
 
 - `Formula/*.rb` — 14 Homebrew formulas (CLI tools, plugins)
-- `Casks/*.rb` — Homebrew casks (desktop .app bundles)
+- `Casks/*.rb` — Homebrew casks (scribe, scribe-dev)
 - `generator/` — Python formula generator for plugin formulas
   - `generate.py` — Reads manifest, produces `Formula/*.rb`
   - `manifest.json` — Single source of truth for all 14 formulas
   - `blocks/` — Composable bash/ruby fragments (symlink, schema-cleanup, marketplace, etc.)
+- `docs/` — MkDocs Material documentation site (adhd-focus preset)
+- `mkdocs.yml` — MkDocs configuration
 - `tests/` — Shell-based test scripts
 - `.github/workflows/update-formula.yml` — Reusable workflow for auto-updates on release
 - `.github/workflows/validate-formulas.yml` — Weekly formula validation
+- `.github/workflows/docs.yml` — GitHub Pages deployment (on push to main, docs/** changes)
 
 ## Formula Categories
 
@@ -57,6 +60,10 @@ cp Formula/*.rb /opt/homebrew/Library/Taps/data-wise/homebrew-tap/Formula/
 
 # Run shell tests
 bash tests/test_craft_install_timeout.sh
+
+# Documentation site
+mkdocs serve              # Local preview at localhost:8000
+mkdocs build --strict     # Build and validate
 ```
 
 ## Formula Generator
