@@ -6,7 +6,6 @@ class ScribeCli < Formula
   desc "ADHD-friendly note-taking CLI with multi-vault support"
   homepage "https://github.com/Data-Wise/scribe-sw"
   url "https://github.com/Data-Wise/scribe-sw/archive/refs/tags/v0.3.0.tar.gz"
-  version "0.3.0"
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   license "MIT"
 
@@ -53,6 +52,6 @@ class ScribeCli < Formula
     assert_match "Scribe CLI", shell_output("#{bin}/scribe-cli help")
 
     # Test version
-    system "#{bin}/scribe-cli", "help"
+    system bin/"scribe-cli", "help"
   end
 end
