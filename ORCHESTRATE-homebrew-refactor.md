@@ -18,7 +18,7 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 |-------|----------|----------|--------|--------|
 | 1 | Security & Reliability Fixes | Critical | < 2h | ✅ Complete |
 | 3 | Python Formula Generator | High | 4-8h | ✅ Complete |
-| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | 🔄 In Progress |
+| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | 🔄 This-repo done; callers + app pending |
 | 5 | Retrofit Plugin Formulas | Medium | 2-4h | ✅ Complete |
 
 ## Phase 1: Security & Reliability Fixes
@@ -137,10 +137,24 @@ generator/
 
 ## Acceptance Criteria (this repo)
 
-- [ ] All 14 formulas pass `brew audit --strict`
-- [ ] Python generator produces valid formulas for 5 plugin archetypes
-- [ ] Weekly validation workflow running
-- [ ] `update-formula.yml` supports github, pypi, npm, cran sources
+- [x] All 14 formulas pass `brew style` (14/14)
+- [ ] All 14 formulas pass `brew audit --strict` (need to verify post-merge)
+- [x] Python generator produces valid formulas for 6 plugin archetypes
+- [x] Weekly validation workflow created (`validate-formulas.yml`)
+- [x] `update-formula.yml` supports github, pypi, npm, cran sources
+
+## What's Left — This Branch Only
+
+| Task | Status | Notes |
+|------|--------|-------|
+| 4.3 GitHub App token in workflow | Pending | Blocked on manual GitHub App creation (4.2) |
+| 5.6 Local `brew install --build-from-source` test | Pending | Optional verification before merge |
+| Rebase on main | Before merge | CI may have pushed version bumps |
+| Final `brew audit --strict` all 14 | Before merge | Full audit (not just style) |
+
+**Not this branch** (lives in other repos):
+- 4.2 Create GitHub App (manual, github.com UI)
+- 4.4a-d Create caller workflows (examark, mcp-bridge, rforge-orchestrator, workflow repos)
 
 ## Rebase Strategy (CRITICAL)
 
