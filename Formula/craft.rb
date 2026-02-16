@@ -199,9 +199,15 @@ class Craft < Formula
       nil
     end
 
-    # Step 2: Auto-install plugin (always runs regardless of step 1)
+    # Step 2: Auto-install plugin with 30s timeout (always runs regardless of step 1)
     begin
-      system bin/"craft-install"
+      require "timeout"
+      pid = Process.spawn("#{bin}/craft-install")
+      Timeout.timeout(30) { Process.waitpid(pid) }
+    rescue Timeout::Error
+      Process.kill("TERM", pid) rescue nil
+      Process.waitpid(pid) rescue nil
+      opoo "craft-install timed out after 30 seconds (skipping)"
     rescue
       nil
     end
