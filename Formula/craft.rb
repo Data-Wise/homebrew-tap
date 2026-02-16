@@ -250,6 +250,6 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
-    assert_match "2.20.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
+    assert_match "2.21.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 end
