@@ -1,3 +1,7 @@
+# typed: false
+# frozen_string_literal: true
+
+# Craft formula for the data-wise/tap Homebrew tap.
 class Craft < Formula
   desc "Full-stack developer toolkit for Claude Code with 109 commands"
   homepage "https://github.com/Data-Wise/craft"
@@ -222,7 +226,7 @@ class Craft < Formula
         allowed_keys = %w[name version description author]
         data = JSON.parse(plugin_json.read)
         cleaned = data.slice(*allowed_keys)
-        plugin_json.write(JSON.pretty_generate(cleaned) + "\n") if cleaned.size < data.size
+        plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
       end
     rescue
       # Non-fatal: plugin may still work if key issue is fixed in source

@@ -1,3 +1,7 @@
+# typed: false
+# frozen_string_literal: true
+
+# HimalayaMcp formula for the data-wise/tap Homebrew tap.
 class HimalayaMcp < Formula
   desc "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
   homepage "https://github.com/Data-Wise/himalaya-mcp"
@@ -180,19 +184,17 @@ class HimalayaMcp < Formula
 
   def post_install
     # Strip keys not recognized by Claude Code's strict plugin.json schema
-    begin
-      require "json"
-      plugin_json = libexec/".claude-plugin/plugin.json"
-      if plugin_json.exist?
-        allowed_keys = %w[name version description author]
-        data = JSON.parse(plugin_json.read)
-        cleaned = data.slice(*allowed_keys)
-        plugin_json.write(JSON.pretty_generate(cleaned) + "\n") if cleaned.size < data.size
-      end
-    rescue
-      nil
+    require "json"
+    plugin_json = libexec/".claude-plugin/plugin.json"
+    if plugin_json.exist?
+      allowed_keys = %w[name version description author]
+      data = JSON.parse(plugin_json.read)
+      cleaned = data.slice(*allowed_keys)
+      plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
     end
-    # Note: No symlink attempt here — macOS sandbox-exec blocks ALL
+  rescue
+    nil
+    # NOTE: No symlink attempt here — macOS sandbox-exec blocks ALL
     # post_install writes to $HOME, regardless of formula build steps.
     # Users run `himalaya-mcp-install` after `brew install`.
   end

@@ -1,15 +1,19 @@
+# typed: false
+# frozen_string_literal: true
+
+# Rforge formula for the data-wise/tap Homebrew tap.
 class Rforge < Formula
   desc "R package ecosystem orchestrator - 15 commands - Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  head "https://github.com/Data-Wise/rforge.git", branch: "main"
   license "MIT"
+  head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
   depends_on "jq" => :optional
 
   def install
     # Install plugin to libexec (Homebrew-managed location)
     # Include hidden files like .claude-plugin
-    libexec.install Dir["*", ".*"].reject { |f| f == "." || f == ".." || f == ".git" }
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     # Create wrapper script that symlinks to ~/.claude/plugins/
     # Use stable /opt/homebrew/opt path (survives upgrades) instead of versioned Cellar path
@@ -145,12 +149,6 @@ class Rforge < Formula
     system bin/"rforge-uninstall" if (bin/"rforge-uninstall").exist?
   end
 
-  test do
-    assert_predicate libexec/".claude-plugin/plugin.json", :exist?
-    assert_predicate libexec/"commands", :directory?
-    assert_predicate libexec/"agents", :directory?
-  end
-
   def caveats
     <<~EOS
       The RForge plugin has been installed to:
@@ -177,5 +175,11 @@ class Rforge < Formula
       For more information:
         https://github.com/Data-Wise/rforge
     EOS
+  end
+
+  test do
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_predicate libexec/"commands", :directory?
+    assert_predicate libexec/"agents", :directory?
   end
 end

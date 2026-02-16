@@ -1,6 +1,7 @@
 # typed: false
 # frozen_string_literal: true
 
+# FlowCli formula for the data-wise/tap Homebrew tap.
 class FlowCli < Formula
   desc "ZSH workflow tools designed for ADHD brains"
   homepage "https://data-wise.github.io/flow-cli/"
@@ -14,6 +15,10 @@ class FlowCli < Formula
   depends_on "zsh"
 
   def install
+    # Move man pages to proper Homebrew location (share/man) before installing
+    man1.install Dir["man/man1/*"] if (buildpath/"man/man1").exist?
+    rm_r(buildpath/"man") if (buildpath/"man").exist?
+
     # Install the plugin files
     prefix.install Dir["*"]
 

@@ -1,3 +1,7 @@
+# typed: false
+# frozen_string_literal: true
+
+# Scholar formula for the data-wise/tap Homebrew tap.
 class Scholar < Formula
   desc "Academic workflows for research and teaching - Claude Code plugin"
   homepage "https://github.com/Data-Wise/scholar"
@@ -139,17 +143,21 @@ class Scholar < Formula
   end
 
   def post_install
-    # Auto-install plugin after brew install
-    system bin/"scholar-install"
-
-    # Sync Claude Code plugin registry with new version
-    # This updates the cache so Claude Code loads the correct version
-    if which("claude")
-      system "claude", "plugin", "update", "scholar@local-plugins"
+    begin
+      # Auto-install plugin after brew install
+      system bin/"scholar-install"
+    rescue
+      nil
     end
-  rescue
-    # Don't fail if claude CLI not available or update fails
-    nil
+
+    begin
+      # Sync Claude Code plugin registry with new version
+      # This updates the cache so Claude Code loads the correct version
+      system "claude", "plugin", "update", "scholar@local-plugins" if which("claude")
+    rescue
+      # Don't fail if claude CLI not available or update fails
+      nil
+    end
   end
 
   def post_uninstall

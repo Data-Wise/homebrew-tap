@@ -1,9 +1,13 @@
+# typed: false
+# frozen_string_literal: true
+
+# ADHD-friendly workflow automation plugin for Claude Code
 class Workflow < Formula
   desc "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin"
   homepage "https://github.com/Data-Wise/claude-plugins"
   url "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v0.1.0/workflow-v0.1.0.tar.gz"
-  sha256 "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783"
   version "0.1.0"
+  sha256 "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783"
   license "MIT"
 
   depends_on "jq"
@@ -110,13 +114,13 @@ class Workflow < Formula
   end
 
   test do
-    assert_predicate libexec/".claude-plugin/plugin.json", :exist?
-    assert_predicate libexec/"README.md", :exist?
-    assert_predicate libexec/"commands/brainstorm.md", :exist?
-    assert_predicate libexec/"skills/design/backend-designer.md", :exist?
-    assert_predicate libexec/"skills/design/frontend-designer.md", :exist?
-    assert_predicate libexec/"skills/design/devops-helper.md", :exist?
-    assert_predicate libexec/"agents/orchestrator.md", :exist?
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists libexec/"README.md"
+    assert_path_exists libexec/"commands/brainstorm.md"
+    assert_path_exists libexec/"skills/design/backend-designer.md"
+    assert_path_exists libexec/"skills/design/frontend-designer.md"
+    assert_path_exists libexec/"skills/design/devops-helper.md"
+    assert_path_exists libexec/"agents/orchestrator.md"
 
     # Validate JSON files
     system "jq", "empty", libexec/".claude-plugin/plugin.json"

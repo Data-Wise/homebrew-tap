@@ -1,12 +1,16 @@
+# typed: false
+# frozen_string_literal: true
+
+# Atlas - Project state engine for developer workflows
 class Atlas < Formula
-  desc "Project state engine - registry, sessions, capture, and context for ADHD-friendly workflow"
+  desc "Project state engine with registry, sessions, and capture"
   homepage "https://github.com/Data-Wise/atlas"
   url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "92ee26b3c60c85f13090634557028d27dfc5039ebc00e59b018b49f128f7ebd1"
   license "MIT"
 
-  depends_on "node@20"
-  depends_on "python@3.12" => :build  # Required for node-gyp (better-sqlite3)
+  depends_on "python@3.12" => :build
+  depends_on "node@20" # Required for node-gyp (better-sqlite3)
 
   def install
     system "npm", "install", *std_npm_args
@@ -50,6 +54,6 @@ class Atlas < Formula
     # Test init creates config directory
     ENV["ATLAS_CONFIG"] = testpath/".atlas"
     system bin/"atlas", "init"
-    assert_predicate testpath/".atlas", :exist?
+    assert_path_exists testpath/".atlas"
   end
 end
