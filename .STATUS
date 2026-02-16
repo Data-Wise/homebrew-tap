@@ -1,12 +1,36 @@
-# Homebrew Tap
+status: Active
+last_session: 2026-02-16
+milestone: Homebrew refactor complete
 
-## Status: Paused
-## Progress: 30
-## Focus: Custom Homebrew formulas for personal tools
+progress: All phases merged to main (PR #91)
 
-## Overview
-Homebrew tap for distributing CLI tools like atlas.
+📊 Tap Inventory: 14 formulas + 2 casks (14/14 pass brew audit --strict)
 
-## Next
-- Add atlas formula
-- Set up CI for formula testing
+| Formula | Type | CI Caller | Audit Status |
+|---------|------|-----------|-------------|
+| craft | plugin (generated) | Yes | CLEAN |
+| scholar | plugin (generated) | Yes | CLEAN |
+| himalaya-mcp | plugin (generated) | Yes | CLEAN |
+| rforge | plugin (generated) | No | CLEAN |
+| rforge-orchestrator | plugin (generated) | Yes | CLEAN |
+| workflow | plugin (generated) | Yes | CLEAN |
+| aiterm | python | Yes | CLEAN |
+| atlas | node | Yes | CLEAN |
+| nexus-cli | python | Yes | CLEAN |
+| flow-cli | shell | Yes | CLEAN |
+| examark | npm | Yes | CLEAN |
+| examify | npm (deprecated) | No | CLEAN |
+| mcp-bridge | node | Yes | CLEAN |
+| scribe-cli | swift | No | CLEAN (placeholder SHA) |
+
+🎯 What shipped (PR #91):
+- Formula generator (generator/generate.py + manifest.json + blocks/)
+- 6 plugin formulas retrofitted via generator
+- CI: npm/cran source types, GitHub App auth, weekly validation
+- MkDocs documentation site
+- 54+ brew audit issues fixed across all 14 formulas
+
+🎯 Next Action:
+→ Replace scribe-cli placeholder SHA when v0.3.0 release is created
+→ Verify GitHub Pages deploys docs site
+→ Verify update-formula workflow uses App token correctly
