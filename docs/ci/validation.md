@@ -8,9 +8,9 @@ Runs every Monday at 06:00 UTC via `validate-formulas.yml`. Can also be triggere
 
 ## What It Checks
 
-### brew style
+### brew audit --strict
 
-Runs `brew style` on all 14 formulas in `Formula/`. Reports pass/fail count and lists any failing formulas.
+Runs `brew audit --strict` on all 14 formulas using tap-qualified names (`data-wise/tap/<name>`). Reports pass/fail count and lists any failing formulas.
 
 ### ruby -c
 
@@ -23,16 +23,16 @@ Results are written to the GitHub Actions step summary with a pass/fail table.
 ## Running Locally
 
 ```bash
-# Style check all formulas
-for f in Formula/*.rb; do
-  echo -n "$(basename "$f" .rb): "
-  brew style "$f" >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
-done
-
-# Strict audit (reads from tap dir, not worktree)
+# Strict audit (must use tap name, reads from tap dir)
 for f in Formula/*.rb; do
   name=$(basename "$f" .rb)
   brew audit --strict "data-wise/tap/$name" 2>&1
+done
+
+# Style check (accepts file paths)
+for f in Formula/*.rb; do
+  echo -n "$(basename "$f" .rb): "
+  brew style "$f" >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
 done
 
 # Ruby syntax check
