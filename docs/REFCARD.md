@@ -70,4 +70,4 @@ python3 generator/generate.py --list       # List all formulas
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
 | update-formula.yml | Called by project repos on release | Updates version/SHA via sed |
-| validate-formulas.yml | Weekly (Monday 06:00 UTC) | brew style + ruby -c on all 14 |
+| validate-formulas.yml | Weekly (Monday 06:00 UTC) | `brew audit --strict` + `ruby -c` on all 14 |
