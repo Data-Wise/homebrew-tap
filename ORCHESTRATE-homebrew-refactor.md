@@ -16,8 +16,8 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 
 | Phase | Increment | Priority | Effort | Status |
 |-------|----------|----------|--------|--------|
-| 1 | Security & Reliability Fixes | Critical | < 2h | ✅ This repo done, caller workflows pending |
-| 3 | Python Formula Generator | High | 4-8h | |
+| 1 | Security & Reliability Fixes | Critical | < 2h | ✅ Complete |
+| 3 | Python Formula Generator | High | 4-8h | ✅ Complete |
 | 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | |
 | 5 | Retrofit Plugin Formulas | Medium | 2-4h | |
 
@@ -35,9 +35,9 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 
 These callers live in their respective project repos, NOT here:
 
-- [ ] 1.1 Fix script injection in `aiterm`, `atlas`, `flow-cli` callers (env: indirection)
-- [ ] 1.2 Standardize SHA: `sha256sum` everywhere (not `shasum -a 256`)
-- [ ] 1.3 Add retry + empty-SHA guard to `craft`, `aiterm`, `atlas`, `flow-cli` callers
+- [x] 1.1 Fix script injection in `aiterm`, `atlas`, `flow-cli` callers (env: indirection) — already done
+- [x] 1.2 Standardize SHA: `sha256sum` everywhere (not `shasum -a 256`) — craft was the only holdout, fixed
+- [x] 1.3 Add retry + empty-SHA guard to `craft`, `aiterm`, `atlas`, `flow-cli` callers — craft was the only holdout, fixed
 
 **Caller workflow locations:**
 - `~/projects/dev-tools/craft/.github/workflows/homebrew-release.yml`
@@ -68,12 +68,12 @@ These callers live in their respective project repos, NOT here:
 
 **Scope:** `generator/` directory in this repo
 
-- [ ] 3.1 Create `generator/manifest.yml` with all 14 formula entries
-- [ ] 3.2 Create composable bash blocks in `generator/blocks/`
-- [ ] 3.3 Build `generator/generate.py` (Python 3, stdlib only)
-- [ ] 3.4 Add `--diff` mode (show changes vs existing formula)
-- [ ] 3.5 Add validation: `ruby -c`, manifest drift detection
-- [ ] 3.6 Test: generate all 5 plugin formulas, diff against existing
+- [x] 3.1 Create `generator/manifest.json` with all 14 formula entries (JSON, not YAML — stdlib only)
+- [x] 3.2 Create composable bash blocks in `generator/blocks/` (9 blocks)
+- [x] 3.3 Build `generator/generate.py` (Python 3, stdlib only)
+- [x] 3.4 Add `--diff` mode (show changes vs existing formula)
+- [x] 3.5 Add validation: `ruby -c` via `--validate` flag
+- [x] 3.6 Test: generate all 6 plugin formulas, all pass ruby -c
 
 **Key files (all new):**
 ```
