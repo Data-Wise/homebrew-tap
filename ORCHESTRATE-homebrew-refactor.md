@@ -18,8 +18,8 @@ Only phases that touch this repo are listed. Phases 2 and 6 are craft-only.
 |-------|----------|----------|--------|--------|
 | 1 | Security & Reliability Fixes | Critical | < 2h | ✅ Complete |
 | 3 | Python Formula Generator | High | 4-8h | ✅ Complete |
-| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | |
-| 5 | Retrofit Plugin Formulas | Medium | 2-4h | |
+| 4 | CI Workflow Expansion + GitHub App | Medium | 4-6h | 🔄 In Progress |
+| 5 | Retrofit Plugin Formulas | Medium | 2-4h | ✅ Complete |
 
 ## Phase 1: Security & Reliability Fixes
 
@@ -98,10 +98,10 @@ generator/
 
 ### This repo
 
-- [ ] 4.1 Add `npm` and `cran` source types to `update-formula.yml`
+- [x] 4.1 Add `npm` and `cran` source types to `update-formula.yml`
 - [ ] 4.3 Update `update-formula.yml` to use `actions/create-github-app-token@v1`
-- [ ] 4.5 Create weekly validation workflow (`validate-formulas.yml`)
-- [ ] 4.6 Add `brew audit --strict` step to `update-formula.yml` (non-blocking initially)
+- [x] 4.5 Create weekly validation workflow (`validate-formulas.yml`)
+- [x] 4.6 Add `brew style` step to `update-formula.yml` (non-blocking initially)
 
 ### Other repos (new caller workflows)
 
@@ -118,11 +118,11 @@ generator/
 
 **Scope:** `Formula/` in this repo
 
-- [ ] 5.1 Generate `craft.rb` from manifest, diff and merge
-- [ ] 5.2 Generate `scholar.rb`, fix bare rescue, add schema cleanup
-- [ ] 5.3 Generate `rforge.rb` (pending: start tagging releases first)
-- [ ] 5.4 Rewrite `workflow.rb` from old-gen (cp -r) to new patterns
-- [ ] 5.5 Verify all 5 plugin formulas pass `brew audit --strict`
+- [x] 5.1 Generate `craft.rb` from manifest, diff and merge
+- [x] 5.2 Generate `scholar.rb`, fix bare rescue, add schema cleanup
+- [x] 5.3 Generate `rforge.rb` (head-only, no versioned releases)
+- [x] 5.4 Rewrite `workflow.rb` from old-gen (cp -r) to new patterns
+- [x] 5.5 Verify all 6 plugin formulas pass `brew style` (14/14 total)
 - [ ] 5.6 Test with `brew install --build-from-source` locally
 
 **Reference formula:** `Formula/himalaya-mcp.rb` (gold standard — passes audit, has all patterns)

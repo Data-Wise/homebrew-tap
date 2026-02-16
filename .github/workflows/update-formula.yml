@@ -30,7 +30,7 @@ on:
         required: true
         type: string
       source_type:
-        description: 'Source type: github or pypi'
+        description: 'Source type: github, pypi, npm, or cran'
         required: false
         type: string
         default: 'github'
@@ -92,14 +92,25 @@ jobs:
 
           echo "📦 Updating $FORMULA to v${VERSION}"
 
-          if [ "$SOURCE_TYPE" = "pypi" ]; then
-            # PyPI package - update version in URL pattern
-            PACKAGE_NAME=$(echo "$FORMULA_NAME" | tr '-' '_')
-            sed -i "s|/${PACKAGE_NAME}-[0-9][^/]*\.tar\.gz|/${PACKAGE_NAME}-${VERSION}.tar.gz|g" "$FORMULA"
-          else
-            # GitHub tarball - update version in URL
-            sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${VERSION}.tar.gz|g" "$FORMULA"
-          fi
+          case "$SOURCE_TYPE" in
+            pypi)
+              # PyPI package - update version in URL pattern
+              PACKAGE_NAME=$(echo "$FORMULA_NAME" | tr '-' '_')
+              sed -i "s|/${PACKAGE_NAME}-[0-9][^/]*\.tar\.gz|/${PACKAGE_NAME}-${VERSION}.tar.gz|g" "$FORMULA"
+              ;;
+            npm)
+              # npm package - update version in registry URL (tgz pattern)
+              sed -i "s|/-/${FORMULA_NAME}-[0-9][^/]*\.tgz|/-/${FORMULA_NAME}-${VERSION}.tgz|g" "$FORMULA"
+              ;;
+            cran)
+              # CRAN package - update version in archive URL
+              sed -i "s|/${FORMULA_NAME}_[0-9][^/]*\.tar\.gz|/${FORMULA_NAME}_${VERSION}.tar.gz|g" "$FORMULA"
+              ;;
+            *)
+              # GitHub tarball (default) - update version in URL
+              sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${VERSION}.tar.gz|g" "$FORMULA"
+              ;;
+          esac
 
           # Update SHA256 (first occurrence - main package)
           sed -i "0,/sha256 \"[^\"]*\"/s|sha256 \"[^\"]*\"|sha256 \"${SHA256}\"|" "$FORMULA"
@@ -127,6 +138,13 @@ jobs:
           echo ""
           echo "✅ Updated formula:"
           head -15 "$FORMULA"
+
+      - name: Validate formula syntax
+        continue-on-error: true
+        env:
+          FORMULA_NAME: ${{ inputs.formula_name }}
+        run: |
+          brew style "Formula/${FORMULA_NAME}.rb" || echo "⚠️ Style check found issues (non-blocking)"
 
       # When auto_merge is true, commit directly to main (no PR race condition)
       # persist-credentials: false above prevents actions/checkout from setting

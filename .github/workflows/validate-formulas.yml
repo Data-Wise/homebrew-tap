@@ -1,0 +1,83 @@
+# Weekly validation of all Homebrew formulas
+# Catches style regressions, syntax errors, and audit issues early
+
+name: Validate Formulas
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate all formulas
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Tap repository
+        run: |
+          mkdir -p "$(brew --repository)/Library/Taps/data-wise"
+          ln -sf "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/data-wise/homebrew-tap"
+
+      - name: Run brew style on all formulas
+        run: |
+          echo "## Formula Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          PASS=0
+          FAIL=0
+          ERRORS=""
+
+          for formula in Formula/*.rb; do
+            name=$(basename "$formula" .rb)
+            if brew style "$formula" >/dev/null 2>&1; then
+              ((PASS++))
+            else
+              ((FAIL++))
+              ERRORS="${ERRORS}\n- \`${name}\`"
+              echo "❌ FAIL: $name"
+              brew style "$formula" 2>&1 || true
+              echo ""
+            fi
+          done
+
+          echo "| Result | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ Pass | $PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ Fail | $FAIL |" >> $GITHUB_STEP_SUMMARY
+
+          if [ -n "$ERRORS" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failures" >> $GITHUB_STEP_SUMMARY
+            echo -e "$ERRORS" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo ""
+          echo "Pass: $PASS  Fail: $FAIL"
+
+          if [ "$FAIL" -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Run ruby syntax check
+        if: always()
+        run: |
+          ERRORS=0
+          for formula in Formula/*.rb; do
+            if ! ruby -c "$formula" >/dev/null 2>&1; then
+              echo "❌ Syntax error: $formula"
+              ruby -c "$formula" 2>&1 || true
+              ((ERRORS++))
+            fi
+          done
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "❌ $ERRORS formula(s) have syntax errors"
+            exit 1
+          else
+            echo "✅ All formulas pass syntax check"
+          fi
