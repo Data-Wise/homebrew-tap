@@ -136,8 +136,15 @@ class Rforge < Formula
   end
 
   def post_install
+    # Run install script with 30s timeout
     begin
-      system bin/"rforge-install"
+      require "timeout"
+      pid = Process.spawn("#{bin}/rforge-install")
+      Timeout.timeout(30) { Process.waitpid(pid) }
+    rescue Timeout::Error
+      Process.kill("TERM", pid) rescue nil
+      Process.waitpid(pid) rescue nil
+      opoo "rforge-install timed out after 30 seconds (skipping)"
     rescue
       nil
     end
