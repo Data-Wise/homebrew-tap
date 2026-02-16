@@ -6,6 +6,7 @@ class ScribeCli < Formula
   desc "ADHD-friendly note-taking CLI with multi-vault support"
   homepage "https://github.com/Data-Wise/scribe-sw"
   url "https://github.com/Data-Wise/scribe-sw/archive/refs/tags/v0.3.0.tar.gz"
+  # TODO: Replace with real SHA256 after creating v0.3.0 release
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   license "MIT"
 

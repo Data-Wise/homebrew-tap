@@ -100,7 +100,7 @@ class Rforge < Formula
           fi
 
           echo ""
-              echo "15 commands available:"
+          echo "15 commands available:"
           echo "  /rforge:analyze, /rforge:status, /rforge:deps, /rforge:cascade"
           echo "  /rforge:release, /rforge:impact, /rforge:next, /rforge:complete"
       else

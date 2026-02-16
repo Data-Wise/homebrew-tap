@@ -101,7 +101,7 @@ class RforgeOrchestrator < Formula
           fi
 
           echo ""
-              echo "Commands: /rforge:analyze, /rforge:quick, /rforge:thorough"
+          echo "Commands: /rforge:analyze, /rforge:quick, /rforge:thorough"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
           echo ""

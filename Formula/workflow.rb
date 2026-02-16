@@ -101,7 +101,7 @@ class Workflow < Formula
           fi
 
           echo ""
-              echo "Skills: backend-designer, frontend-designer, devops-helper"
+          echo "Skills: backend-designer, frontend-designer, devops-helper"
           echo "Commands: /brainstorm, /workflow:spec-review"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
@@ -117,7 +117,7 @@ class Workflow < Formula
 
     (bin/"workflow-uninstall").write <<~EOS
       #!/bin/bash
-      set -e
+      # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="workflow"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"

@@ -23,7 +23,7 @@ jobs:
           mkdir -p "$(brew --repository)/Library/Taps/data-wise"
           ln -sf "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/data-wise/homebrew-tap"
 
-      - name: Run brew style on all formulas
+      - name: Run brew audit --strict on all formulas
         run: |
           echo "## Formula Validation" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -34,13 +34,13 @@ jobs:
 
           for formula in Formula/*.rb; do
             name=$(basename "$formula" .rb)
-            if brew style "$formula" >/dev/null 2>&1; then
+            if brew audit --strict "data-wise/tap/$name" >/dev/null 2>&1; then
               ((PASS++))
             else
               ((FAIL++))
               ERRORS="${ERRORS}\n- \`${name}\`"
               echo "❌ FAIL: $name"
-              brew style "$formula" 2>&1 || true
+              brew audit --strict "data-wise/tap/$name" 2>&1 || true
               echo ""
             fi
           done

@@ -145,11 +145,11 @@ class Craft < Formula
           else
               echo "To enable, run: claude plugin install craft@local-plugins"
           fi
-              if [ "$HOOK_INSTALLED" = true ]; then
+          if [ "$HOOK_INSTALLED" = true ]; then
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-              echo "109 commands available:"
+          echo "109 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
@@ -186,16 +186,32 @@ class Craft < Formula
 
   def post_install
     # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
-    require "json"
-    plugin_json = libexec/".claude-plugin/plugin.json"
-    if plugin_json.exist?
-      allowed_keys = %w[name version description author]
-      data = JSON.parse(plugin_json.read)
-      cleaned = data.slice(*allowed_keys)
-      plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
+    begin
+      require "json"
+      plugin_json = libexec/".claude-plugin/plugin.json"
+      if plugin_json.exist?
+        allowed_keys = %w[name version description author]
+        data = JSON.parse(plugin_json.read)
+        cleaned = data.slice(*allowed_keys)
+        plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
+      end
+    rescue
+      nil
     end
-  rescue
-    nil
+
+    # Step 2: Auto-install plugin (always runs regardless of step 1)
+    begin
+      system bin/"craft-install"
+    rescue
+      nil
+    end
+
+    # Step 3: Sync Claude Code plugin registry (optional)
+    begin
+      system "claude", "plugin", "update", "craft@local-plugins" if which("claude")
+    rescue
+      nil
+    end
   end
 
   def post_uninstall

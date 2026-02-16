@@ -101,7 +101,7 @@ class Scholar < Formula
           fi
 
           echo ""
-              echo "28 commands available (14 research + 13 teaching):"
+          echo "28 commands available (14 research + 13 teaching):"
           echo "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*"
           echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       else

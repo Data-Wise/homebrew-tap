@@ -115,7 +115,7 @@ class HimalayaMcp < Formula
           fi
 
           echo ""
-              echo "7 email skills available:"
+          echo "7 email skills available:"
           echo "  /email:inbox       - List and browse inbox"
           echo "  /email:triage      - Classify emails (actionable/FYI/skip)"
           echo "  /email:digest      - Daily email digest"
