@@ -15,7 +15,8 @@ class HimalayaMcp < Formula
 
   def install
     system "npm", "install", *std_npm_args(prefix: false)
-    system "npm", "run", "build:bundle"
+    system "npm", "run", "build"        # tsc — builds dist/cli/setup.js
+    system "npm", "run", "build:bundle" # esbuild — builds dist/index.js (overwrites tsc output)
 
     # Plugin restructured in v1.2.1: plugin.json is in himalaya-mcp-plugin/.claude-plugin/
     mkdir_p libexec/".claude-plugin"
@@ -24,6 +25,13 @@ class HimalayaMcp < Formula
     libexec.install ".mcp.json"
     cp_r "himalaya-mcp-plugin", libexec/"plugin"
     libexec.install "dist"
+
+    # Setup CLI — wrapper script for 'himalaya-mcp setup'
+    (bin/"himalaya-mcp").write <<~EOS
+      #!/bin/bash
+      exec node "#{libexec}/dist/cli/setup.js" "$@"
+    EOS
+    chmod "+x", bin/"himalaya-mcp"
 
     (bin/"himalaya-mcp-install").write <<~EOS
       #!/bin/bash
