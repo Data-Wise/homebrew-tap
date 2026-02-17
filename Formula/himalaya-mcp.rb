@@ -17,9 +17,12 @@ class HimalayaMcp < Formula
     system "npm", "install", *std_npm_args(prefix: false)
     system "npm", "run", "build:bundle"
 
-    libexec.install ".claude-plugin"
+    # Plugin restructured in v1.2.1: plugin.json is in himalaya-mcp-plugin/.claude-plugin/
+    mkdir_p libexec/".claude-plugin"
+    cp "himalaya-mcp-plugin/.claude-plugin/plugin.json", libexec/".claude-plugin/plugin.json"
+    cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
     libexec.install ".mcp.json"
-    libexec.install "plugin"
+    cp_r "himalaya-mcp-plugin", libexec/"plugin"
     libexec.install "dist"
 
     (bin/"himalaya-mcp-install").write <<~EOS
