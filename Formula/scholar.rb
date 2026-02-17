@@ -101,7 +101,7 @@ class Scholar < Formula
           fi
 
           echo ""
-          echo "30 commands available (14 research + 15 teaching + 1 hub):"
+          echo "31 commands available (14 research + 16 teaching + 1 hub):"
           echo "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*"
           echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       else
@@ -169,9 +169,9 @@ class Scholar < Formula
       If not auto-enabled, run:
         claude plugin install scholar@local-plugins
 
-      30 commands available for academic workflows:
+      31 commands available for academic workflows:
         - 14 research commands (literature, manuscript, simulation, planning)
-        - 15 teaching commands (syllabus, assignments, exams, feedback, lectures, solutions, validation, migration)
+        - 16 teaching commands (syllabus, assignments, exams, feedback, lectures, solutions, validation, migration)
         - 1 hub command (command discovery and navigation)
 
       Try: /arxiv "your research topic"
