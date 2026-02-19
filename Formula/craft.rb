@@ -149,7 +149,7 @@ class Craft < Formula
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-          echo "111 commands available:"
+          echo "107 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
@@ -226,7 +226,7 @@ class Craft < Formula
 
   def caveats
     <<~EOS
-      111 commands for full-stack development:
+      107 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
@@ -256,6 +256,6 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
-    assert_match "2.21.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
+    assert_match "2.22.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 end
