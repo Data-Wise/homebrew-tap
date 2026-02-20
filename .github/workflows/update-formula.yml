@@ -205,6 +205,13 @@ jobs:
           PUSH_URL="https://x-access-token:${TAP_TOKEN}@github.com/Data-Wise/homebrew-tap.git"
           git remote set-url origin "$PUSH_URL"
           git add "Formula/${FORMULA_NAME}.rb"
+
+          # Handle idempotent re-runs: skip if formula already up to date
+          if git diff --cached --quiet; then
+            echo "✅ Formula already up to date — nothing to commit"
+            exit 0
+          fi
+
           git commit -m "${FORMULA_NAME}: update to v${VERSION}"
 
           # Unset GITHUB_TOKEN so the runner's credential helper doesn't
