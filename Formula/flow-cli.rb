@@ -15,19 +15,34 @@ class FlowCli < Formula
   depends_on "zsh"
 
   def install
-    # Move man pages to proper Homebrew location (share/man) before installing
+    # Man pages to proper Homebrew location
     man1.install Dir["man/man1/*"] if (buildpath/"man/man1").exist?
     rm_r(buildpath/"man") if (buildpath/"man").exist?
 
-    # Install the plugin files
-    prefix.install Dir["*"]
+    # Core runtime files only (selective install)
+    prefix.install "flow.plugin.zsh"
+    prefix.install "lib"
+    prefix.install "commands"
+    prefix.install "completions"
+    prefix.install "hooks"
+    prefix.install "setup"
+    prefix.install "scripts"
+    prefix.install "config" if (buildpath/"config").exist?
+    prefix.install "plugins" if (buildpath/"plugins").exist?
+    prefix.install "zsh" if (buildpath/"zsh").exist?
+
+    # Essential docs
+    prefix.install "README.md"
+    prefix.install "CHANGELOG.md"
+    prefix.install "LICENSE"
+
+    # Installer scripts
+    prefix.install "install.sh" if (buildpath/"install.sh").exist?
+    prefix.install "uninstall.sh" if (buildpath/"uninstall.sh").exist?
 
     # Create a loader script
     (prefix/"bin/flow-cli-init").write <<~EOS
       #!/bin/zsh
-      # Source this file in your .zshrc to enable flow-cli
-      # Add to .zshrc: eval "$(flow-cli-init)"
-
       echo "source #{prefix}/flow.plugin.zsh"
     EOS
     (prefix/"bin/flow-cli-init").chmod 0755
