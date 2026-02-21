@@ -3,10 +3,10 @@
 
 # Craft formula for the data-wise/tap Homebrew tap.
 class Craft < Formula
-  desc "Full-stack developer toolkit for Claude Code with 108 commands"
+  desc "Full-stack developer toolkit for Claude Code with 107 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.24.0.tar.gz"
-  sha256 "20b02d34a52aa1d6de56f5336b476530cec48ead5c87a00430f7360e316fc965"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.25.0.tar.gz"
+  sha256 "54f607ede679f2f19644e34df16d9df1cb6987490ba8b518686b69bd0ef57ac6"
   license "MIT"
 
   depends_on "jq" => :optional
@@ -149,7 +149,7 @@ class Craft < Formula
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-          echo "108 commands available:"
+          echo "107 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
@@ -226,7 +226,7 @@ class Craft < Formula
 
   def caveats
     <<~EOS
-      108 commands for full-stack development:
+      107 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
@@ -256,6 +256,6 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
-    assert_match "2.24.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
+    assert_match "2.25.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 end
