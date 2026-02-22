@@ -7,11 +7,10 @@ cask "scribe" do
 
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
-  # Intel build pending - use v1.12.0 for Intel Macs
   on_intel do
     sha256 "72b14a1e823654e69ddb4c325f6613a033ecc51e4577cc4018f7280891f07c92"
 
-    url "https://github.com/Data-Wise/scribe/releases/download/v1.12.0/Scribe_1.12.0_x64.dmg"
+    url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
   end
 
   name "Scribe"
@@ -43,16 +42,15 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.16.2:"
-    ohai "  • Technical Debt Remediation - 364 lines of dead code removed"
-    ohai "  • Extracted KeyboardShortcutHandler, EditorOrchestrator"
-    ohai "  • Extracted GeneralSettingsTab, EditorSettingsTab"
-    ohai "  • 2,163 tests passing (98.5%)"
+    ohai "What's New in v1.17.0:"
+    ohai "  - Quarto autocomplete (YAML, chunk options, cross-refs, code chunks)"
+    ohai "  - Context-aware LaTeX completions scoped to math mode"
+    ohai "  - 2,187 tests passing"
     ohai ""
     ohai "Quick Start:"
-    ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
-    ohai "  • Command palette: ⌘K"
-    ohai "  • Focus mode: ⌘⇧F"
+    ohai "  - Global hotkey: Cmd+Shift+N (opens Scribe from anywhere)"
+    ohai "  - Command palette: Cmd+K"
+    ohai "  - Focus mode: Cmd+Shift+F"
     ohai ""
     ohai "Report issues: https://github.com/Data-Wise/scribe/issues"
   end
@@ -70,41 +68,35 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.16.2:
-    • Technical Debt Remediation Phase 1 complete
-    • Removed 364 lines of unused code from production files
-    • Extracted KeyboardShortcutHandler, EditorOrchestrator from App.tsx
-    • Extracted GeneralSettingsTab, EditorSettingsTab from SettingsModal
-    • 2,163 tests passing (98.5%)
-
-    Previous Release (v1.16.0):
-    • Icon-Centric Sidebar - Per-icon expansion with accordion pattern
-    • Each icon remembers compact/card mode preference
-    • Smooth 200ms animations for expansion
+    New in v1.17.0:
+    - Quarto autocomplete - YAML frontmatter, chunk options, cross-references
+    - Context-aware LaTeX completions - scoped to math mode, suppressed in code blocks
+    - Quarto code chunk completions - R, Python, Julia, OJS, Mermaid, Graphviz
+    - 2,187 tests passing
 
     Features:
-    • Three Editor Modes - Source (⌘1), Live Preview (⌘2), Reading (⌘3)
-    • Callouts - 11 types with color coding (> [!note], > [!tip], > [!warning], etc.)
-    • LaTeX Math - KaTeX rendering ($...$ inline, $$...$$ display)
-    • 8 ADHD-friendly themes (visual gallery)
-    • 14 recommended fonts
-    • Wiki-links and tags with backlinks
-    • Focus mode & global hotkey (⌘⇧N)
-    • Citation autocomplete
-    • Export via Pandoc
-    • Quick Actions (✨ Improve, 📝 Expand, 📋 Summarize, 💡 Explain, 🔍 Research)
+    - Three Editor Modes - Source (Cmd+1), Live Preview (Cmd+2), Reading (Cmd+3)
+    - Callouts - 11 types with color coding (> [!note], > [!tip], > [!warning], etc.)
+    - LaTeX Math - KaTeX rendering ($...$ inline, $$...$$ display)
+    - 8 ADHD-friendly themes (visual gallery)
+    - 14 recommended fonts
+    - Wiki-links and tags with backlinks
+    - Focus mode & global hotkey (Cmd+Shift+N)
+    - Citation autocomplete
+    - Export via Pandoc
+    - Quick Actions (Improve, Expand, Summarize, Explain, Research)
 
     Keyboard Shortcuts:
-    • ⌘⇧N    Open Scribe from anywhere
-    • ⌘,     Settings (fuzzy search)
-    • ⌘K     Command palette
-    • ⌘⇧F    Toggle focus mode
-    • ⌘E     Toggle write/preview mode
-    • ⌘⌥1-9  Quick Actions (customizable)
+    - Cmd+Shift+N    Open Scribe from anywhere
+    - Cmd+,          Settings (fuzzy search)
+    - Cmd+K          Command palette
+    - Cmd+Shift+F    Toggle focus mode
+    - Cmd+E          Toggle write/preview mode
+    - Cmd+Option+1-9 Quick Actions (customizable)
 
     Optional Dependencies:
-    • Pandoc: brew install pandoc
-    • LaTeX: brew install --cask mactex (for PDF export)
+    - Pandoc: brew install pandoc
+    - LaTeX: brew install --cask mactex (for PDF export)
 
     Report issues: https://github.com/Data-Wise/scribe/issues
   EOS
