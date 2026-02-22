@@ -5,8 +5,8 @@
 class Atlas < Formula
   desc "Project state engine with registry, sessions, and capture"
   homepage "https://github.com/Data-Wise/atlas"
-  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.8.0.tar.gz"
-  sha256 "92ee26b3c60c85f13090634557028d27dfc5039ebc00e59b018b49f128f7ebd1"
+  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "f46f2791d20248cea39569c01e437e10be08f68961d07888c22ff4a735bb61ff"
   license "MIT"
 
   depends_on "python@3.12" => :build
@@ -34,10 +34,11 @@ class Atlas < Formula
         atlas stats                   # Session analytics
         atlas dash                    # Interactive dashboard
 
-      New in v0.7.0:
-        atlas session export FILE     # Export to iCal for calendars
-        Dashboard: Press 'f' for Task-Based Focus (Pomodoro)
-        Dashboard: Press 'T' for Timeline View
+      New in v0.9.0:
+        React Ink TUI replaces blessed (73% code reduction)
+        Multi-panel dashboard: Tab cycles SINGLE/SPLIT/TRIPLE layouts
+        MCP Server with 10 tools for Claude integration
+        atlas plan                    # Guided daily planning
 
       Shell completions have been installed for bash, zsh, and fish.
 
