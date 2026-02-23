@@ -5,8 +5,8 @@
 class Scholar < Formula
   desc "Academic workflows for research and teaching - Claude Code plugin"
   homepage "https://github.com/Data-Wise/scholar"
-  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v2.14.0.tar.gz"
-  sha256 "64ba5f41fa3b2726eaf8c5369d243edc63d6c96960193fdf8af2d0686d1f7ec3"
+  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v2.15.0.tar.gz"
+  sha256 "bcc7809eaf92504abd292a762de2da957d38d97b7a559eab21d6066e20a3d8c0"
   license "MIT"
 
   depends_on "jq" => :optional
@@ -101,7 +101,7 @@ class Scholar < Formula
           fi
 
           echo ""
-          echo "31 commands available (14 research + 16 teaching + 1 hub):"
+          echo "30 commands available (14 research + 16 teaching + 1 hub):"
           echo "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*"
           echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       else
@@ -169,7 +169,7 @@ class Scholar < Formula
       If not auto-enabled, run:
         claude plugin install scholar@local-plugins
 
-      31 commands available for academic workflows:
+      30 commands available for academic workflows:
         - 14 research commands (literature, manuscript, simulation, planning)
         - 16 teaching commands (syllabus, assignments, exams, feedback, lectures, solutions, validation, migration)
         - 1 hub command (command discovery and navigation)
