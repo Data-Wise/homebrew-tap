@@ -3,7 +3,7 @@ cask "scribe" do
 
   # Architecture-specific SHA256 hashes
   on_arm do
-    sha256 "fbc649d5250aea51706be0696d7712f4f2794cd46873f6f42d262a9cca1706d6"
+    sha256 "440b3b830c2def86c7d32528b64d0afc1ae6780c0ef746ed24f54d4cc00f9495"
 
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
