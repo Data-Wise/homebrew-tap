@@ -1,5 +1,5 @@
 cask "scribe" do
-  version "1.19.0"
+  version "1.20.0"
 
   # Architecture-specific SHA256 hashes
   on_arm do
@@ -42,10 +42,10 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.17.0:"
-    ohai "  - Quarto autocomplete (YAML, chunk options, cross-refs, code chunks)"
-    ohai "  - Context-aware LaTeX completions scoped to math mode"
-    ohai "  - 2,187 tests passing"
+    ohai "What's New in v1.20.0:"
+    ohai "  - Settings infrastructure (SettingsToggle, usePreferences hook)"
+    ohai "  - Session timer replaced by Pomodoro focus counter"
+    ohai "  - 2,280 tests passing"
     ohai ""
     ohai "Quick Start:"
     ohai "  - Global hotkey: Cmd+Shift+N (opens Scribe from anywhere)"
@@ -68,17 +68,17 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.17.0:
-    - Quarto autocomplete - YAML frontmatter, chunk options, cross-references
-    - Context-aware LaTeX completions - scoped to math mode, suppressed in code blocks
-    - Quarto code chunk completions - R, Python, Julia, OJS, Mermaid, Graphviz
-    - 2,187 tests passing
+    New in v1.20.0:
+    - Settings infrastructure (reusable SettingsToggle, usePreferences hook)
+    - Session timer removed, replaced by Pomodoro focus counter in StatsPanel
+    - SHORTCUTS registry (25 keyboard shortcuts, single source of truth)
+    - 2,280 tests passing
 
     Features:
     - Three Editor Modes - Source (Cmd+1), Live Preview (Cmd+2), Reading (Cmd+3)
     - Callouts - 11 types with color coding (> [!note], > [!tip], > [!warning], etc.)
     - LaTeX Math - KaTeX rendering ($...$ inline, $$...$$ display)
-    - 8 ADHD-friendly themes (visual gallery)
+    - 10 ADHD-friendly themes (visual gallery)
     - 14 recommended fonts
     - Wiki-links and tags with backlinks
     - Focus mode & global hotkey (Cmd+Shift+N)
