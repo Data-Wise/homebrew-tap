@@ -8,6 +8,6 @@
     else
         echo "To enable, run: claude plugin install {plugin_name}@local-plugins"
     fi
-    {hook_message}
+{hook_message}
     echo ""
-    {summary_lines}
+{summary_lines}
