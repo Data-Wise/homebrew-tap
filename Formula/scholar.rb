@@ -140,11 +140,19 @@ class Scholar < Formula
     # Step 1: Auto-install plugin with 30s timeout
     begin
       require "timeout"
-      pid = Process.spawn("#{bin}/scholar-install")
+      pid = Process.spawn(bin/"scholar-install")
       Timeout.timeout(30) { Process.waitpid(pid) }
     rescue Timeout::Error
-      Process.kill("TERM", pid) rescue nil
-      Process.waitpid(pid) rescue nil
+      begin
+        Process.kill("TERM", pid)
+      rescue
+        nil
+      end
+      begin
+        Process.waitpid(pid)
+      rescue
+        nil
+      end
       opoo "scholar-install timed out after 30 seconds (skipping)"
     rescue
       nil

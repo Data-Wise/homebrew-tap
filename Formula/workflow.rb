@@ -117,7 +117,7 @@ class Workflow < Formula
 
     (bin/"workflow-uninstall").write <<~EOS
       #!/bin/bash
-      # NOTE: Not using set -e to handle permission errors gracefully
+      set -e
 
       PLUGIN_NAME="workflow"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
@@ -139,11 +139,19 @@ class Workflow < Formula
     # Step 1: Auto-install plugin with 30s timeout
     begin
       require "timeout"
-      pid = Process.spawn("#{bin}/workflow-install")
+      pid = Process.spawn(bin/"workflow-install")
       Timeout.timeout(30) { Process.waitpid(pid) }
     rescue Timeout::Error
-      Process.kill("TERM", pid) rescue nil
-      Process.waitpid(pid) rescue nil
+      begin
+        Process.kill("TERM", pid)
+      rescue
+        nil
+      end
+      begin
+        Process.waitpid(pid)
+      rescue
+        nil
+      end
       opoo "workflow-install timed out after 30 seconds (skipping)"
     rescue
       nil
