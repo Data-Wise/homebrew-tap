@@ -45,6 +45,28 @@ The manifest (`generator/manifest.json`) is the single source of truth for all f
 | `test_paths` | array | Files/dirs to verify in test block |
 | `caveats_extra` | string | Additional caveats text |
 
+## Install Layout Fields
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `libexec_copy_map` | object | Source→dest directory mapping for `cp_r` into libexec | `{"himalaya-mcp-plugin/skills": "skills"}` |
+| `libexec_copy_map_optional` | object | Like `copy_map` but only copies if source directory exists | `{"himalaya-mcp-plugin/hooks": "hooks"}` |
+| `libexec_mkdir` | array | Directories to pre-create in libexec before copying | `["skills", "agents"]` |
+| `libexec_copy_files` | object | Individual file copies (src→dest) into libexec | `{"src/config.json": "config.json"}` |
+| `extra_scripts` | array of objects | CLI wrapper scripts installed to `bin/`. Each object has `name` (string) and `body` (string) keys | `[{"name": "himalaya-mcp", "body": "exec node ..."}]` |
+
+These fields replace the older `libexec_paths` approach with a more flexible layout system. Use `libexec_copy_map` for directory trees, `libexec_copy_files` for individual files, and `libexec_mkdir` to ensure target directories exist before copies run.
+
+## post_install Pattern
+
+All generated plugin formulas use a 3-step `post_install` pattern, with each step in its own `begin/rescue/end` block for independent error isolation:
+
+1. **JSON schema cleanup** (conditional on `features.schema_cleanup`) — strips unrecognized keys from `plugin.json`
+2. **Auto-install** — runs the `<name>-install` script with a 30-second timeout using `Process.spawn` + `Timeout`
+3. **Registry sync** — runs `claude plugin update` to refresh the plugin registry
+
+If any step fails, the remaining steps still execute.
+
 ## Special Fields
 
 | Field | Type | Description |

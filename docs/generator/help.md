@@ -116,7 +116,9 @@ flowchart LR
 3. **For each formula:**
     - Generate install script from blocks (header, symlink, marketplace, etc.)
     - Generate uninstall script
-    - Compose full Ruby formula (class, install, post_install, test, caveats)
+    - Process `libexec_copy_map` / `libexec_copy_map_optional` for directory layout and `libexec_copy_files` for individual files
+    - Generate `extra_scripts` as CLI wrapper scripts in `bin/`
+    - Compose full Ruby formula (class, install, post_install with 3-step pattern, test, caveats)
 4. **Write** to `Formula/<name>.rb` (or diff/validate)
 
 ---
