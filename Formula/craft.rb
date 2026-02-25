@@ -5,8 +5,8 @@
 class Craft < Formula
   desc "Full-stack developer toolkit for Claude Code with 107 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.27.0.tar.gz"
-  sha256 "d89506a3f931b15976a955772099a70a8ab6bb5d08df3a779abe185836c80015"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.28.0.tar.gz"
+  sha256 "c92158c23bcf67dc92708588314d71be6fe478ea39973ca1e9ccf7f7f255c653"
   license "MIT"
 
   depends_on "jq" => :optional
@@ -256,6 +256,6 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
-    assert_match "2.27.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
+    assert_match "2.28.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 end
