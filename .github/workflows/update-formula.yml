@@ -183,6 +183,59 @@ jobs:
           echo "✅ Updated formula:"
           head -15 "$FORMULA"
 
+
+      - name: Update manifest.json (generated formulas only)
+        env:
+          FORMULA_NAME: ${{ inputs.formula_name }}
+          VERSION: ${{ inputs.version }}
+          SHA256: ${{ inputs.sha256 }}
+          CMD_COUNT: ${{ inputs.command_count }}
+          AGENT_COUNT: ${{ inputs.agent_count }}
+          SKILL_COUNT: ${{ inputs.skill_count }}
+        run: |
+          MANIFEST="generator/manifest.json"
+
+          # Skip if formula is not in manifest or is hand-crafted (generated: false)
+          if ! jq -e ".formulas[\"$FORMULA_NAME\"]" "$MANIFEST" >/dev/null 2>&1; then
+            echo "Not in manifest -- skipping"
+            exit 0
+          fi
+          if [ "$(jq ".formulas[\"$FORMULA_NAME\"].generated" "$MANIFEST")" = "false" ]; then
+            echo "Hand-crafted formula (generated: false) -- skipping"
+            exit 0
+          fi
+
+          echo "Updating manifest.json for $FORMULA_NAME"
+
+          # Update version and sha256
+          jq --arg name "$FORMULA_NAME" --arg ver "$VERSION" --arg sha "$SHA256" \
+             '.formulas[$name].version = $ver | .formulas[$name].sha256 = $sha' \
+             "$MANIFEST" > tmp_manifest.json && mv tmp_manifest.json "$MANIFEST"
+
+          # Update dynamic counts in desc if provided
+          if [ -n "$CMD_COUNT" ]; then
+            jq --arg name "$FORMULA_NAME" --arg count "$CMD_COUNT" \
+               '.formulas[$name].desc = (.formulas[$name].desc | gsub("[0-9]+ commands"; ($count + " commands")))' \
+               "$MANIFEST" > tmp_manifest.json && mv tmp_manifest.json "$MANIFEST"
+            echo "  Updated command count to $CMD_COUNT in manifest"
+          fi
+
+          if [ -n "$AGENT_COUNT" ]; then
+            jq --arg name "$FORMULA_NAME" --arg count "$AGENT_COUNT" \
+               '.formulas[$name].desc = (.formulas[$name].desc | gsub("[0-9]+ agents"; ($count + " agents")))' \
+               "$MANIFEST" > tmp_manifest.json && mv tmp_manifest.json "$MANIFEST"
+            echo "  Updated agent count to $AGENT_COUNT in manifest"
+          fi
+
+          if [ -n "$SKILL_COUNT" ]; then
+            jq --arg name "$FORMULA_NAME" --arg count "$SKILL_COUNT" \
+               '.formulas[$name].desc = (.formulas[$name].desc | gsub("[0-9]+ skills"; ($count + " skills")))' \
+               "$MANIFEST" > tmp_manifest.json && mv tmp_manifest.json "$MANIFEST"
+            echo "  Updated skill count to $SKILL_COUNT in manifest"
+          fi
+
+          echo "Manifest updated successfully"
+
       - name: Validate formula syntax
         continue-on-error: true
         env:
@@ -205,6 +258,9 @@ jobs:
           PUSH_URL="https://x-access-token:${TAP_TOKEN}@github.com/Data-Wise/homebrew-tap.git"
           git remote set-url origin "$PUSH_URL"
           git add "Formula/${FORMULA_NAME}.rb"
+          if [ -f generator/manifest.json ] && ! git diff --quiet -- generator/manifest.json; then
+            git add "generator/manifest.json"
+          fi
 
           # Handle idempotent re-runs: skip if formula already up to date
           if git diff --cached --quiet; then
