@@ -5,8 +5,8 @@
 class HimalayaMcp < Formula
   desc "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
   homepage "https://github.com/Data-Wise/himalaya-mcp"
-  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.3.1.tar.gz"
-  sha256 "62d50cc95bfb6e87685a9161e35d2062d1668752609126b6c500c01f5605ca37"
+  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "35662a9ffbe046e7f9208d64dae0d28bfa4f46c2c129f64e14813614f83be35e"
   license "MIT"
 
   depends_on "himalaya"
@@ -184,11 +184,19 @@ class HimalayaMcp < Formula
     # Step 2: Auto-install plugin with 30s timeout
     begin
       require "timeout"
-      pid = Process.spawn("#{bin}/himalaya-mcp-install")
+      pid = Process.spawn(bin/"himalaya-mcp-install")
       Timeout.timeout(30) { Process.waitpid(pid) }
     rescue Timeout::Error
-      Process.kill("TERM", pid) rescue nil
-      Process.waitpid(pid) rescue nil
+      begin
+        Process.kill("TERM", pid)
+      rescue
+        nil
+      end
+      begin
+        Process.waitpid(pid)
+      rescue
+        nil
+      end
       opoo "himalaya-mcp-install timed out after 30 seconds (skipping)"
     rescue
       nil
