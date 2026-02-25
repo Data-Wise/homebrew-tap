@@ -135,12 +135,20 @@ class RforgeOrchestrator < Formula
   end
 
   def post_install
+    # Step 1: Auto-install plugin with 30s timeout
     begin
-      system bin/"rforge-orchestrator-install"
+      require "timeout"
+      pid = Process.spawn("#{bin}/rforge-orchestrator-install")
+      Timeout.timeout(30) { Process.waitpid(pid) }
+    rescue Timeout::Error
+      Process.kill("TERM", pid) rescue nil
+      Process.waitpid(pid) rescue nil
+      opoo "rforge-orchestrator-install timed out after 30 seconds (skipping)"
     rescue
       nil
     end
 
+    # Step 2: Sync Claude Code plugin registry (optional)
     begin
       system "claude", "plugin", "update", "rforge-orchestrator@local-plugins" if which("claude")
     rescue

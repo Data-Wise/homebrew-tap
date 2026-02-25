@@ -101,7 +101,7 @@ class Scholar < Formula
           fi
 
           echo ""
-          echo "30 commands available (14 research + 16 teaching + 1 hub):"
+          echo "28 commands available (14 research + 13 teaching):"
           echo "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*"
           echo "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       else
@@ -137,7 +137,7 @@ class Scholar < Formula
   end
 
   def post_install
-    # Run install script with 30s timeout
+    # Step 1: Auto-install plugin with 30s timeout
     begin
       require "timeout"
       pid = Process.spawn("#{bin}/scholar-install")
@@ -150,6 +150,7 @@ class Scholar < Formula
       nil
     end
 
+    # Step 2: Sync Claude Code plugin registry (optional)
     begin
       system "claude", "plugin", "update", "scholar@local-plugins" if which("claude")
     rescue
@@ -169,10 +170,9 @@ class Scholar < Formula
       If not auto-enabled, run:
         claude plugin install scholar@local-plugins
 
-      30 commands available for academic workflows:
+      28 commands available for academic workflows:
         - 14 research commands (literature, manuscript, simulation, planning)
-        - 16 teaching commands (syllabus, assignments, exams, feedback, lectures, solutions, validation, migration)
-        - 1 hub command (command discovery and navigation)
+        - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)
 
       Try: /arxiv "your research topic"
 

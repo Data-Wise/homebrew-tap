@@ -15,18 +15,18 @@ class HimalayaMcp < Formula
 
   def install
     system "npm", "install", *std_npm_args(prefix: false)
-    system "npm", "run", "build"        # tsc — builds dist/cli/setup.js
-    system "npm", "run", "build:bundle" # esbuild — builds dist/index.js (overwrites tsc output)
+    system "npm", "run", "build"
+    system "npm", "run", "build:bundle"
 
-    # Plugin restructured in v1.2.1: plugin.json is in himalaya-mcp-plugin/.claude-plugin/
     mkdir_p libexec/".claude-plugin"
     cp "himalaya-mcp-plugin/.claude-plugin/plugin.json", libexec/".claude-plugin/plugin.json"
     cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
     libexec.install ".mcp.json"
-    cp_r "himalaya-mcp-plugin", libexec/"plugin"
     libexec.install "dist"
+    cp_r "himalaya-mcp-plugin/skills", libexec/"skills"
+    cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
+    cp_r "himalaya-mcp-plugin/hooks", libexec/"hooks" if (buildpath/"himalaya-mcp-plugin/hooks").exist?
 
-    # Setup CLI — wrapper script for 'himalaya-mcp setup'
     (bin/"himalaya-mcp").write <<~EOS
       #!/bin/bash
       exec node "#{libexec}/dist/cli/setup.js" "$@"
@@ -168,16 +168,38 @@ class HimalayaMcp < Formula
 
   def post_install
     # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
-    require "json"
-    plugin_json = libexec/".claude-plugin/plugin.json"
-    if plugin_json.exist?
-      allowed_keys = %w[name version description author]
-      data = JSON.parse(plugin_json.read)
-      cleaned = data.slice(*allowed_keys)
-      plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
+    begin
+      require "json"
+      plugin_json = libexec/".claude-plugin/plugin.json"
+      if plugin_json.exist?
+        allowed_keys = %w[name version description author]
+        data = JSON.parse(plugin_json.read)
+        cleaned = data.slice(*allowed_keys)
+        plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
+      end
+    rescue
+      nil
     end
-  rescue
-    nil
+
+    # Step 2: Auto-install plugin with 30s timeout
+    begin
+      require "timeout"
+      pid = Process.spawn("#{bin}/himalaya-mcp-install")
+      Timeout.timeout(30) { Process.waitpid(pid) }
+    rescue Timeout::Error
+      Process.kill("TERM", pid) rescue nil
+      Process.waitpid(pid) rescue nil
+      opoo "himalaya-mcp-install timed out after 30 seconds (skipping)"
+    rescue
+      nil
+    end
+
+    # Step 3: Sync Claude Code plugin registry (optional)
+    begin
+      system "claude", "plugin", "update", "himalaya-mcp@local-plugins" if which("claude")
+    rescue
+      nil
+    end
   end
 
   def post_uninstall
@@ -186,12 +208,6 @@ class HimalayaMcp < Formula
 
   def caveats
     <<~EOS
-      To complete installation, run:
-        himalaya-mcp-install
-
-      To uninstall the plugin:
-        himalaya-mcp-uninstall
-
       7 email skills for Claude Code:
         /email:inbox   /email:triage   /email:digest
         /email:reply   /email:compose  /email:attachments
@@ -204,6 +220,12 @@ class HimalayaMcp < Formula
       Requires himalaya CLI with at least one configured account.
       See: https://github.com/Data-Wise/himalaya-mcp
 
+      After upgrades, sync Claude Code registry:
+        claude plugin update himalaya-mcp@local-plugins
+
+      If symlink failed (macOS permissions), run manually:
+        ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
+
       For more information:
         https://github.com/Data-Wise/himalaya-mcp
     EOS
@@ -212,6 +234,7 @@ class HimalayaMcp < Formula
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
     assert_path_exists libexec/"dist/index.js"
-    assert_predicate libexec/"plugin/skills", :directory?
+    assert_predicate libexec/"skills", :directory?
+    assert_predicate libexec/"agents", :directory?
   end
 end
