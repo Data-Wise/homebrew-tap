@@ -136,7 +136,7 @@ class Rforge < Formula
   end
 
   def post_install
-    # Run install script with 30s timeout
+    # Step 1: Auto-install plugin with 30s timeout
     begin
       require "timeout"
       pid = Process.spawn("#{bin}/rforge-install")
@@ -149,6 +149,7 @@ class Rforge < Formula
       nil
     end
 
+    # Step 2: Sync Claude Code plugin registry (optional)
     begin
       system "claude", "plugin", "update", "rforge@local-plugins" if which("claude")
     rescue

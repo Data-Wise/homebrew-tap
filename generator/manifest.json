@@ -6,12 +6,12 @@
   "formulas": {
     "craft": {
       "type": "claude-plugin",
-      "desc": "Full-stack developer toolkit for Claude Code with 109 commands",
+      "desc": "Full-stack developer toolkit for Claude Code with 107 commands",
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
-      "version": "2.19.0",
-      "sha256": "97aa17d6f779a8bfb4169698d9172a44314f1543864d0ae0581f51867954c3af",
+      "version": "2.28.0",
+      "sha256": "c92158c23bcf67dc92708588314d71be6fe478ea39973ca1e9ccf7f7f255c653",
       "dependencies": {
         "optional": ["jq"]
       },
@@ -24,7 +24,7 @@
       "dynamic_counts": ["commands", "agents", "skills"],
       "install_script_desc": "Full-stack developer toolkit - code, git, site, docs, testing, and architecture commands",
       "install_script_summary": [
-        "109 commands available:",
+        "107 commands available:",
         "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check",
         "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       ],
@@ -34,7 +34,7 @@
         { "path": "skills", "type": "directory" },
         { "path": "agents", "type": "directory" }
       ],
-      "caveats_extra": "109 commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
+      "caveats_extra": "107 commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
     },
 
     "himalaya-mcp": {
@@ -43,8 +43,8 @@
       "homepage": "https://github.com/Data-Wise/himalaya-mcp",
       "source": "github",
       "repo": "Data-Wise/himalaya-mcp",
-      "version": "1.2.0",
-      "sha256": "d290d8f9095838b280a6acffe69d44548c3e217fa0993dd9e87731f84e229771",
+      "version": "1.3.0",
+      "sha256": "35662a9ffbe046e7f9208d64dae0d28bfa4f46c2c129f64e14813614f83be35e",
       "dependencies": {
         "runtime": ["himalaya", "node"],
         "optional": ["jq"]
@@ -56,9 +56,28 @@
       },
       "build_steps": [
         "system \"npm\", \"install\", *std_npm_args(prefix: false)",
+        "system \"npm\", \"run\", \"build\"",
         "system \"npm\", \"run\", \"build:bundle\""
       ],
-      "libexec_paths": [".claude-plugin", ".mcp.json", "plugin", "dist"],
+      "libexec_mkdir": [".claude-plugin"],
+      "libexec_copy_files": {
+        "himalaya-mcp-plugin/.claude-plugin/plugin.json": ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json": ".claude-plugin/marketplace.json"
+      },
+      "libexec_paths": [".mcp.json", "dist"],
+      "libexec_copy_map": {
+        "himalaya-mcp-plugin/skills": "skills",
+        "himalaya-mcp-plugin/agents": "agents"
+      },
+      "libexec_copy_map_optional": {
+        "himalaya-mcp-plugin/hooks": "hooks"
+      },
+      "extra_scripts": [
+        {
+          "name": "himalaya-mcp",
+          "body": "#!/bin/bash\nexec node \"#{libexec}/dist/cli/setup.js\" \"$@\""
+        }
+      ],
       "install_script_desc": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
       "install_script_summary": [
         "7 email skills available:",
@@ -73,9 +92,10 @@
       "test_paths": [
         { "path": ".claude-plugin/plugin.json", "type": "file" },
         { "path": "dist/index.js", "type": "file" },
-        { "path": "plugin/skills", "type": "directory" }
+        { "path": "skills", "type": "directory" },
+        { "path": "agents", "type": "directory" }
       ],
-      "caveats_extra": "To complete installation, run:\n  himalaya-mcp-install\n\nTo uninstall the plugin:\n  himalaya-mcp-uninstall\n\n7 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:help\n\n19 MCP tools available.\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp"
+      "caveats_extra": "7 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:help\n\n19 MCP tools available.\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp"
     },
 
     "scholar": {
@@ -84,8 +104,8 @@
       "homepage": "https://github.com/Data-Wise/scholar",
       "source": "github",
       "repo": "Data-Wise/scholar",
-      "version": "2.12.0",
-      "sha256": "70ca303da77b8f6eaeaa491db6df6732ecba051dc19f6578d18ce98d2b3d117a",
+      "version": "2.15.0",
+      "sha256": "bcc7809eaf92504abd292a762de2da957d38d97b7a559eab21d6066e20a3d8c0",
       "dependencies": {
         "optional": ["jq"]
       },

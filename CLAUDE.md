@@ -36,7 +36,7 @@ Plugin formulas share a complex install pattern — when editing one, keep them 
 - Files install to `libexec` (including hidden `.claude-plugin` dir)
 - A `<name>-install` script handles: symlink creation (3 fallback methods), marketplace manifest registration via `jq`, auto-enable in `settings.json`, Claude-running detection (`lsof`/`pgrep`) to skip file modifications
 - A `<name>-uninstall` script reverses the install
-- `post_install` strips unrecognized `plugin.json` keys (e.g., `claude_md_budget`) then calls the install script
+- `post_install` uses 3-step pattern: (1) strip unrecognized plugin.json keys in own begin/rescue/end, (2) run install script with 30s timeout, (3) claude plugin update registry sync. Each step is independently error-isolated.
 - Use `$(brew --prefix)/opt/<name>/libexec` (stable path) not versioned Cellar paths
 
 ## Commands
@@ -68,7 +68,7 @@ mkdocs build --strict     # Build and validate
 
 ## Formula Generator
 
-6 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA.
+6 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA. Key manifest fields include `libexec_copy_map` for directory layout, `extra_scripts` for CLI wrappers, and feature flags for schema cleanup and branch guards.
 
 ```bash
 python3 generator/generate.py              # Generate all 6 plugin formulas

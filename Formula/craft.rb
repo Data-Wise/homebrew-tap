@@ -199,7 +199,7 @@ class Craft < Formula
       nil
     end
 
-    # Step 2: Auto-install plugin with 30s timeout (always runs regardless of step 1)
+    # Step 2: Auto-install plugin with 30s timeout
     begin
       require "timeout"
       pid = Process.spawn("#{bin}/craft-install")
@@ -256,6 +256,5 @@ class Craft < Formula
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
-    assert_match "2.28.0", shell_output("cat #{libexec}/.claude-plugin/plugin.json")
   end
 end

@@ -186,6 +186,16 @@ def generate_formula(formula_name, config, defaults):
             lines.append(f"    {step}")
         lines.append("")
 
+    # Pre-install directory creation
+    if "libexec_mkdir" in config:
+        for dir_path in config["libexec_mkdir"]:
+            lines.append(f'    mkdir_p libexec/"{dir_path}"')
+
+    # Individual file copies (cp "src", libexec/"dest")
+    if "libexec_copy_files" in config:
+        for src, dest in config["libexec_copy_files"].items():
+            lines.append(f'    cp "{src}", libexec/"{dest}"')
+
     # Libexec install
     if "libexec_paths" in config:
         for path in config["libexec_paths"]:
@@ -195,7 +205,29 @@ def generate_formula(formula_name, config, defaults):
     else:
         lines.append('    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }')
 
+    # Directory copy map (cp_r "src", libexec/"dest")
+    if "libexec_copy_map" in config:
+        for src, dest in config["libexec_copy_map"].items():
+            lines.append(f'    cp_r "{src}", libexec/"{dest}"')
+
+    # Optional directory copy map (only if source exists)
+    if "libexec_copy_map_optional" in config:
+        for src, dest in config["libexec_copy_map_optional"].items():
+            lines.append(f'    cp_r "{src}", libexec/"{dest}" if (buildpath/"{src}").exist?')
+
     lines.append("")
+
+    # Extra scripts (e.g., CLI wrappers)
+    if "extra_scripts" in config:
+        for script_cfg in config["extra_scripts"]:
+            script_name = script_cfg["name"]
+            script_body = script_cfg["body"]
+            lines.append(f'    (bin/"{script_name}").write <<~EOS')
+            for line in script_body.split("\n"):
+                lines.append(f"      {line}" if line.strip() else "")
+            lines.append("    EOS")
+            lines.append(f'    chmod "+x", bin/"{script_name}"')
+            lines.append("")
 
     # Install script
     install_script = generate_install_script(formula_name, config)
@@ -218,33 +250,50 @@ def generate_formula(formula_name, config, defaults):
     lines.append(f'    chmod "+x", bin/"{formula_name}-uninstall"')
     lines.append("  end")
 
-    # post_install
+    # post_install — 3-step pattern for all claude-plugin formulas
     lines.append("")
     lines.append("  def post_install")
+
+    # Step 1: JSON schema cleanup (only if schema_cleanup feature enabled)
     if features.get("schema_cleanup"):
         lines.append("    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema")
-        lines.append("    require \"json\"")
-        lines.append('    plugin_json = libexec/".claude-plugin/plugin.json"')
-        lines.append("    if plugin_json.exist?")
-        lines.append('      allowed_keys = %w[name version description author]')
-        lines.append("      data = JSON.parse(plugin_json.read)")
-        lines.append("      cleaned = data.slice(*allowed_keys)")
-        lines.append('      plugin_json.write("#{JSON.pretty_generate(cleaned)}\\n") if cleaned.size < data.size')
-        lines.append("    end")
-        lines.append("  rescue")
-        lines.append("    nil")
-    else:
         lines.append("    begin")
-        lines.append(f'      system bin/"{formula_name}-install"')
+        lines.append('      require "json"')
+        lines.append('      plugin_json = libexec/".claude-plugin/plugin.json"')
+        lines.append("      if plugin_json.exist?")
+        lines.append('        allowed_keys = %w[name version description author]')
+        lines.append("        data = JSON.parse(plugin_json.read)")
+        lines.append("        cleaned = data.slice(*allowed_keys)")
+        lines.append('        plugin_json.write("#{JSON.pretty_generate(cleaned)}\\n") if cleaned.size < data.size')
+        lines.append("      end")
         lines.append("    rescue")
         lines.append("      nil")
         lines.append("    end")
         lines.append("")
-        lines.append("    begin")
-        lines.append(f'      system "claude", "plugin", "update", "{formula_name}@local-plugins" if which("claude")')
-        lines.append("    rescue")
-        lines.append("      nil")
-        lines.append("    end")
+
+    # Step 2: Auto-install plugin with 30s timeout (always)
+    lines.append(f'    # Step {"2" if features.get("schema_cleanup") else "1"}: Auto-install plugin with 30s timeout')
+    lines.append("    begin")
+    lines.append('      require "timeout"')
+    lines.append(f'      pid = Process.spawn("#{{bin}}/{formula_name}-install")')
+    lines.append("      Timeout.timeout(30) { Process.waitpid(pid) }")
+    lines.append("    rescue Timeout::Error")
+    lines.append("      Process.kill(\"TERM\", pid) rescue nil")
+    lines.append("      Process.waitpid(pid) rescue nil")
+    lines.append(f'      opoo "{formula_name}-install timed out after 30 seconds (skipping)"')
+    lines.append("    rescue")
+    lines.append("      nil")
+    lines.append("    end")
+    lines.append("")
+
+    # Step 3: Sync Claude Code plugin registry (always)
+    lines.append(f'    # Step {"3" if features.get("schema_cleanup") else "2"}: Sync Claude Code plugin registry (optional)')
+    lines.append("    begin")
+    lines.append(f'      system "claude", "plugin", "update", "{formula_name}@local-plugins" if which("claude")')
+    lines.append("    rescue")
+    lines.append("      nil")
+    lines.append("    end")
+
     lines.append("  end")
 
     # post_uninstall

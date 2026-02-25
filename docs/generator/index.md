@@ -47,11 +47,13 @@ python3 generator/generate.py --list
 | Formula | Special Features |
 |---------|-----------------|
 | craft | Branch guard hook, build steps |
-| himalaya-mcp | npm build, explicit libexec paths |
+| himalaya-mcp | npm build, copy_map layout, CLI wrapper |
 | scholar | Standard plugin pattern |
 | rforge | Head-only (no releases) |
 | rforge-orchestrator | Monorepo URL pattern |
 | workflow | Monorepo tarball URL |
+
+All generated plugin formulas use a 3-step `post_install` pattern: (1) JSON schema cleanup, (2) auto-install with 30s timeout, (3) registry sync — each in its own `begin/rescue/end` block.
 
 The other 8 formulas are hand-crafted (Python virtualenv, Node npm, Shell, Swift patterns that differ enough from the plugin template).
 
