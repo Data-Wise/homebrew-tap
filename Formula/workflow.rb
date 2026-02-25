@@ -117,7 +117,7 @@ class Workflow < Formula
 
     (bin/"workflow-uninstall").write <<~EOS
       #!/bin/bash
-      set -e
+      # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="workflow"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
