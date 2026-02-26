@@ -126,13 +126,17 @@ class HimalayaMcp < Formula
           fi
 
           echo ""
-          echo "7 email skills available:"
+          echo "11 email skills available:"
           echo "  /email:inbox       - List and browse inbox"
           echo "  /email:triage      - Classify emails (actionable/FYI/skip)"
           echo "  /email:digest      - Daily email digest"
           echo "  /email:reply       - Draft and send replies"
           echo "  /email:compose     - Compose new emails"
           echo "  /email:attachments - Manage attachments"
+          echo "  /email:search      - Search emails by keyword, sender, flags"
+          echo "  /email:manage      - Bulk email operations"
+          echo "  /email:stats       - Inbox statistics"
+          echo "  /email:config      - Setup wizard"
           echo "  /email:help        - Help hub for all commands"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
@@ -216,10 +220,11 @@ class HimalayaMcp < Formula
 
   def caveats
     <<~EOS
-      7 email skills for Claude Code:
+      11 email skills for Claude Code:
         /email:inbox   /email:triage   /email:digest
         /email:reply   /email:compose  /email:attachments
-        /email:help
+        /email:search  /email:manage   /email:stats
+        /email:config  /email:help
 
       19 MCP tools available.
 
