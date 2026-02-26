@@ -3,12 +3,12 @@ cask "scribe" do
 
   # Architecture-specific SHA256 hashes
   on_arm do
-    sha256 "84807a938491e88cf92ef05c82546d0b6e70e52a0dc685eabd52a9dfa184c2d5"
+    sha256 "3d971ba3e7059fec448508310f6c43f7bb8e5c57097cd8ee862bd75f73075ae9"
 
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
   on_intel do
-    sha256 "e553862aa6cf6286cd433990d016f582c19d823c1de7dd281451e34c6801cc58"
+    sha256 "a7563fa74a0a35fee435e5f57dbd3a11fee9609067304d015d971549a282744a"
 
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
   end
@@ -42,10 +42,12 @@ cask "scribe" do
   postflight do
     ohai "Scribe v#{version} installed successfully!"
     ohai ""
-    ohai "What's New in v1.20.0:"
-    ohai "  - Settings infrastructure (SettingsToggle, usePreferences hook)"
-    ohai "  - Session timer replaced by Pomodoro focus counter"
-    ohai "  - 2,280 tests passing"
+    ohai "What's New in v#{version}:"
+    ohai "  - Responsive layout engine with auto-collapse sidebars"
+    ohai "  - Global UI zoom (Cmd+/Cmd-, 50%-200%)"
+    ohai "  - macOS 4-pane tiling support (350×350 minimum)"
+    ohai "  - Right sidebar resize handle"
+    ohai "  - 2,326 tests passing"
     ohai ""
     ohai "Quick Start:"
     ohai "  - Global hotkey: Cmd+Shift+N (opens Scribe from anywhere)"
@@ -68,11 +70,13 @@ cask "scribe" do
   caveats <<~EOS
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
-    New in v1.20.0:
-    - Settings infrastructure (reusable SettingsToggle, usePreferences hook)
-    - Session timer removed, replaced by Pomodoro focus counter in StatsPanel
-    - SHORTCUTS registry (25 keyboard shortcuts, single source of truth)
-    - 2,280 tests passing
+    New in v#{version}:
+    - Responsive layout engine with auto-collapse sidebars
+    - Global UI zoom (Cmd+/Cmd-, 50%-200%) with persistent preferences
+    - macOS 4-pane tiling support (350×350 minimum window size)
+    - Right sidebar resize handle (200-600px)
+    - Touch resize + reduced-motion accessibility support
+    - 2,326 tests passing
 
     Features:
     - Three Editor Modes - Source (Cmd+1), Live Preview (Cmd+2), Reading (Cmd+3)
