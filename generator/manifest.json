@@ -13,7 +13,9 @@
       "version": "2.28.0",
       "sha256": "c92158c23bcf67dc92708588314d71be6fe478ea39973ca1e9ccf7f7f255c653",
       "dependencies": {
-        "optional": ["jq"]
+        "optional": [
+          "jq"
+        ]
       },
       "features": {
         "schema_cleanup": true,
@@ -21,7 +23,11 @@
         "marketplace": true,
         "claude_detection": true
       },
-      "dynamic_counts": ["commands", "agents", "skills"],
+      "dynamic_counts": [
+        "commands",
+        "agents",
+        "skills"
+      ],
       "install_script_desc": "Full-stack developer toolkit - code, git, site, docs, testing, and architecture commands",
       "install_script_summary": [
         "107 commands available:",
@@ -29,14 +35,25 @@
         "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       ],
       "test_paths": [
-        { "path": ".claude-plugin/plugin.json", "type": "file" },
-        { "path": "commands", "type": "directory" },
-        { "path": "skills", "type": "directory" },
-        { "path": "agents", "type": "directory" }
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "commands",
+          "type": "directory"
+        },
+        {
+          "path": "skills",
+          "type": "directory"
+        },
+        {
+          "path": "agents",
+          "type": "directory"
+        }
       ],
       "caveats_extra": "107 commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
     },
-
     "himalaya-mcp": {
       "type": "claude-plugin",
       "desc": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
@@ -46,8 +63,13 @@
       "version": "1.3.0",
       "sha256": "35662a9ffbe046e7f9208d64dae0d28bfa4f46c2c129f64e14813614f83be35e",
       "dependencies": {
-        "runtime": ["himalaya", "node"],
-        "optional": ["jq"]
+        "runtime": [
+          "himalaya",
+          "node"
+        ],
+        "optional": [
+          "jq"
+        ]
       },
       "features": {
         "schema_cleanup": true,
@@ -59,12 +81,17 @@
         "system \"npm\", \"run\", \"build\"",
         "system \"npm\", \"run\", \"build:bundle\""
       ],
-      "libexec_mkdir": [".claude-plugin"],
+      "libexec_mkdir": [
+        ".claude-plugin"
+      ],
       "libexec_copy_files": {
         "himalaya-mcp-plugin/.claude-plugin/plugin.json": ".claude-plugin/plugin.json",
         ".claude-plugin/marketplace.json": ".claude-plugin/marketplace.json"
       },
-      "libexec_paths": [".mcp.json", "dist"],
+      "libexec_paths": [
+        ".mcp.json",
+        "dist"
+      ],
       "libexec_copy_map": {
         "himalaya-mcp-plugin/skills": "skills",
         "himalaya-mcp-plugin/agents": "agents"
@@ -90,14 +117,25 @@
         "  /email:help        - Help hub for all commands"
       ],
       "test_paths": [
-        { "path": ".claude-plugin/plugin.json", "type": "file" },
-        { "path": "dist/index.js", "type": "file" },
-        { "path": "skills", "type": "directory" },
-        { "path": "agents", "type": "directory" }
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "dist/index.js",
+          "type": "file"
+        },
+        {
+          "path": "skills",
+          "type": "directory"
+        },
+        {
+          "path": "agents",
+          "type": "directory"
+        }
       ],
       "caveats_extra": "7 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:help\n\n19 MCP tools available.\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp"
     },
-
     "scholar": {
       "type": "claude-plugin",
       "desc": "Academic workflows for research and teaching - Claude Code plugin",
@@ -107,7 +145,9 @@
       "version": "2.15.0",
       "sha256": "bcc7809eaf92504abd292a762de2da957d38d97b7a559eab21d6066e20a3d8c0",
       "dependencies": {
-        "optional": ["jq"]
+        "optional": [
+          "jq"
+        ]
       },
       "features": {
         "schema_cleanup": false,
@@ -121,13 +161,21 @@
         "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       ],
       "test_paths": [
-        { "path": ".claude-plugin/plugin.json", "type": "file" },
-        { "path": "src/plugin-api/commands", "type": "directory" },
-        { "path": "src/plugin-api/skills", "type": "directory" }
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "src/plugin-api/commands",
+          "type": "directory"
+        },
+        {
+          "path": "src/plugin-api/skills",
+          "type": "directory"
+        }
       ],
       "caveats_extra": "The Scholar plugin has been installed to:\n  ~/.claude/plugins/scholar\n\nIf not auto-enabled, run:\n  claude plugin install scholar@local-plugins\n\n28 commands available for academic workflows:\n  - 14 research commands (literature, manuscript, simulation, planning)\n  - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)\n\nTry: /arxiv \"your research topic\"\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/scholar/libexec ~/.claude/plugins/scholar"
     },
-
     "rforge": {
       "type": "claude-plugin",
       "desc": "R package ecosystem orchestrator - 15 commands - Claude Code plugin",
@@ -137,7 +185,9 @@
       "head_only": true,
       "head": "https://github.com/Data-Wise/rforge.git",
       "dependencies": {
-        "optional": ["jq"]
+        "optional": [
+          "jq"
+        ]
       },
       "features": {
         "schema_cleanup": false,
@@ -151,13 +201,21 @@
         "  /rforge:release, /rforge:impact, /rforge:next, /rforge:complete"
       ],
       "test_paths": [
-        { "path": ".claude-plugin/plugin.json", "type": "file" },
-        { "path": "commands", "type": "directory" },
-        { "path": "skills", "type": "directory" }
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "commands",
+          "type": "directory"
+        },
+        {
+          "path": "skills",
+          "type": "directory"
+        }
       ],
       "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n15 commands for R package ecosystem management.\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge"
     },
-
     "rforge-orchestrator": {
       "type": "claude-plugin",
       "desc": "Auto-delegation orchestrator for RForge MCP tools - Claude Code plugin",
@@ -169,7 +227,9 @@
       "url_override": "https://github.com/Data-Wise/claude-plugins/archive/refs/tags/rforge-orchestrator-v{version}.tar.gz",
       "libexec_subdir": "rforge-orchestrator",
       "dependencies": {
-        "optional": ["jq"]
+        "optional": [
+          "jq"
+        ]
       },
       "features": {
         "schema_cleanup": false,
@@ -181,13 +241,21 @@
         "Commands: /rforge:analyze, /rforge:quick, /rforge:thorough"
       ],
       "test_paths": [
-        { "path": ".claude-plugin/plugin.json", "type": "file" },
-        { "path": "commands", "type": "directory" },
-        { "path": "agents", "type": "directory" }
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "commands",
+          "type": "directory"
+        },
+        {
+          "path": "agents",
+          "type": "directory"
+        }
       ],
       "caveats_extra": "The RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands:\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator"
     },
-
     "workflow": {
       "type": "claude-plugin",
       "desc": "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin",
@@ -198,7 +266,9 @@
       "sha256": "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783",
       "url_override": "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v{version}/workflow-v{version}.tar.gz",
       "dependencies": {
-        "optional": ["jq"]
+        "optional": [
+          "jq"
+        ]
       },
       "features": {
         "schema_cleanup": false,
@@ -211,14 +281,25 @@
         "Commands: /brainstorm, /workflow:spec-review"
       ],
       "test_paths": [
-        { "path": ".claude-plugin/plugin.json", "type": "file" },
-        { "path": "commands/brainstorm.md", "type": "file" },
-        { "path": "skills/design/backend-designer.md", "type": "file" },
-        { "path": "agents/orchestrator.md", "type": "file" }
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "commands/brainstorm.md",
+          "type": "file"
+        },
+        {
+          "path": "skills/design/backend-designer.md",
+          "type": "file"
+        },
+        {
+          "path": "agents/orchestrator.md",
+          "type": "file"
+        }
       ],
       "caveats_extra": "The Workflow plugin has been installed to:\n  ~/.claude/plugins/workflow\n\nIf not auto-enabled, run:\n  claude plugin install workflow@local-plugins\n\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/workflow/libexec ~/.claude/plugins/workflow"
     },
-
     "aiterm": {
       "type": "python-virtualenv",
       "desc": "Terminal optimizer for AI-assisted development with Claude Code and Gemini CLI",
@@ -229,7 +310,6 @@
       "sha256": "14a8c8453cd5186a8fc1d5a2fbc4bf7bd2a3e67a546ecbee7644c32df2e1bc50",
       "generated": false
     },
-
     "nexus-cli": {
       "type": "python-virtualenv",
       "desc": "Knowledge workflow CLI for research, teaching, and writing",
@@ -239,7 +319,6 @@
       "sha256": "eb4deb5b88d007fa9d5579240202915ef87a2f91d08c0bc7c0b3aa085d33437e",
       "generated": false
     },
-
     "atlas": {
       "type": "node-npm",
       "desc": "Project state engine with registry, sessions, and capture",
@@ -250,7 +329,6 @@
       "sha256": "92ee26b3c60c85f13090634557028d27dfc5039ebc00e59b018b49f128f7ebd1",
       "generated": false
     },
-
     "examark": {
       "type": "node-npm",
       "desc": "Create exams from Markdown and export to Canvas QTI format",
@@ -260,7 +338,6 @@
       "sha256": "3eef8418a16db3e41dab3cdebf6f6b92d21d30eafa6727063bc21c05241181c1",
       "generated": false
     },
-
     "examify": {
       "type": "node-npm",
       "desc": "DEPRECATED: Use examark instead - Create exams from Markdown",
@@ -270,7 +347,6 @@
       "sha256": "placeholder",
       "generated": false
     },
-
     "flow-cli": {
       "type": "shell",
       "desc": "ZSH workflow tools designed for ADHD brains",
@@ -281,7 +357,6 @@
       "sha256": "f630e949f264dd1006bc935f2d75183e58f5942b332e2c7f06cf743af76f578b",
       "generated": false
     },
-
     "mcp-bridge": {
       "type": "node-npm",
       "desc": "Connect Claude.ai to local MCP servers via SSE",
@@ -292,7 +367,6 @@
       "sha256": "b1e0b46e58e0a8714bc7893498231bfe1e5e0dde670f7bb55d3d998aa0ff939e",
       "generated": false
     },
-
     "scribe-cli": {
       "type": "swift",
       "desc": "ADHD-friendly note-taking CLI with multi-vault support",
