@@ -58,12 +58,16 @@ class ObsidianCliOps < Formula
 
   def post_install
     python = Formula["python@3.12"].opt_bin/"python3.12"
-    # Install Python dependencies using pip (binary wheels = fast install)
-    system python, "-m", "pip", "install", "--user", "-q",
-           "markdown>=3.5", "python-frontmatter>=1.0.0", "mistune>=3.0.0",
-           "PyYAML>=6.0", "requests>=2.31.0", "numpy>=1.24.0",
-           "rich>=13.7.0", "tqdm>=4.66.0", "networkx>=3.2",
-           "click>=8.1.0", "typer>=0.9.0"
+    # Try to install Python deps (non-fatal — user can run obs-setup manually)
+    begin
+      system python, "-m", "pip", "install", "--user", "--upgrade", "-q",
+             "markdown>=3.5", "python-frontmatter>=1.0.0", "mistune>=3.0.0",
+             "PyYAML>=6.0", "requests>=2.31.0", "numpy>=1.24.0",
+             "rich>=13.7.0", "tqdm>=4.66.0", "networkx>=3.2",
+             "click>=8.1.0", "typer>=0.9.0"
+    rescue StandardError
+      opoo "Python deps install failed. Run 'obs-setup' manually."
+    end
     # Initialize database
     system python, "#{libexec}/python/obs_cli.py", "db", "init"
   end
