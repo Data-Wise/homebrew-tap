@@ -5,8 +5,8 @@
 class ObsidianCliOps < Formula
   desc "CLI tool for Obsidian vault management with AI-powered graph analysis"
   homepage "https://data-wise.github.io/obsidian-cli-ops/"
-  url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v3.1.0.tar.gz"
-  sha256 "1625d168b1a570ac7986649f1ad01326614c3a2d7908e60952edf2af2bcbe8e1"
+  url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v3.2.0.tar.gz"
+  sha256 "24f83edf5b1d496dee1026fcf675b4397f43434eae7a63f40dc942b4eac695f0"
   license "MIT"
   head "https://github.com/Data-Wise/obsidian-cli-ops.git", branch: "main"
 
@@ -102,6 +102,6 @@ class ObsidianCliOps < Formula
 
     # Test version output
     output = shell_output("#{bin}/obs version 2>&1")
-    assert_match "3.1.0", output
+    assert_match "3.2.0", output
   end
 end
