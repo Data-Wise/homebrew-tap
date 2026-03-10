@@ -5,8 +5,8 @@
 class Examark < Formula
   desc "Create exams from Markdown and export to Canvas QTI format"
   homepage "https://data-wise.github.io/examark/"
-  url "https://registry.npmjs.org/examark/-/examark-0.6.6.tgz"
-  sha256 "3eef8418a16db3e41dab3cdebf6f6b92d21d30eafa6727063bc21c05241181c1"
+  url "https://registry.npmjs.org/examark/-/examark-0.7.0.tgz"
+  sha256 "c8d3eae160a892e32837db3dcae515e843e5383fef52b8141940c8bcf8b6d59f"
   license "MIT"
 
   depends_on "node"
@@ -17,6 +17,6 @@ class Examark < Formula
   end
 
   test do
-    assert_match "0.6.6", shell_output("#{bin}/examark --version")
+    assert_match "0.7.0", shell_output("#{bin}/examark --version")
   end
 end
