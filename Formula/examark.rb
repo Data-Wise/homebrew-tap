@@ -6,7 +6,7 @@ class Examark < Formula
   desc "Create exams from Markdown and export to Canvas QTI format"
   homepage "https://data-wise.github.io/examark/"
   url "https://registry.npmjs.org/examark/-/examark-0.7.0.tgz"
-  sha256 "c8d3eae160a892e32837db3dcae515e843e5383fef52b8141940c8bcf8b6d59f"
+  sha256 "efd2677e6fa4c234c5f59b5b6303d30ad2eda6475d86e41893fb7999d493080d"
   license "MIT"
 
   depends_on "node"
