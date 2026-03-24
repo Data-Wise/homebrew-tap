@@ -5,8 +5,8 @@
 class HimalayaMcp < Formula
   desc "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
   homepage "https://github.com/Data-Wise/himalaya-mcp"
-  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.4.1.tar.gz"
-  sha256 "30b9e73016c9747dcdd284acdcd7f6ed003df8782850dd3e09940c1f163f7564"
+  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.5.0.tar.gz"
+  sha256 "68b16ce3e33067669211b13d3892b6006c9fecdc2f71bcac9fbef003e36c57cc"
   license "MIT"
 
   depends_on "himalaya"
@@ -126,7 +126,7 @@ class HimalayaMcp < Formula
           fi
 
           echo ""
-          echo "11 email skills available:"
+          echo "12 email skills available:"
           echo "  /email:inbox       - List and browse inbox"
           echo "  /email:triage      - Classify emails (actionable/FYI/skip)"
           echo "  /email:digest      - Daily email digest"
@@ -137,6 +137,7 @@ class HimalayaMcp < Formula
           echo "  /email:manage      - Bulk email operations"
           echo "  /email:stats       - Inbox statistics"
           echo "  /email:config      - Setup wizard"
+          echo "  /email:morning     - Morning email briefing"
           echo "  /email:help        - Help hub for all commands"
       else
           echo "⚠️  Automatic symlink failed (macOS permissions)."
@@ -220,13 +221,13 @@ class HimalayaMcp < Formula
 
   def caveats
     <<~EOS
-      11 email skills for Claude Code:
+      12 email skills for Claude Code:
         /email:inbox   /email:triage   /email:digest
         /email:reply   /email:compose  /email:attachments
         /email:search  /email:manage   /email:stats
-        /email:config  /email:help
+        /email:config  /email:morning  /email:help
 
-      19 MCP tools available.
+      21 MCP tools available.
 
       For Claude Desktop: himalaya-mcp setup
 
