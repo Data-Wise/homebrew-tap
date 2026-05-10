@@ -2,12 +2,24 @@
 # frozen_string_literal: true
 
 # RforgeOrchestrator formula for the data-wise/tap Homebrew tap.
+#
+# DEPRECATED 2026-05-10: This formula was the original packaging of
+# rforge when it lived inside the claude-plugins monorepo. The plugin
+# was extracted to its own repo (Data-Wise/rforge) and renamed to
+# `rforge`. New users should install:
+#
+#     brew install --HEAD data-wise/tap/rforge
+#
+# This formula is kept for the deprecation grace period; it will be
+# upgraded to `disable!` in a future release, and removed thereafter.
 class RforgeOrchestrator < Formula
   desc "Auto-delegation orchestrator for RForge MCP tools - Claude Code plugin"
-  homepage "https://github.com/Data-Wise/claude-plugins"
+  homepage "https://github.com/Data-Wise/rforge"
   url "https://github.com/Data-Wise/claude-plugins/archive/refs/tags/rforge-orchestrator-v0.1.0.tar.gz"
   sha256 "8c065681864b18c9bea41996aa33bec17b95697ed8330846c8b510bd81bbad2e"
   license "MIT"
+
+  deprecate! date: "2026-05-10", because: "renamed; use `brew install --HEAD data-wise/tap/rforge`"
 
   depends_on "jq" => :optional
 
@@ -170,6 +182,23 @@ class RforgeOrchestrator < Formula
 
   def caveats
     <<~EOS
+      ⚠️  DEPRECATED — This formula is no longer maintained.
+
+      The plugin has been renamed to `rforge` and now lives in its own
+      repository. Migrate with:
+
+          brew uninstall data-wise/tap/rforge-orchestrator
+          rm -rf ~/.claude/plugins/rforge-orchestrator
+          brew install --HEAD data-wise/tap/rforge
+
+      The new formula installs to ~/.claude/plugins/rforge and ships
+      v1.2.0 features (R-aware PreToolUse hook, marketplace install,
+      validation skills, 15 commands).
+
+      ──────────────────────────────────────────────────────
+
+      Legacy install info (for users on this deprecated formula):
+
       The RForge Orchestrator plugin has been installed to:
         ~/.claude/plugins/rforge-orchestrator
 
@@ -180,7 +209,7 @@ class RforgeOrchestrator < Formula
         - Claude Code CLI must be installed
         - RForge MCP server must be configured in ~/.claude/settings.json
 
-      Available commands:
+      Available commands (v0.1.0 had only these three):
         /rforge:analyze  - Analyze R project and recommend tools
         /rforge:quick    - Quick project analysis
         /rforge:thorough - Thorough multi-stage analysis
@@ -188,8 +217,8 @@ class RforgeOrchestrator < Formula
       If symlink failed (macOS permissions), run manually:
         ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator
 
-      For more information:
-        https://github.com/Data-Wise/claude-plugins
+      For the new plugin and full v1.2.0 docs:
+        https://github.com/Data-Wise/rforge
     EOS
   end
 
