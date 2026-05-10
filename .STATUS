@@ -24,7 +24,7 @@ progress: All phases merged to main, repo cleaned up, CI verified
 | scholar | plugin (generated) | Yes | CLEAN |
 | himalaya-mcp | plugin (generated) | Yes | CLEAN |
 | rforge | plugin (generated) | No | CLEAN |
-| rforge-orchestrator | plugin (generated) | Yes | CLEAN |
+| rforge-orchestrator | plugin (legacy) | Yes | DEPRECATED 2026-05-10 → migrate to `rforge` |
 | workflow | plugin (generated) | Yes | CLEAN |
 | aiterm | python | Yes | CLEAN |
 | atlas | node | Yes | CLEAN |
