@@ -5,8 +5,8 @@
 class Craft < Formula
   desc "Full-stack developer toolkit for Claude Code with 108 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.32.1.tar.gz"
-  sha256 "684cb90ba136d387e3c2748177362b52543a920daa3da3ed0031dc50255d778b"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.33.0.tar.gz"
+  sha256 "15fbc1786b122aea8a31b5d3ea44ae4821ff5cfa80fe458a587200fab0f9e505"
   license "MIT"
 
   depends_on "jq" => :optional
