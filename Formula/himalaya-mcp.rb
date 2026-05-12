@@ -5,8 +5,8 @@
 class HimalayaMcp < Formula
   desc "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
   homepage "https://github.com/Data-Wise/himalaya-mcp"
-  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "68b16ce3e33067669211b13d3892b6006c9fecdc2f71bcac9fbef003e36c57cc"
+  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "812278d27aaccb262a5dbd3afcbfd6e8c7bf569235c23f4d9c188d52c7ef43c6"
   license "MIT"
 
   depends_on "himalaya"
@@ -227,7 +227,7 @@ class HimalayaMcp < Formula
         /email:search  /email:manage   /email:stats
         /email:config  /email:morning  /email:help
 
-      21 MCP tools available.
+      22 MCP tools available (incl. health_check for IMAP diagnostics).
 
       For Claude Desktop: himalaya-mcp setup
 
