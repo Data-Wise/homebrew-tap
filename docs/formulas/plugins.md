@@ -83,18 +83,30 @@ brew install data-wise/tap/scholar
 
 ### rforge
 
-R package ecosystem orchestrator. Head-only (no versioned releases yet).
+R package ecosystem orchestrator — 16 self-contained commands, R-aware hooks,
+validation skills. Pure-Python `lib/` modules (no MCP server required as of v1.3.0).
 
 ```bash
+# Stable (recommended)
+brew install data-wise/tap/rforge
+
+# Or track main for the latest commits
 brew install --HEAD data-wise/tap/rforge
 ```
 
+Current stable: **v1.3.0** (2026-05-11). See the
+[rforge release notes](https://github.com/Data-Wise/rforge/releases/latest) for change history.
+
 ### rforge-orchestrator
 
-Auto-delegation orchestrator for RForge MCP tools. Lives in the claude-plugins monorepo.
+> **Deprecated 2026-05-10** — renamed; use `brew install --HEAD data-wise/tap/rforge` instead.
+> The original orchestrator plugin was extracted from the claude-plugins monorepo
+> and the new name is `rforge`. The formula keeps this name as a redirect for
+> backward compatibility but installs nothing usable on its own.
 
 ```bash
-brew install data-wise/tap/rforge-orchestrator
+# Don't install this; use rforge instead.
+brew install data-wise/tap/rforge
 ```
 
 ### workflow
