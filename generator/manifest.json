@@ -178,12 +178,12 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator - 16 commands - Claude Code plugin",
+      "desc": "R package ecosystem orchestrator - 28 commands - Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
-      "version": "2.0.0",
-      "sha256": "75bfaf29030a45732dade5d0b8c17be94e30a734fe9c338b878e3d16eac179d3",
+      "version": "2.1.0",
+      "sha256": "a8dda05e6ee5052a2a3cf0e3b14acd800014b1a40bff417dfaa344255ee00ab2",
       "head": "https://github.com/Data-Wise/rforge.git",
       "dependencies": {
         "optional": [
@@ -215,7 +215,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n15 commands for R package ecosystem management.\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge"
+      "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n28 commands for R package ecosystem management.\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge"
     },
     "rforge-orchestrator": {
       "type": "claude-plugin",
