@@ -192,6 +192,6 @@ class Rforge < Formula
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
     assert_predicate libexec/"commands", :directory?
-    assert_predicate libexec/"skills", :directory?
+    assert_predicate libexec/"lib", :directory?
   end
 end
