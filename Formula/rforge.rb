@@ -3,10 +3,10 @@
 
 # Rforge formula for the data-wise/tap Homebrew tap.
 class Rforge < Formula
-  desc "R package ecosystem orchestrator - 16 commands - Claude Code plugin"
+  desc "R package ecosystem orchestrator - 28 commands - Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.0.0.tar.gz"
-  sha256 "75bfaf29030a45732dade5d0b8c17be94e30a734fe9c338b878e3d16eac179d3"
+  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.1.0.tar.gz"
+  sha256 "a8dda05e6ee5052a2a3cf0e3b14acd800014b1a40bff417dfaa344255ee00ab2"
   license "MIT"
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
@@ -179,7 +179,7 @@ class Rforge < Formula
       If not auto-enabled, run:
         claude plugin install rforge@local-plugins
 
-      15 commands for R package ecosystem management.
+      28 commands for R package ecosystem management.
 
       If symlink failed (macOS permissions), run manually:
         ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge
