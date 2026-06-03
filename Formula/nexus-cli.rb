@@ -7,8 +7,8 @@ class NexusCli < Formula
 
   desc "Knowledge workflow CLI for research, teaching, and writing"
   homepage "https://data-wise.github.io/nexus-cli"
-  url "https://files.pythonhosted.org/packages/0b/e5/9a61673a826b1f478e65131be06c9a40610172fee25908966c3ac11f0d00/nexus_cli-0.5.2.tar.gz"
-  sha256 "cf25797a8d3f54c308ff37f248c204708a898c3b3270143f9d13c2a97d847228"
+  url "https://files.pythonhosted.org/packages/1b/4f/3969867a038cfc02206370d3a6a7fb6ba8eeb6c25998897363cec3c0aacd/nexus_cli-0.6.0.tar.gz"
+  sha256 "12fdfead27b7ee890cdf023294d47210108e7dee5da4bcd22a94a1439ea65b58"
   license "MIT"
 
   depends_on "libyaml"
@@ -105,7 +105,7 @@ class NexusCli < Formula
   end
 
   test do
-    assert_match "0.5.2", shell_output("#{bin}/nexus --version")
+    assert_match "0.6.0", shell_output("#{bin}/nexus --version")
     system bin/"nexus", "doctor"
   end
 end
