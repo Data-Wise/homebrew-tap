@@ -7,8 +7,8 @@ class NexusCli < Formula
 
   desc "Knowledge workflow CLI for research, teaching, and writing"
   homepage "https://data-wise.github.io/nexus-cli"
-  url "https://github.com/Data-Wise/nexus-cli/archive/refs/tags/v0.5.2.tar.gz"
-  sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+  url "https://files.pythonhosted.org/packages/0b/e5/9a61673a826b1f478e65131be06c9a40610172fee25908966c3ac11f0d00/nexus_cli-0.5.2.tar.gz"
+  sha256 "cf25797a8d3f54c308ff37f248c204708a898c3b3270143f9d13c2a97d847228"
   license "MIT"
 
   depends_on "libyaml"
