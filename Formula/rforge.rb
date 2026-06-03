@@ -5,8 +5,8 @@
 class Rforge < Formula
   desc "R package ecosystem orchestrator - 28 commands - Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.1.0.tar.gz"
-  sha256 "a8dda05e6ee5052a2a3cf0e3b14acd800014b1a40bff417dfaa344255ee00ab2"
+  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.2.0.tar.gz"
+  sha256 "be4b529d74dbf4564df29b4fe77c02581ebfe6c8f819158d67abb05051a5fc43"
   license "MIT"
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
