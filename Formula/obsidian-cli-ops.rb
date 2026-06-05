@@ -97,16 +97,16 @@ class ObsidianCliOps < Formula
     venv.pip_install resources
 
     # Bundle the backend, schema, and zsh wrapper.
-    libexec.install "src/python"
+    (libexec/"src").install "src/python"
     libexec.install "schema"
-    libexec.install "src/obs.zsh"
+    (libexec/"src").install "src/obs.zsh"
 
     # Launcher → isolated venv interpreter (matches obs.zsh resolution tier 1).
     (bin/"obs").write <<~EOS
       #!/bin/zsh
       # Obsidian CLI Ops launcher (Homebrew-installed)
       export OBS_PYTHON="#{libexec}/venv/bin/python"
-      source "#{libexec}/obs.zsh"
+      source "#{libexec}/src/obs.zsh"
       obs "$@"
     EOS
     (bin/"obs").chmod 0755
@@ -118,7 +118,7 @@ class ObsidianCliOps < Formula
 
   def post_install
     # Initialize the database using the isolated interpreter (deps guaranteed).
-    system libexec/"venv/bin/python", "#{libexec}/python/obs_cli.py", "db", "init"
+    system libexec/"venv/bin/python", "#{libexec}/src/python/obs_cli.py", "db", "init"
   end
 
   def caveats
@@ -144,8 +144,8 @@ class ObsidianCliOps < Formula
 
   test do
     # Core files present.
-    assert_path_exists libexec/"obs.zsh"
-    assert_path_exists libexec/"python/obs_cli.py"
+    assert_path_exists libexec/"src/obs.zsh"
+    assert_path_exists libexec/"src/python/obs_cli.py"
     assert_path_exists libexec/"schema/vault_db.sql"
 
     # Isolated venv has the deps (the v3.2.0 regression guard).
