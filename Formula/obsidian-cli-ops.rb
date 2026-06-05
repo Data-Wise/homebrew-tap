@@ -15,7 +15,7 @@ class ObsidianCliOps < Formula
   homepage "https://data-wise.github.io/obsidian-cli-ops/"
   url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v3.2.1.tar.gz"
   # RELEASE TODO: shasum -a 256 of the v3.2.1 source tarball (tag not yet cut).
-  sha256 "TODO_FILL_AT_RELEASE"
+  sha256 "4ac84f9a9941165f89eb958157b0305100c054170bb31ed0b7b8ce4dfcdc2365"
   license "MIT"
   head "https://github.com/Data-Wise/obsidian-cli-ops.git", branch: "main"
 
