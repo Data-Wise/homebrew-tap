@@ -114,6 +114,12 @@ class ObsidianCliOps < Formula
     # Essential docs
     prefix.install "README.md"
     prefix.install "LICENSE" if (buildpath/"LICENSE").exist?
+
+    # Man page. Shipped from releases that include man/man1/obs.1 (added
+    # 2026-06); absent from v3.2.1, so guard on existence to stay install-safe
+    # on older tarballs and on --HEAD before the page is merged. Homebrew links
+    # it onto MANPATH automatically, so `man obs` works after install.
+    man1.install "man/man1/obs.1" if (buildpath/"man/man1/obs.1").exist?
   end
 
   def post_install
