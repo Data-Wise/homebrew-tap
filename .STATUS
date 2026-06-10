@@ -1,8 +1,15 @@
 status: Active
-last_session: 2026-02-16
+last_session: 2026-06-10
 milestone: Homebrew refactor complete
 
 progress: All phases merged to main, repo cleaned up, CI verified
+
+📋 Session 2026-06-10 (depends_on macos deprecation fix):
+- Fixed `depends_on macos:` deprecation in scribe + scribe-dev casks (string form `">= :catalina"` → bare symbol `:catalina`) — PR #112 (main c3e2e38)
+- Documented the symbol-form cask convention in CLAUDE.md (Cask Conventions section) — PR #113 (main 7ff9010)
+- Deleted `homebrew-tap-temp` duplicate clone (stale, 353 commits behind, no unique work)
+- Applied guardrails-only branch protection to main: force-push + deletion BLOCKED, no PR gate / no required checks (keeps update-formula.yml `auto_merge: true` direct-push working)
+- ROOT CAUSE fixed upstream in craft (`commands/dist/homebrew.md` generator template) — on craft dev, ships next craft release
 
 📋 Session 2026-02-16 (cont):
 - Fixed update-formula.yml false push triggers (PR #94)
@@ -38,3 +45,4 @@ progress: All phases merged to main, repo cleaned up, CI verified
 → Replace scribe-cli placeholder SHA when v0.3.0 release is created
 → Verify update-formula workflow uses App token correctly (next time a project releases)
 → Monitor: push-trigger suppression may need further investigation (PR #94 fix didn't fully resolve)
+→ After next craft release lands, confirm regenerated casks emit `depends_on macos: :catalina` (proves the generator root-cause fix holds in practice)
