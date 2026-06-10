@@ -5,8 +5,8 @@
 class Rforge < Formula
   desc "R package ecosystem orchestrator — 33 commands — Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.2.0.tar.gz"
-  sha256 "be4b529d74dbf4564df29b4fe77c02581ebfe6c8f819158d67abb05051a5fc43"
+  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.6.0.tar.gz"
+  sha256 "c7d898793132b67f5aa3a643d018c26d890844ac459aa6e8da1dab87c79c411b"
   license "MIT"
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
@@ -179,7 +179,7 @@ class Rforge < Formula
       If not auto-enabled, run:
         claude plugin install rforge@local-plugins
 
-      28 commands for R package ecosystem management.
+      35 commands for R package ecosystem management.
 
       If symlink failed (macOS permissions), run manually:
         ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge
