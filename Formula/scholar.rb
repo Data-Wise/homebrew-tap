@@ -12,9 +12,9 @@ class Scholar < Formula
   depends_on "jq" => :optional
 
   def install
-    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
-
     bin.mkpath
+
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     (bin/"scholar-install").write <<~EOS
       #!/bin/bash
@@ -196,6 +196,7 @@ class Scholar < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists bin/"scholar-install"
     assert_predicate libexec/"src/plugin-api/commands", :directory?
     assert_predicate libexec/"src/plugin-api/skills", :directory?
   end

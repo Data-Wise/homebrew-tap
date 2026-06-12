@@ -13,6 +13,8 @@ class McpBridge < Formula
   depends_on "node"
 
   def install
+    bin.mkpath
+
     # Install the server package to libexec
     cd "packages/server" do
       # Copy server files to libexec
@@ -24,8 +26,6 @@ class McpBridge < Formula
       end
 
       # Create bin wrapper for mcp-bridge CLI
-      bin.mkpath
-
       (bin/"mcp-bridge").write <<~EOS
         #!/bin/bash
         exec "#{libexec}/mcp-bridge" "$@"
@@ -92,6 +92,8 @@ class McpBridge < Formula
   end
 
   test do
+    assert_path_exists bin/"mcp-bridge"
+
     # Test that the server starts and responds
     _port = free_port
     pid = fork do

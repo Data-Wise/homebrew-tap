@@ -13,9 +13,9 @@ class Rforge < Formula
   depends_on "jq" => :optional
 
   def install
-    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
-
     bin.mkpath
+
+    libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     (bin/"rforge-install").write <<~EOS
       #!/bin/bash
@@ -193,6 +193,7 @@ class Rforge < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists bin/"rforge-install"
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"lib", :directory?
   end

@@ -24,9 +24,9 @@ class RforgeOrchestrator < Formula
   depends_on "jq" => :optional
 
   def install
-    libexec.install Dir["rforge-orchestrator/*"]
-
     bin.mkpath
+
+    libexec.install Dir["rforge-orchestrator/*"]
 
     (bin/"rforge-orchestrator-install").write <<~EOS
       #!/bin/bash
@@ -226,6 +226,7 @@ class RforgeOrchestrator < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists bin/"rforge-orchestrator-install"
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"agents", :directory?
   end

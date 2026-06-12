@@ -91,6 +91,8 @@ class ObsidianCliOps < Formula
   end
 
   def install
+    bin.mkpath
+
     # Build the isolated venv and install ONLY the pinned deps (resources above).
     venv = virtualenv_create(libexec/"venv", "python3.12")
     venv.pip_install resources
@@ -101,8 +103,6 @@ class ObsidianCliOps < Formula
     (libexec/"src").install "src/obs.zsh"
 
     # Launcher → isolated venv interpreter (matches obs.zsh resolution tier 1).
-    bin.mkpath
-
     (bin/"obs").write <<~EOS
       #!/bin/zsh
       # Obsidian CLI Ops launcher (Homebrew-installed)
@@ -151,6 +151,7 @@ class ObsidianCliOps < Formula
 
   test do
     # Core files present.
+    assert_path_exists bin/"obs"
     assert_path_exists libexec/"src/obs.zsh"
     assert_path_exists libexec/"src/python/obs_cli.py"
     assert_path_exists libexec/"schema/vault_db.sql"
