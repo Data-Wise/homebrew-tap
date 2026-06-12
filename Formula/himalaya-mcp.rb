@@ -27,6 +27,8 @@ class HimalayaMcp < Formula
     cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
     cp_r "himalaya-mcp-plugin/hooks", libexec/"hooks" if (buildpath/"himalaya-mcp-plugin/hooks").exist?
 
+    bin.mkpath
+
     (bin/"himalaya-mcp").write <<~EOS
       #!/bin/bash
       exec node "#{libexec}/dist/cli/setup.js" "$@"

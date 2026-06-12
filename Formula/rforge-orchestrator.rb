@@ -26,6 +26,8 @@ class RforgeOrchestrator < Formula
   def install
     libexec.install Dir["rforge-orchestrator/*"]
 
+    bin.mkpath
+
     (bin/"rforge-orchestrator-install").write <<~EOS
       #!/bin/bash
       # NOTE: Not using set -e to handle permission errors gracefully

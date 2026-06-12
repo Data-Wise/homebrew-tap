@@ -101,6 +101,8 @@ class ObsidianCliOps < Formula
     (libexec/"src").install "src/obs.zsh"
 
     # Launcher → isolated venv interpreter (matches obs.zsh resolution tier 1).
+    bin.mkpath
+
     (bin/"obs").write <<~EOS
       #!/bin/zsh
       # Obsidian CLI Ops launcher (Homebrew-installed)

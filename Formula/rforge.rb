@@ -15,6 +15,8 @@ class Rforge < Formula
   def install
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
+    bin.mkpath
+
     (bin/"rforge-install").write <<~EOS
       #!/bin/bash
       # NOTE: Not using set -e to handle permission errors gracefully

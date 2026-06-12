@@ -24,6 +24,8 @@ class McpBridge < Formula
       end
 
       # Create bin wrapper for mcp-bridge CLI
+      bin.mkpath
+
       (bin/"mcp-bridge").write <<~EOS
         #!/bin/bash
         exec "#{libexec}/mcp-bridge" "$@"
