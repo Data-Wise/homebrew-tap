@@ -12,6 +12,8 @@ class Workflow < Formula
   depends_on "jq" => :optional
 
   def install
+    bin.mkpath
+
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     (bin/"workflow-install").write <<~EOS
@@ -193,6 +195,7 @@ class Workflow < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists bin/"workflow-install"
     assert_path_exists libexec/"commands/brainstorm.md"
     assert_path_exists libexec/"skills/design/backend-designer.md"
     assert_path_exists libexec/"agents/orchestrator.md"

@@ -14,6 +14,8 @@ class HimalayaMcp < Formula
   depends_on "jq" => :optional
 
   def install
+    bin.mkpath
+
     system "npm", "install", *std_npm_args(prefix: false)
     system "npm", "run", "build"
     system "npm", "run", "build:bundle"
@@ -247,6 +249,7 @@ class HimalayaMcp < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists bin/"himalaya-mcp"
     assert_path_exists libexec/"dist/index.js"
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
