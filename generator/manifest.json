@@ -182,8 +182,8 @@
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
-      "version": "2.11.1",
-      "sha256": "0a5538ba22aee5a156df68d53f9ea047af693eb51ddccbaa749645f0b214c276",
+      "version": "2.12.0",
+      "sha256": "32f3ed5801a99c3b070edb67ea2c5adf16a2729773bc9500017ec9f9d193487c",
       "head": "https://github.com/Data-Wise/rforge.git",
       "dependencies": {
         "optional": [
