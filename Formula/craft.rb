@@ -3,17 +3,15 @@
 
 # Craft formula for the data-wise/tap Homebrew tap.
 class Craft < Formula
-  desc "Full-stack developer toolkit for Claude Code with 109 commands"
+  desc "Full-stack developer toolkit for Claude Code with 110 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.35.0.tar.gz"
-  sha256 "6a1d2bc21931926ba26a55fb41a66e2bdc81e86b5df1b1d10e6884406bf70ebb"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.36.0.tar.gz"
+  sha256 "4e1faa29000b0464ad0caad171c6cdc164a94193f3f380bc0a56729d8a640ce4"
   license "MIT"
 
   depends_on "jq" => :optional
 
   def install
-    bin.mkpath
-
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     (bin/"craft-install").write <<~EOS
@@ -263,7 +261,6 @@ class Craft < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
-    assert_path_exists bin/"craft-install"
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?

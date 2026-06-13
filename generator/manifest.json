@@ -6,12 +6,12 @@
   "formulas": {
     "craft": {
       "type": "claude-plugin",
-      "desc": "Full-stack developer toolkit for Claude Code with 109 commands",
+      "desc": "Full-stack developer toolkit for Claude Code with 110 commands",
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
-      "version": "2.35.0",
-      "sha256": "6a1d2bc21931926ba26a55fb41a66e2bdc81e86b5df1b1d10e6884406bf70ebb",
+      "version": "2.36.0",
+      "sha256": "4e1faa29000b0464ad0caad171c6cdc164a94193f3f380bc0a56729d8a640ce4",
       "dependencies": {
         "optional": [
           "jq"
@@ -178,7 +178,7 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator — 41 commands — Claude Code plugin",
+      "desc": "R package ecosystem orchestrator \u2014 41 commands \u2014 Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
