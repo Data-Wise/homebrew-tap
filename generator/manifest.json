@@ -142,8 +142,8 @@
       "homepage": "https://github.com/Data-Wise/scholar",
       "source": "github",
       "repo": "Data-Wise/scholar",
-      "version": "2.27.0",
-      "sha256": "26689a9d4a8a51807a7dbf42c8f3829fa7dda4f94007498fbd75a5420c718282",
+      "version": "2.28.0",
+      "sha256": "4c0ec08b302765e0009896f2d23f535c984c8e7e3ac1e57f55388eb4b100a64d",
       "dependencies": {
         "optional": [
           "jq"
@@ -178,7 +178,7 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator \u2014 41 commands \u2014 Claude Code plugin",
+      "desc": "R package ecosystem orchestrator — 41 commands — Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
