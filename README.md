@@ -14,6 +14,7 @@ brew tap data-wise/tap
 
 | Formula | Description |
 |---------|-------------|
+| **agy** | Causal inference assumption validator and workspace state synchronization CLI |
 | **aiterm** | Terminal optimizer for AI-assisted development |
 | **atlas** | ADHD-friendly project state engine with sessions, captures, and context |
 | **examark** | Create exams from Markdown and export to Canvas QTI format |

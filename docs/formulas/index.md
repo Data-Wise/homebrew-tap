@@ -8,7 +8,7 @@ The tap contains 15 formulas and 2 casks, organized into three categories:
 
 **agy**, **aiterm**, **nexus-cli**
 
-Use `Language::Python::Virtualenv`, depend on `python@3.10` or `python@3.12`. Installed via virtualenv patterns.
+Use `Language::Python::Virtualenv`, depend on `python@3.12`. Installed via virtualenv patterns.
 
 ### 2. Claude Code Plugin Formulas
 
