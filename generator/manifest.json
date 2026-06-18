@@ -142,8 +142,8 @@
       "homepage": "https://github.com/Data-Wise/scholar",
       "source": "github",
       "repo": "Data-Wise/scholar",
-      "version": "3.0.0",
-      "sha256": "ed2141b0214d679b4da68678132a6492962d019ab2dd3862791974ba0200f52c",
+      "version": "3.0.1",
+      "sha256": "f65886df3030d3f119b2540f3fe0d38ad99aa6b2893e304475c7749b3a0629dd",
       "dependencies": {
         "optional": [
           "jq"
