@@ -301,6 +301,16 @@
       ],
       "caveats_extra": "The Workflow plugin has been installed to:\n  ~/.claude/plugins/workflow\n\nIf not auto-enabled, run:\n  claude plugin install workflow@local-plugins\n\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/workflow/libexec ~/.claude/plugins/workflow"
     },
+    "agy": {
+      "type": "python-virtualenv",
+      "desc": "Causal inference assumption validator and workspace state synchronization CLI",
+      "homepage": "https://github.com/Data-Wise/agy-cli",
+      "source": "github",
+      "repo": "Data-Wise/agy-cli",
+      "version": "0.1.0",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "generated": false
+    },
     "aiterm": {
       "type": "python-virtualenv",
       "desc": "Terminal optimizer for AI-assisted development with Claude Code and Gemini CLI",
