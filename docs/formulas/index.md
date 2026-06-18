@@ -1,14 +1,14 @@
 # Formula Overview
 
-The tap contains 14 formulas and 2 casks, organized into three categories:
+The tap contains 15 formulas and 2 casks, organized into three categories:
 
 ## Categories
 
 ### 1. Python Virtualenv Formulas
 
-**aiterm**, **nexus-cli**
+**agy**, **aiterm**, **nexus-cli**
 
-Use `Language::Python::Virtualenv`, depend on `python@3.12`. Installed via `venv.pip_install` or `virtualenv_install_with_resources`.
+Use `Language::Python::Virtualenv`, depend on `python@3.10` or `python@3.12`. Installed via virtualenv patterns.
 
 ### 2. Claude Code Plugin Formulas
 

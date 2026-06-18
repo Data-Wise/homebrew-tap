@@ -1,5 +1,16 @@
 # CLI Tools
 
+## agy
+
+Causal inference assumption validator and workspace state synchronization CLI.
+
+```bash
+brew install data-wise/tap/agy
+agy status
+```
+
+**Type:** Python virtualenv | **Source:** GitHub
+
 ## aiterm
 
 Terminal optimizer for AI-assisted development with Claude Code and Gemini CLI.
