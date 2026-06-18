@@ -10,8 +10,8 @@ class Agy < Formula
   include Language::Python::Virtualenv
 
   def install
-    virtualenv_create(libexec, "python3.10")
-    system libexec/"bin/pip", "install", "-v", "--ignore-installed", buildpath
+    venv = virtualenv_create(libexec, "python3.10")
+    venv.pip_install buildpath
     bin.install_symlink libexec/"bin/agy"
   end
 
