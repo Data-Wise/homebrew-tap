@@ -3,10 +3,10 @@
 
 # Craft formula for the data-wise/tap Homebrew tap.
 class Craft < Formula
-  desc "Full-stack developer toolkit for Claude Code with 112 commands"
+  desc "Full-stack developer toolkit for Claude Code with 113 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.41.1.tar.gz"
-  sha256 "dc819a3feffbcc22659e37aa5b94a3f1c8143281ff58b9b9f6867c7edafb33f8"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.42.0.tar.gz"
+  sha256 "f4ef4e01d341a396f6e654fc82291122cbba5cc008a028c686d77eff42476f47"
   license "MIT"
 
   depends_on "jq" => :optional
