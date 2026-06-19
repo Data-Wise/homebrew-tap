@@ -10,8 +10,8 @@
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
-      "version": "2.41.0",
-      "sha256": "314b41fc63c795b782ddcfeda78b1a2e2ae39dc85ec6f36595d46ace4db9686e",
+      "version": "2.41.1",
+      "sha256": "dc819a3feffbcc22659e37aa5b94a3f1c8143281ff58b9b9f6867c7edafb33f8",
       "dependencies": {
         "optional": [
           "jq"
