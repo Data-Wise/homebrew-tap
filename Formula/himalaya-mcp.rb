@@ -22,12 +22,12 @@ class HimalayaMcp < Formula
 
     mkdir_p libexec/".claude-plugin"
     cp "himalaya-mcp-plugin/.claude-plugin/plugin.json", libexec/".claude-plugin/plugin.json"
+    cp_r "himalaya-mcp-plugin/.claude-plugin/hooks", libexec/".claude-plugin/hooks"
     cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
     libexec.install ".mcp.json"
     libexec.install "dist"
     cp_r "himalaya-mcp-plugin/skills", libexec/"skills"
     cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
-    cp_r "himalaya-mcp-plugin/hooks", libexec/"hooks" if (buildpath/"himalaya-mcp-plugin/hooks").exist?
 
     (bin/"himalaya-mcp").write <<~EOS
       #!/bin/bash
@@ -249,6 +249,8 @@ class HimalayaMcp < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_path_exists libexec/".claude-plugin/hooks/session-start.sh"
+    assert_path_exists libexec/".claude-plugin/hooks/pre-send.sh"
     assert_path_exists bin/"himalaya-mcp"
     assert_path_exists libexec/"dist/index.js"
     assert_predicate libexec/"skills", :directory?
