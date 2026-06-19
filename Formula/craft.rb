@@ -3,10 +3,10 @@
 
 # Craft formula for the data-wise/tap Homebrew tap.
 class Craft < Formula
-  desc "Full-stack developer toolkit for Claude Code with 111 commands"
+  desc "Full-stack developer toolkit for Claude Code with 112 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.40.0.tar.gz"
-  sha256 "a090901cd603bf89dbafdd3953a2567a95a472db14becc1607b044abbcd44e9d"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.41.0.tar.gz"
+  sha256 "314b41fc63c795b782ddcfeda78b1a2e2ae39dc85ec6f36595d46ace4db9686e"
   license "MIT"
 
   depends_on "jq" => :optional
@@ -149,7 +149,7 @@ class Craft < Formula
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-          echo "111 commands available:"
+          echo "107 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
@@ -234,7 +234,7 @@ class Craft < Formula
 
   def caveats
     <<~EOS
-      111 commands for full-stack development:
+      107 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
