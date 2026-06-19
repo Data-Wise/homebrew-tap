@@ -6,12 +6,12 @@
   "formulas": {
     "craft": {
       "type": "claude-plugin",
-      "desc": "Full-stack developer toolkit for Claude Code with 110 commands",
+      "desc": "Full-stack developer toolkit for Claude Code with 111 commands",
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
-      "version": "2.39.0",
-      "sha256": "b3260e483b78c1eb138667648d7bbd6735d9c151c84244eec7196bbd7de19d48",
+      "version": "2.40.0",
+      "sha256": "a090901cd603bf89dbafdd3953a2567a95a472db14becc1607b044abbcd44e9d",
       "dependencies": {
         "optional": [
           "jq"
