@@ -5,16 +5,14 @@
 class Rforge < Formula
   desc "R package ecosystem orchestrator — 41 commands — Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.13.0.tar.gz"
-  sha256 "609a5d0397c9e46257f9e9b9a4e3423971cd9fc035f509b2084831ae784d4532"
+  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.14.0.tar.gz"
+  sha256 "d1cb2eb12447abebb2d56a119b4b6fbeb9b98a70c2697e5c0a0cca225503dec5"
   license "MIT"
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
   depends_on "jq" => :optional
 
   def install
-    bin.mkpath
-
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
 
     (bin/"rforge-install").write <<~EOS
@@ -193,7 +191,6 @@ class Rforge < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
-    assert_path_exists bin/"rforge-install"
     assert_predicate libexec/"commands", :directory?
     assert_predicate libexec/"lib", :directory?
   end
