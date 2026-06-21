@@ -1,12 +1,14 @@
 # typed: false
 # frozen_string_literal: true
 
-# NexusCli - Knowledge workflow CLI
+# NexusCli - DEPRECATED: absorbed into obsidian-cli-ops (obs)
 class NexusCli < Formula
   include Language::Python::Virtualenv
 
-  desc "Knowledge workflow CLI for research, teaching, and writing"
-  homepage "https://data-wise.github.io/nexus-cli"
+  deprecate! date: "2026-06-21", because: "nexus-cli has been absorbed into obsidian-cli-ops (obs). Install with: brew install data-wise/tap/obsidian-cli-ops"
+
+  desc "DEPRECATED — use obsidian-cli-ops (obs) instead"
+  homepage "https://data-wise.github.io/obsidian-cli-ops/migration/"
   url "https://files.pythonhosted.org/packages/2e/1f/f05ada79136ffff12c81fe4b6a4bb4e2b282e1b80b860174e0605dc15eb9/nexus_cli-0.6.1.tar.gz"
   sha256 "610456c4f7a052c01b2b9482acf1c86626331ecbd1e534c167b043c9b28f7f58"
   license "MIT"
