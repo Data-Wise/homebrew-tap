@@ -5,8 +5,10 @@
 class Scholar < Formula
   desc "Academic workflows for research and teaching - Claude Code plugin"
   homepage "https://github.com/Data-Wise/scholar"
-  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v3.0.1.tar.gz"
-  sha256 "f65886df3030d3f119b2540f3fe0d38ad99aa6b2893e304475c7749b3a0629dd"
+  url "https://github.com/Data-Wise/scholar/archive/refs/tags/v3.1.0.tar.gz"
+  # TODO(blocked on tag): after `git tag v3.1.0 && git push --tags` on Data-Wise/scholar, fill the sha with:
+  #   curl -sL https://github.com/Data-Wise/scholar/archive/refs/tags/v3.1.0.tar.gz | shasum -a 256
+  sha256 "REPLACE_WITH_v3.1.0_TARBALL_SHA256_AFTER_TAGGING"
   license "MIT"
 
   depends_on "jq" => :optional
