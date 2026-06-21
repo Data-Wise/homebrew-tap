@@ -10,8 +10,8 @@
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
-      "version": "2.43.0",
-      "sha256": "0b06afdd858894abdc15e7648a780ecb64437213b8bd8cd65822b0476c397c03",
+      "version": "2.44.0",
+      "sha256": "6e2ca52290b312523b861229746088f6c2906199de818f28ab235fa0a6b122e9",
       "dependencies": {
         "optional": [
           "jq"
@@ -178,7 +178,7 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator — 41 commands — Claude Code plugin",
+      "desc": "R package ecosystem orchestrator \u2014 41 commands \u2014 Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
