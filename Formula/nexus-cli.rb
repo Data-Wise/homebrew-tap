@@ -9,8 +9,8 @@ class NexusCli < Formula
 
   desc "DEPRECATED — use obsidian-cli-ops (obs) instead"
   homepage "https://data-wise.github.io/obsidian-cli-ops/migration/"
-  url "https://files.pythonhosted.org/packages/2e/1f/f05ada79136ffff12c81fe4b6a4bb4e2b282e1b80b860174e0605dc15eb9/nexus_cli-0.6.1.tar.gz"
-  sha256 "610456c4f7a052c01b2b9482acf1c86626331ecbd1e534c167b043c9b28f7f58"
+  url "https://files.pythonhosted.org/packages/d0/76/221953d1b82084a0fc9e5370ffde9a81388456a1ee418dc530851fd72e53/nexus_cli-0.7.0.tar.gz"
+  sha256 "e61a92b72e64f7f17ae370948c82231f9369c02f965264a394ab282fc00b9170"
   license "MIT"
 
   depends_on "libyaml"
@@ -107,7 +107,7 @@ class NexusCli < Formula
   end
 
   test do
-    assert_match "0.6.1", shell_output("#{bin}/nexus --version")
+    assert_match "0.7.0", shell_output("#{bin}/nexus --version")
     system bin/"nexus", "doctor"
   end
 end
