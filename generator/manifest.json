@@ -30,7 +30,7 @@
       ],
       "install_script_desc": "Full-stack developer toolkit - code, git, site, docs, testing, and architecture commands",
       "install_script_summary": [
-        "107 commands available:",
+        "115 commands available:",
         "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check",
         "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       ],
@@ -52,7 +52,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "107 commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
+      "caveats_extra": "115 commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
     },
     "himalaya-mcp": {
       "type": "claude-plugin",

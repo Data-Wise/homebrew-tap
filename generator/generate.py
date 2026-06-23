@@ -295,9 +295,15 @@ def generate_formula(formula_name, config, defaults):
     lines.append("")
 
     # Step 3: Sync Claude Code plugin registry (always)
+    # Refresh the local-plugins marketplace index BEFORE updating, so the
+    # update reads the freshly-installed version rather than a stale cached
+    # manifest (otherwise `plugin update` no-ops on the prior version).
     lines.append(f'    # Step {"3" if features.get("schema_cleanup") else "2"}: Sync Claude Code plugin registry (optional)')
     lines.append("    begin")
-    lines.append(f'      system "claude", "plugin", "update", "{formula_name}@local-plugins" if which("claude")')
+    lines.append('      if which("claude")')
+    lines.append('        system "claude", "plugin", "marketplace", "update", "local-plugins"')
+    lines.append(f'        system "claude", "plugin", "update", "{formula_name}@local-plugins"')
+    lines.append("      end")
     lines.append("    rescue")
     lines.append("      nil")
     lines.append("    end")
