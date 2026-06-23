@@ -291,7 +291,7 @@ class ObsidianCliOps < Formula
         obs ai setup           # Interactive AI setup wizard
         obs ai status          # Check provider status
 
-      Claude Desktop / Claude Code (MCP server "obsidian-ops", 25 tools):
+      Claude Desktop / Claude Code (MCP server "obsidian-ops", 38 tools):
         After this upgrade, RESTART Claude Desktop (Cmd+Q, reopen) so it
         reloads the server — MCP tools are read only at startup.
         ⚠ v4.0.0 renamed the MCP client key. If your config still has a
