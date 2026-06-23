@@ -280,12 +280,27 @@ class ObsidianCliOps < Formula
         obs stats <vault>      # Show vault statistics
         obs analyze <vault>    # Analyze knowledge graph
         obs health <vault>     # Vault health dashboard
+        obs doctor             # Self-diagnostic (run this if something's off)
+
+      New in v4.0.0 (nexus-cli absorbed into obs):
+        obs config show        # Unified config at ~/.config/obs/config.yaml
+        obs research zotero …  # Zotero / PDF / course / manuscript / bib tools
+        (nexus-cli is retired — its config migrates via `obs config migrate`)
 
       AI features (optional):
         obs ai setup           # Interactive AI setup wizard
         obs ai status          # Check provider status
 
+      Claude Desktop / Claude Code (MCP server "obsidian-ops", 25 tools):
+        After this upgrade, RESTART Claude Desktop (Cmd+Q, reopen) so it
+        reloads the server — MCP tools are read only at startup.
+        ⚠ v4.0.0 renamed the MCP client key. If your config still has a
+          "nexus" server, rename that key to "obsidian-ops".
+        Setup + migration: https://data-wise.github.io/obsidian-cli-ops/claude-integration/
+
       Dependencies are isolated in an internal venv — no manual pip needed.
+      The launcher resolves the venv via the Homebrew opt symlink, so it keeps
+      working across version bumps without editing your MCP config.
 
       Documentation: https://data-wise.github.io/obsidian-cli-ops/
     EOS
