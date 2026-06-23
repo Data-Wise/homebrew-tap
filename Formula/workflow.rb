@@ -161,7 +161,10 @@ class Workflow < Formula
 
     # Step 2: Sync Claude Code plugin registry (optional)
     begin
-      system "claude", "plugin", "update", "workflow@local-plugins" if which("claude")
+      if which("claude")
+        system "claude", "plugin", "marketplace", "update", "local-plugins"
+        system "claude", "plugin", "update", "workflow@local-plugins"
+      end
     rescue
       nil
     end

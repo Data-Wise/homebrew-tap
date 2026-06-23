@@ -6,12 +6,13 @@
   "formulas": {
     "craft": {
       "type": "claude-plugin",
-      "desc": "Full-stack developer toolkit for Claude Code with 115 commands",
+      "desc": "Full-stack developer toolkit for Claude Code with {command_count} commands",
       "homepage": "https://github.com/Data-Wise/craft",
       "source": "github",
       "repo": "Data-Wise/craft",
       "version": "2.49.0",
       "sha256": "3e237f9f3035449e90a44b25a18067cedb80a3d2180d52e6bd48d4da3ee2417b",
+      "command_count": 115,
       "dependencies": {
         "optional": [
           "jq"
@@ -30,7 +31,7 @@
       ],
       "install_script_desc": "Full-stack developer toolkit - code, git, site, docs, testing, and architecture commands",
       "install_script_summary": [
-        "115 commands available:",
+        "{command_count} commands available:",
         "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check",
         "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       ],
@@ -52,7 +53,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "115 commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
+      "caveats_extra": "{command_count} commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
     },
     "himalaya-mcp": {
       "type": "claude-plugin",
@@ -62,6 +63,7 @@
       "repo": "Data-Wise/himalaya-mcp",
       "version": "1.7.0",
       "sha256": "ec63631cca2ad28422a721fabf5365834ce594f6e7540b7815046bcf673f5714",
+      "bin_mkpath": true,
       "dependencies": {
         "runtime": [
           "himalaya",
@@ -88,6 +90,11 @@
         "himalaya-mcp-plugin/.claude-plugin/plugin.json": ".claude-plugin/plugin.json",
         ".claude-plugin/marketplace.json": ".claude-plugin/marketplace.json"
       },
+      "libexec_copy_map_after": {
+        "himalaya-mcp-plugin/.claude-plugin/plugin.json": {
+          "himalaya-mcp-plugin/.claude-plugin/hooks": ".claude-plugin/hooks"
+        }
+      },
       "libexec_paths": [
         ".mcp.json",
         "dist"
@@ -95,9 +102,6 @@
       "libexec_copy_map": {
         "himalaya-mcp-plugin/skills": "skills",
         "himalaya-mcp-plugin/agents": "agents"
-      },
-      "libexec_copy_map_optional": {
-        "himalaya-mcp-plugin/hooks": "hooks"
       },
       "extra_scripts": [
         {
@@ -107,19 +111,36 @@
       ],
       "install_script_desc": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
       "install_script_summary": [
-        "7 email skills available:",
+        "12 email skills available:",
         "  /email:inbox       - List and browse inbox",
         "  /email:triage      - Classify emails (actionable/FYI/skip)",
         "  /email:digest      - Daily email digest",
         "  /email:reply       - Draft and send replies",
         "  /email:compose     - Compose new emails",
         "  /email:attachments - Manage attachments",
+        "  /email:search      - Search emails by keyword, sender, flags",
+        "  /email:manage      - Bulk email operations",
+        "  /email:stats       - Inbox statistics",
+        "  /email:config      - Setup wizard",
+        "  /email:morning     - Morning email briefing",
         "  /email:help        - Help hub for all commands"
       ],
       "test_paths": [
         {
           "path": ".claude-plugin/plugin.json",
           "type": "file"
+        },
+        {
+          "path": ".claude-plugin/hooks/session-start.sh",
+          "type": "file"
+        },
+        {
+          "path": ".claude-plugin/hooks/pre-send.sh",
+          "type": "file"
+        },
+        {
+          "type": "bin",
+          "path": "himalaya-mcp"
         },
         {
           "path": "dist/index.js",
@@ -134,7 +155,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "7 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:help\n\n19 MCP tools available.\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp"
+      "caveats_extra": "12 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:search  /email:manage   /email:stats\n  /email:config  /email:morning  /email:help\n\n22 MCP tools available (incl. health_check for IMAP diagnostics).\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp"
     },
     "scholar": {
       "type": "claude-plugin",
@@ -144,6 +165,8 @@
       "repo": "Data-Wise/scholar",
       "version": "3.1.1",
       "sha256": "fd5f82b0468d86268bc345297c2bd1d6d64122a192151f77388edad2509788f7",
+      "command_count": 34,
+      "bin_mkpath": true,
       "dependencies": {
         "optional": [
           "jq"
@@ -156,7 +179,7 @@
       },
       "install_script_desc": "Academic workflows for research and teaching - literature, manuscript, simulation, and course materials",
       "install_script_summary": [
-        "28 commands available (14 research + 13 teaching):",
+        "{command_count} commands available (14 research + 13 teaching):",
         "  Research: /arxiv, /doi, /bib:search, /bib:add, /manuscript:*, /simulation:*, /scholar:*",
         "  Teaching: /teaching:exam, /teaching:quiz, /teaching:syllabus, /teaching:assignment, /teaching:lecture, /teaching:sync"
       ],
@@ -164,6 +187,10 @@
         {
           "path": ".claude-plugin/plugin.json",
           "type": "file"
+        },
+        {
+          "type": "bin",
+          "path": "scholar-install"
         },
         {
           "path": "src/plugin-api/commands",
@@ -174,11 +201,11 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "The Scholar plugin has been installed to:\n  ~/.claude/plugins/scholar\n\nIf not auto-enabled, run:\n  claude plugin install scholar@local-plugins\n\n28 commands available for academic workflows:\n  - 14 research commands (literature, manuscript, simulation, planning)\n  - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)\n\nTry: /arxiv \"your research topic\"\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/scholar/libexec ~/.claude/plugins/scholar"
+      "caveats_extra": "The Scholar plugin has been installed to:\n  ~/.claude/plugins/scholar\n\nIf not auto-enabled, run:\n  claude plugin install scholar@local-plugins\n\n{command_count} commands available for academic workflows:\n  - 14 research commands (literature, manuscript, simulation, planning)\n  - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)\n\nTry: /arxiv \"your research topic\"\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/scholar/libexec ~/.claude/plugins/scholar"
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator \u2014 41 commands \u2014 Claude Code plugin",
+      "desc": "R package ecosystem orchestrator — 41 commands — Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
@@ -220,13 +247,20 @@
     "rforge-orchestrator": {
       "type": "claude-plugin",
       "desc": "Auto-delegation orchestrator for RForge MCP tools - Claude Code plugin",
-      "homepage": "https://github.com/Data-Wise/claude-plugins",
+      "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/claude-plugins",
       "version": "0.1.0",
       "sha256": "8c065681864b18c9bea41996aa33bec17b95697ed8330846c8b510bd81bbad2e",
       "url_override": "https://github.com/Data-Wise/claude-plugins/archive/refs/tags/rforge-orchestrator-v{version}.tar.gz",
       "libexec_subdir": "rforge-orchestrator",
+      "bin_mkpath": true,
+      "header_comment": "RforgeOrchestrator formula for the data-wise/tap Homebrew tap.\n\nDEPRECATED 2026-05-10: This formula was the original packaging of\nrforge when it lived inside the claude-plugins monorepo. The plugin\nwas extracted to its own repo (Data-Wise/rforge) and renamed to\n`rforge`. New users should install:\n\n    brew install --HEAD data-wise/tap/rforge\n\nThis formula is kept for the deprecation grace period; it will be\nupgraded to `disable!` in a future release, and removed thereafter.",
+      "caveats_no_footer": true,
+      "deprecate": {
+        "date": "2026-05-10",
+        "reason": "renamed; use `brew install --HEAD data-wise/tap/rforge`"
+      },
       "dependencies": {
         "optional": [
           "jq"
@@ -247,6 +281,10 @@
           "type": "file"
         },
         {
+          "type": "bin",
+          "path": "rforge-orchestrator-install"
+        },
+        {
           "path": "commands",
           "type": "directory"
         },
@@ -255,7 +293,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "The RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands:\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator"
+      "caveats_extra": "⚠️  DEPRECATED — This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n──────────────────────────────────────────────────────\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge"
     },
     "workflow": {
       "type": "claude-plugin",
@@ -266,6 +304,7 @@
       "version": "0.1.0",
       "sha256": "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783",
       "url_override": "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v{version}/workflow-v{version}.tar.gz",
+      "bin_mkpath": true,
       "dependencies": {
         "optional": [
           "jq"
@@ -285,6 +324,10 @@
         {
           "path": ".claude-plugin/plugin.json",
           "type": "file"
+        },
+        {
+          "type": "bin",
+          "path": "workflow-install"
         },
         {
           "path": "commands/brainstorm.md",

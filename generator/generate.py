@@ -55,6 +55,32 @@ def format_block(template, **kwargs):
     return result
 
 
+def apply_command_count_token(config):
+    """Replace {command_count} token in config string fields (in-place on a copy)."""
+    import copy
+    config = copy.deepcopy(config)
+    command_count = config.get("command_count")
+    if command_count is None:
+        return config
+
+    token = "{command_count}"
+    replacement = str(command_count)
+
+    def replace_in_str(s):
+        if isinstance(s, str):
+            return s.replace(token, replacement)
+        return s
+
+    config["desc"] = replace_in_str(config.get("desc", ""))
+    if "install_script_summary" in config:
+        config["install_script_summary"] = [replace_in_str(s) for s in config["install_script_summary"]]
+    if "install_script_desc" in config:
+        config["install_script_desc"] = replace_in_str(config["install_script_desc"])
+    if "caveats_extra" in config:
+        config["caveats_extra"] = replace_in_str(config["caveats_extra"])
+    return config
+
+
 def generate_install_script(formula_name, config):
     """Generate the <name>-install bash script content."""
     plugin_name = formula_name
@@ -135,18 +161,38 @@ def generate_uninstall_script(formula_name, config):
 
 def generate_formula(formula_name, config, defaults):
     """Generate a complete Ruby formula file for a Claude Code plugin."""
+    # Apply {command_count} token substitution first
+    config = apply_command_count_token(config)
+
     class_name = ruby_class_name(formula_name)
     features = config.get("features", {})
     deps = config.get("dependencies", {})
 
     head_only = config.get("head_only", False)
 
+    # Header comment block (custom or default)
+    header_comment = config.get("header_comment")
+    if header_comment:
+        # header_comment is raw text; each non-empty line is prefixed with "# "
+        # Preserve leading whitespace within lines for indented code blocks
+        raw_lines = header_comment.split("\n")
+        comment_lines = []
+        for raw_line in raw_lines:
+            if raw_line.strip():
+                # Preserve the leading whitespace (for indented code blocks like "    brew ...")
+                comment_lines.append(f"# {raw_line}")
+            else:
+                comment_lines.append("#")
+        formula_comment = "\n".join(comment_lines)
+    else:
+        formula_comment = f"# {class_name} formula for the {defaults['tap']} Homebrew tap."
+
     # Build the formula
     lines = [
         "# typed: false",
         "# frozen_string_literal: true",
         "",
-        f"# {class_name} formula for the {defaults['tap']} Homebrew tap.",
+        formula_comment,
         f"class {class_name} < Formula",
         f'  desc "{config["desc"]}"',
         f'  homepage "{config["homepage"]}"',
@@ -169,6 +215,13 @@ def generate_formula(formula_name, config, defaults):
         if "head" in config:
             lines.append(f'  head "{config["head"]}", branch: "main"')
 
+    # deprecate! directive — after license/head (matches Homebrew convention)
+    # Emits a blank line before deprecate! to match standard formatting
+    if "deprecate" in config:
+        dep = config["deprecate"]
+        lines.append("")
+        lines.append(f'  deprecate! date: "{dep["date"]}", because: "{dep["reason"]}"')
+
     lines.append("")
 
     # Dependencies
@@ -179,6 +232,11 @@ def generate_formula(formula_name, config, defaults):
 
     lines.append("")
     lines.append("  def install")
+
+    # bin.mkpath (optional, must come before libexec install)
+    if config.get("bin_mkpath"):
+        lines.append("    bin.mkpath")
+        lines.append("")
 
     # Build steps (for formulas that need npm build etc.)
     if "build_steps" in config:
@@ -192,9 +250,18 @@ def generate_formula(formula_name, config, defaults):
             lines.append(f'    mkdir_p libexec/"{dir_path}"')
 
     # Individual file copies (cp "src", libexec/"dest")
+    # libexec_copy_files supports an optional interleaved cp_r via "libexec_copy_map_inline"
+    # by using a special sentinel key "__cp_r_<src>__<dest>__" — or via explicit interleaving.
+    # To interleave a cp_r between cp calls, use libexec_copy_files_with_cp_r (ordered list).
     if "libexec_copy_files" in config:
         for src, dest in config["libexec_copy_files"].items():
             lines.append(f'    cp "{src}", libexec/"{dest}"')
+            # After each cp, emit any interleaved cp_r entries keyed to this src
+            if "libexec_copy_map_after" in config:
+                after_key = src
+                if after_key in config["libexec_copy_map_after"]:
+                    for map_src, map_dest in config["libexec_copy_map_after"][after_key].items():
+                        lines.append(f'    cp_r "{map_src}", libexec/"{map_dest}"')
 
     # Libexec install
     if "libexec_paths" in config:
@@ -323,9 +390,10 @@ def generate_formula(formula_name, config, defaults):
     caveats_text = config.get("caveats_extra", f"The {class_name} plugin has been installed to:\n  ~/.claude/plugins/{formula_name}")
     for line in caveats_text.split("\n"):
         lines.append(f"      {line}" if line.strip() else "")
-    lines.append("")
-    lines.append(f"      For more information:")
-    lines.append(f'        {config["homepage"]}')
+    if not config.get("caveats_no_footer"):
+        lines.append("")
+        lines.append(f"      For more information:")
+        lines.append(f'        {config["homepage"]}')
     lines.append("    EOS")
     lines.append("  end")
 
@@ -335,8 +403,11 @@ def generate_formula(formula_name, config, defaults):
     for tp in config.get("test_paths", []):
         if isinstance(tp, dict):
             path = tp["path"]
-            if tp["type"] == "directory":
+            tp_type = tp["type"]
+            if tp_type == "directory":
                 lines.append(f'    assert_predicate libexec/"{path}", :directory?')
+            elif tp_type == "bin":
+                lines.append(f'    assert_path_exists bin/"{path}"')
             else:
                 lines.append(f'    assert_path_exists libexec/"{path}"')
         else:
