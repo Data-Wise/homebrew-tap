@@ -1,0 +1,33 @@
+# Formula Drift Guard
+#
+# Generated formulas (Formula/*.rb) must always match a fresh regen from
+# generator/manifest.json. This fails CI if a generated formula was hand-edited
+# without updating the source — preventing silent manifest-drift that the next
+# release regen would revert.
+
+name: Formula Drift Guard
+
+on:
+  push:
+    paths:
+      - 'generator/**'
+      - 'Formula/**'
+      - '.github/workflows/formula-drift.yml'
+  pull_request:
+    paths:
+      - 'generator/**'
+      - 'Formula/**'
+
+jobs:
+  drift:
+    name: Regen vs committed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check formula drift (regen vs committed)
+        run: bash generator/check-drift.sh
