@@ -5,8 +5,8 @@
 class Atlas < Formula
   desc "Project state engine with registry, sessions, and capture"
   homepage "https://github.com/Data-Wise/atlas"
-  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "79ee1239924e0925190157a51d8c2ccac95a34f748a4f81d20cd6dd842f19305"
+  url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.11.1.tar.gz"
+  sha256 "b9aab1ece8550649bb6f4fc780bd38f0a1480a05b2970c65419db3fea9766822"
   license "MIT"
 
   depends_on "python@3.12" => :build
