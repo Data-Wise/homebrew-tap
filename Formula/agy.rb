@@ -25,6 +25,14 @@ class Agy < Formula
     bin.install_symlink libexec/"bin/cagy"
   end
 
+  def caveats
+    <<~EOS
+      The CLI command has been renamed from `agy` to `cagy` to avoid conflicts.
+      Run it via:
+        cagy status
+    EOS
+  end
+
   test do
     system bin/"cagy", "status"
   end
