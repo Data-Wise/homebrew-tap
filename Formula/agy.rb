@@ -22,10 +22,10 @@ class Agy < Formula
     venv.pip_install "requests>=2.31.0"
     
     venv.pip_install buildpath
-    bin.install_symlink libexec/"bin/agy"
+    bin.install_symlink libexec/"bin/cagy"
   end
 
   test do
-    system "#{bin}/agy", "status"
+    system "#{bin}/cagy", "status"
   end
 end
