@@ -5,8 +5,8 @@
 class Craft < Formula
   desc "Full-stack developer toolkit for Claude Code with 117 commands"
   homepage "https://github.com/Data-Wise/craft"
-  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.54.0.tar.gz"
-  sha256 "95627dab4a8648a202f71e7895885cd250bd1665543ed4ecd2fb9d67edf42178"
+  url "https://github.com/Data-Wise/craft/archive/refs/tags/v2.55.0.tar.gz"
+  sha256 "d9fde6fb7025da34dc1c8d8d1a982d10c671da4f549e22eae16bb764bf509baa"
   license "MIT"
 
   depends_on "jq" => :optional
@@ -149,7 +149,7 @@ class Craft < Formula
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-          echo "117 commands available:"
+          echo "116 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
@@ -237,7 +237,7 @@ class Craft < Formula
 
   def caveats
     <<~EOS
-      117 commands for full-stack development:
+      116 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
