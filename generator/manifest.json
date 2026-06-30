@@ -12,7 +12,7 @@
       "repo": "Data-Wise/craft",
       "version": "2.55.0",
       "sha256": "d9fde6fb7025da34dc1c8d8d1a982d10c671da4f549e22eae16bb764bf509baa",
-      "command_count": 116,
+      "command_count": 117,
       "dependencies": {
         "optional": [
           "jq"
