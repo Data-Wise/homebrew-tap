@@ -21,7 +21,7 @@ class RforgeOrchestrator < Formula
 
   deprecate! date: "2026-05-10", because: "renamed; use `brew install --HEAD data-wise/tap/rforge`"
 
-  depends_on "jq" => :optional
+  depends_on "jq"
 
   def install
     bin.mkpath
@@ -34,7 +34,8 @@ class RforgeOrchestrator < Formula
 
       PLUGIN_NAME="rforge-orchestrator"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use stable opt path — Homebrew maintains this symlink across upgrades
+      # Copy from the stable opt path — Homebrew repoints opt/<name> across upgrades,
+      # and post_install re-runs this installer to refresh the real copy.
       SOURCE_DIR="$(brew --prefix)/opt/rforge-orchestrator/libexec"
 
       echo "Installing RForgeOrchestrator plugin to Claude Code..."
@@ -42,31 +43,39 @@ class RforgeOrchestrator < Formula
       # Create plugins directory if it doesn't exist
       mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
-      # Remove existing installation (handle macOS extended attributes)
+      # Remove any existing installation. NOTE: older versions installed a SYMLINK
+      # here — we now install a REAL copy, so this also MIGRATES legacy symlink
+      # installs to a real directory.
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
           rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
-      # Create symlink to Homebrew-managed files
-      # Try multiple approaches for macOS compatibility
+      # Install a REAL copy of the Homebrew-managed files (never a symlink).
+      # Use a tar pipe rather than `cp -R`: tar copies symlinks AS symlinks, so the
+      # intentionally-broken governance test fixtures don't abort the copy on macOS
+      # BSD cp. LINK_SUCCESS gates the success/fallback branches below.
       LINK_SUCCESS=false
-
-      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
-      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 2: Standard symlink
-      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 3: Remove and recreate
-      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
+      if [ -d "$SOURCE_DIR" ] && mkdir -p "$TARGET_DIR" 2>/dev/null; then
+          if ( cd "$SOURCE_DIR" && tar cf - . ) 2>/dev/null | ( cd "$TARGET_DIR" && tar xf - ) 2>/dev/null; then
+              # Verify the copy actually landed before declaring success
+              if [ -f "$TARGET_DIR/.claude-plugin/plugin.json" ]; then
+                  LINK_SUCCESS=true
+              fi
+          fi
+          [ "$LINK_SUCCESS" = true ] || rm -rf "$TARGET_DIR" 2>/dev/null || true
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
-          # Also create symlink in local-marketplace for plugin discovery
+          # Mirror into local-marketplace for plugin discovery — a REAL copy, not a
+          # symlink (also migrates a legacy symlink here). Costs ~2x disk per plugin;
+          # accepted tradeoff for the no-symlinks install policy.
           MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
           mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
-          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+          if [ -d "$TARGET_DIR" ]; then
+              rm -rf "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || rm -f "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+              mkdir -p "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+              ( cd "$TARGET_DIR" && tar cf - . ) 2>/dev/null | ( cd "$MARKETPLACE_DIR/$PLUGIN_NAME" && tar xf - ) 2>/dev/null || true
+          fi
 
           # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
           MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
@@ -117,11 +126,11 @@ class RforgeOrchestrator < Formula
           echo ""
           echo "Commands: /rforge:analyze, /rforge:quick, /rforge:thorough"
       else
-          echo "⚠️  Automatic symlink failed (macOS permissions)."
+          echo "⚠️  Automatic install failed (could not copy plugin files)."
           echo ""
-          echo "Run this command manually to complete installation:"
+          echo "Copy the plugin into place manually to complete installation:"
           echo ""
-          echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+          echo "  mkdir -p $TARGET_DIR && ( cd $SOURCE_DIR && tar cf - . ) | ( cd $TARGET_DIR && tar xf - )"
           echo ""
           exit 0  # Don't fail the brew install
       fi
@@ -175,6 +184,30 @@ class RforgeOrchestrator < Formula
       if which("claude")
         system "claude", "plugin", "marketplace", "update", "local-plugins"
         system "claude", "plugin", "update", "rforge-orchestrator@local-plugins"
+      else
+        opoo "claude not on PATH - run: claude plugin install rforge-orchestrator@local-plugins to finish"
+      end
+    rescue
+      nil
+    end
+
+    # Prune old cached plugin versions (keep newest 3)
+    begin
+      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/rforge-orchestrator")
+      if cache.directory?
+        cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree)
+      end
+    rescue
+      nil
+    end
+
+    # Warn if the installed copy's version drifts from this formula
+    begin
+      require "json"
+      installed = Pathname.new("#{Dir.home}/.claude/plugins/rforge-orchestrator/.claude-plugin/plugin.json")
+      if installed.file?
+        iv = JSON.parse(installed.read)["version"]
+        opoo "installed rforge-orchestrator v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
       end
     rescue
       nil
@@ -219,8 +252,8 @@ class RforgeOrchestrator < Formula
         /rforge:quick    - Quick project analysis
         /rforge:thorough - Thorough multi-stage analysis
 
-      If symlink failed (macOS permissions), run manually:
-        ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator
+      If the automatic copy failed (macOS permissions), run manually:
+        mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )
 
       For the new plugin and full v1.2.0 docs:
         https://github.com/Data-Wise/rforge

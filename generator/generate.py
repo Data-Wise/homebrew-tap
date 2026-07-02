@@ -370,10 +370,40 @@ def generate_formula(formula_name, config, defaults):
     lines.append('      if which("claude")')
     lines.append('        system "claude", "plugin", "marketplace", "update", "local-plugins"')
     lines.append(f'        system "claude", "plugin", "update", "{formula_name}@local-plugins"')
+    lines.append("      else")
+    lines.append(f'        opoo "claude not on PATH - run: claude plugin install {formula_name}@local-plugins to finish"')
     lines.append("      end")
     lines.append("    rescue")
     lines.append("      nil")
     lines.append("    end")
+    lines.append("")
+
+    # Cache GC: prune old cached plugin versions, keep newest 3 (unbounded growth otherwise)
+    lines.append("    # Prune old cached plugin versions (keep newest 3)")
+    lines.append("    begin")
+    lines.append(f'      cache = Pathname.new("#{{Dir.home}}/.claude/plugins/cache/local-plugins/{formula_name}")')
+    lines.append("      if cache.directory?")
+    lines.append("        cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree)")
+    lines.append("      end")
+    lines.append("    rescue")
+    lines.append("      nil")
+    lines.append("    end")
+
+    # Version-drift self-check (advisory). Skipped for head-only formulas where
+    # `version` is not a released semver and would false-positive.
+    if not head_only:
+        lines.append("")
+        lines.append("    # Warn if the installed copy's version drifts from this formula")
+        lines.append("    begin")
+        lines.append('      require "json"')
+        lines.append(f'      installed = Pathname.new("#{{Dir.home}}/.claude/plugins/{formula_name}/.claude-plugin/plugin.json")')
+        lines.append("      if installed.file?")
+        lines.append('        iv = JSON.parse(installed.read)["version"]')
+        lines.append(f'        opoo "installed {formula_name} v#{{iv}} != formula v#{{version}}" if iv && iv.to_s != version.to_s')
+        lines.append("      end")
+        lines.append("    rescue")
+        lines.append("      nil")
+        lines.append("    end")
 
     lines.append("  end")
 

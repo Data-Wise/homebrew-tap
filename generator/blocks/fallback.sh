@@ -1,7 +1,7 @@
-    echo "⚠️  Automatic symlink failed (macOS permissions)."
+    echo "⚠️  Automatic install failed (could not copy plugin files)."
     echo ""
-    echo "Run this command manually to complete installation:"
+    echo "Copy the plugin into place manually to complete installation:"
     echo ""
-    echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+    echo "  mkdir -p $TARGET_DIR && ( cd $SOURCE_DIR && tar cf - . ) | ( cd $TARGET_DIR && tar xf - )"
     echo ""
     exit 0  # Don't fail the brew install
