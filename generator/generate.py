@@ -224,10 +224,10 @@ def generate_formula(formula_name, config, defaults):
 
     lines.append("")
 
-    # Dependencies
-    for dep in deps.get("runtime", []):
+    # Dependencies (sorted — Homebrew's FormulaAudit/DependencyOrder wants alphabetical)
+    for dep in sorted(deps.get("runtime", [])):
         lines.append(f'  depends_on "{dep}"')
-    for dep in deps.get("optional", []):
+    for dep in sorted(deps.get("optional", [])):
         lines.append(f'  depends_on "{dep}" => :optional')
 
     lines.append("")
@@ -382,9 +382,7 @@ def generate_formula(formula_name, config, defaults):
     lines.append("    # Prune old cached plugin versions (keep newest 3)")
     lines.append("    begin")
     lines.append(f'      cache = Pathname.new("#{{Dir.home}}/.claude/plugins/cache/local-plugins/{formula_name}")')
-    lines.append("      if cache.directory?")
-    lines.append("        cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree)")
-    lines.append("      end")
+    lines.append("      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?")
     lines.append("    rescue")
     lines.append("      nil")
     lines.append("    end")

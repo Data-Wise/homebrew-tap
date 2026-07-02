@@ -183,9 +183,7 @@ class Rforge < Formula
     # Prune old cached plugin versions (keep newest 3)
     begin
       cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/rforge")
-      if cache.directory?
-        cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree)
-      end
+      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
     rescue
       nil
     end
