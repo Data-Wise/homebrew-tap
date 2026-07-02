@@ -15,8 +15,14 @@ class FlowCli < Formula
   depends_on "zsh"
 
   def install
-    # Man pages to proper Homebrew location
-    man1.install Dir["man/man1/*"] if (buildpath/"man/man1").exist?
+    # Man pages to proper Homebrew location. Exclude r.1: flow-cli's `r`
+    # dispatcher man page collides with the `r` formula's R.1 on
+    # case-insensitive filesystems (APFS default), which breaks `brew link`
+    # for anyone with both formulae installed.
+    if (buildpath/"man/man1").exist?
+      pages = Dir["man/man1/*"].reject { |f| File.basename(f).casecmp("r.1").zero? }
+      man1.install(*pages)
+    end
     rm_r(buildpath/"man") if (buildpath/"man").exist?
 
     # Core runtime files only (selective install)
