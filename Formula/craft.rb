@@ -232,8 +232,20 @@ class Craft < Formula
     # Step 3: Sync Claude Code plugin registry (optional)
     begin
       if which("claude")
-        system "claude", "plugin", "marketplace", "update", "local-plugins"
-        system "claude", "plugin", "update", "craft@local-plugins"
+        synced = false
+        2.times do |attempt|
+          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
+          break if synced
+
+          sleep 1 if attempt.zero?
+        end
+        if synced
+          system "claude", "plugin", "update", "craft@local-plugins"
+        else
+          opoo "marketplace sync didn't settle in time - run: " \
+               "claude plugin marketplace update local-plugins && " \
+               "claude plugin update craft@local-plugins"
+        end
       else
         opoo "claude not on PATH - run: claude plugin install craft@local-plugins to finish"
       end

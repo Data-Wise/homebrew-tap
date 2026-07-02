@@ -182,8 +182,20 @@ class RforgeOrchestrator < Formula
     # Step 2: Sync Claude Code plugin registry (optional)
     begin
       if which("claude")
-        system "claude", "plugin", "marketplace", "update", "local-plugins"
-        system "claude", "plugin", "update", "rforge-orchestrator@local-plugins"
+        synced = false
+        2.times do |attempt|
+          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
+          break if synced
+
+          sleep 1 if attempt.zero?
+        end
+        if synced
+          system "claude", "plugin", "update", "rforge-orchestrator@local-plugins"
+        else
+          opoo "marketplace sync didn't settle in time - run: " \
+               "claude plugin marketplace update local-plugins && " \
+               "claude plugin update rforge-orchestrator@local-plugins"
+        end
       else
         opoo "claude not on PATH - run: claude plugin install rforge-orchestrator@local-plugins to finish"
       end
