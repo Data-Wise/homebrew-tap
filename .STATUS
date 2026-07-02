@@ -1,8 +1,33 @@
 status: Active
-last_session: 2026-06-10
+last_session: 2026-07-02
 milestone: Homebrew refactor complete
 
 progress: All phases merged to main, repo cleaned up, CI verified
+
+📋 Session 2026-07-02 (post_install marketplace-sync race fix):
+- PR #134 (main, merged): post_install Step 3 (`claude plugin marketplace update
+  local-plugins`) fired immediately after Step 2's `Process.waitpid` returned,
+  before the spawned install script's marketplace-mirror write was guaranteed
+  visible — spurious "Marketplace 'local-plugins' not found" on `brew reinstall`
+  even though the manifest was correct (reproduced live during a craft v2.58.0
+  reinstall check; standalone re-runs of the exact command succeeded every time,
+  confirming a transient post_install-subprocess race, not a config problem).
+  Fix: retry the marketplace-update call once with a 1s delay; degrade to an
+  advisory `opoo` with the manual fix-it command if both attempts fail;
+  `plugin update` now gated on a successful sync (previously fired unconditionally).
+  Fixed in `generator/generate.py` (never hand-edited into `.rb` files); all 6
+  claude-plugin formulas (craft, himalaya-mcp, scholar, rforge,
+  rforge-orchestrator, workflow) regenerated — `brew audit --strict` clean,
+  `ruby -c` clean, existing `test_no_symlink_install.sh` green. New
+  `tests/test_marketplace_sync_resilience.sh` added, verified via planted-defect
+  positive control (5/5 checks correctly failed on the old pattern, restored to
+  green on the fix) before merge. CI (Regen vs committed drift guard) green,
+  merged clean, `main` synced locally.
+- Also fixed: local checkout was stuck on stale branch
+  `fix/craft-command-count-116` (its PR #133 was already squash-merged) —
+  switched to `main`, pulled, confirmed 0 unmerged work lost.
+- Worktree `feature-post-install-marketplace-resilience` created and removed
+  same session (merged, no orphan left).
 
 📋 Session 2026-06-10 (depends_on macos deprecation fix):
 - Fixed `depends_on macos:` deprecation in scribe + scribe-dev casks (string form `">= :catalina"` → bare symbol `:catalina`) — PR #112 (main c3e2e38)
