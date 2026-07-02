@@ -31,3 +31,6 @@ jobs:
 
       - name: Check formula drift (regen vs committed)
         run: bash generator/check-drift.sh
+
+      - name: No-symlink install contract (claude-plugin formulas)
+        run: bash tests/test_no_symlink_install.sh

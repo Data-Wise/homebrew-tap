@@ -14,7 +14,7 @@
       "sha256": "f641adfc37f5af17a372df1c33a50802328598a4e8947c4085039cc0e9438088",
       "command_count": 117,
       "dependencies": {
-        "optional": [
+        "runtime": [
           "jq"
         ]
       },
@@ -53,7 +53,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "{command_count} commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft"
+      "caveats_extra": "{command_count} commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/craft && ( cd $(brew --prefix)/opt/craft/libexec && tar cf - . ) | ( cd ~/.claude/plugins/craft && tar xf - )"
     },
     "himalaya-mcp": {
       "type": "claude-plugin",
@@ -67,9 +67,7 @@
       "dependencies": {
         "runtime": [
           "himalaya",
-          "node"
-        ],
-        "optional": [
+          "node",
           "jq"
         ]
       },
@@ -155,7 +153,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "12 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:search  /email:manage   /email:stats\n  /email:config  /email:morning  /email:help\n\n22 MCP tools available (incl. health_check for IMAP diagnostics).\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp"
+      "caveats_extra": "12 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:attachments\n  /email:search  /email:manage   /email:stats\n  /email:config  /email:morning  /email:help\n\n22 MCP tools available (incl. health_check for IMAP diagnostics).\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/himalaya-mcp && ( cd $(brew --prefix)/opt/himalaya-mcp/libexec && tar cf - . ) | ( cd ~/.claude/plugins/himalaya-mcp && tar xf - )"
     },
     "scholar": {
       "type": "claude-plugin",
@@ -168,7 +166,7 @@
       "command_count": 34,
       "bin_mkpath": true,
       "dependencies": {
-        "optional": [
+        "runtime": [
           "jq"
         ]
       },
@@ -201,7 +199,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "The Scholar plugin has been installed to:\n  ~/.claude/plugins/scholar\n\nIf not auto-enabled, run:\n  claude plugin install scholar@local-plugins\n\n{command_count} commands available for academic workflows:\n  - 14 research commands (literature, manuscript, simulation, planning)\n  - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)\n\nTry: /arxiv \"your research topic\"\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/scholar/libexec ~/.claude/plugins/scholar"
+      "caveats_extra": "The Scholar plugin has been installed to:\n  ~/.claude/plugins/scholar\n\nIf not auto-enabled, run:\n  claude plugin install scholar@local-plugins\n\n{command_count} commands available for academic workflows:\n  - 14 research commands (literature, manuscript, simulation, planning)\n  - 13 teaching commands (syllabus, assignments, exams, feedback, lectures, validation, migration)\n\nTry: /arxiv \"your research topic\"\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/scholar && ( cd $(brew --prefix)/opt/scholar/libexec && tar cf - . ) | ( cd ~/.claude/plugins/scholar && tar xf - )"
     },
     "rforge": {
       "type": "claude-plugin",
@@ -213,7 +211,7 @@
       "sha256": "7683de54d5aaa15f03490236ac5817f4c0f04e4858fd9dc8e7ca05cc53a6ffe2",
       "head": "https://github.com/Data-Wise/rforge.git",
       "dependencies": {
-        "optional": [
+        "runtime": [
           "jq"
         ]
       },
@@ -242,7 +240,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n35 commands for R package ecosystem management.\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge/libexec ~/.claude/plugins/rforge"
+      "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n35 commands for R package ecosystem management.\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge && ( cd $(brew --prefix)/opt/rforge/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge && tar xf - )"
     },
     "rforge-orchestrator": {
       "type": "claude-plugin",
@@ -262,7 +260,7 @@
         "reason": "renamed; use `brew install --HEAD data-wise/tap/rforge`"
       },
       "dependencies": {
-        "optional": [
+        "runtime": [
           "jq"
         ]
       },
@@ -293,7 +291,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/rforge-orchestrator/libexec ~/.claude/plugins/rforge-orchestrator\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge"
+      "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge"
     },
     "workflow": {
       "type": "claude-plugin",
@@ -306,7 +304,7 @@
       "url_override": "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v{version}/workflow-v{version}.tar.gz",
       "bin_mkpath": true,
       "dependencies": {
-        "optional": [
+        "runtime": [
           "jq"
         ]
       },
@@ -342,7 +340,7 @@
           "type": "file"
         }
       ],
-      "caveats_extra": "The Workflow plugin has been installed to:\n  ~/.claude/plugins/workflow\n\nIf not auto-enabled, run:\n  claude plugin install workflow@local-plugins\n\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns\n\nIf symlink failed (macOS permissions), run manually:\n  ln -sf $(brew --prefix)/opt/workflow/libexec ~/.claude/plugins/workflow"
+      "caveats_extra": "The Workflow plugin has been installed to:\n  ~/.claude/plugins/workflow\n\nIf not auto-enabled, run:\n  claude plugin install workflow@local-plugins\n\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/workflow && ( cd $(brew --prefix)/opt/workflow/libexec && tar cf - . ) | ( cd ~/.claude/plugins/workflow && tar xf - )"
     },
     "agy": {
       "type": "python-virtualenv",

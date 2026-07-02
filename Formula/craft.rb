@@ -9,7 +9,7 @@ class Craft < Formula
   sha256 "f641adfc37f5af17a372df1c33a50802328598a4e8947c4085039cc0e9438088"
   license "MIT"
 
-  depends_on "jq" => :optional
+  depends_on "jq"
 
   def install
     libexec.install Dir["*", ".*"].reject { |f| %w[. .. .git].include?(f) }
@@ -20,7 +20,8 @@ class Craft < Formula
 
       PLUGIN_NAME="craft"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Use stable opt path — Homebrew maintains this symlink across upgrades
+      # Copy from the stable opt path — Homebrew repoints opt/<name> across upgrades,
+      # and post_install re-runs this installer to refresh the real copy.
       SOURCE_DIR="$(brew --prefix)/opt/craft/libexec"
 
       # Strip unrecognized keys from plugin.json (Claude Code rejects them)
@@ -34,31 +35,39 @@ class Craft < Formula
       # Create plugins directory if it doesn't exist
       mkdir -p "$HOME/.claude/plugins" 2>/dev/null || true
 
-      # Remove existing installation (handle macOS extended attributes)
+      # Remove any existing installation. NOTE: older versions installed a SYMLINK
+      # here — we now install a REAL copy, so this also MIGRATES legacy symlink
+      # installs to a real directory.
       if [ -L "$TARGET_DIR" ] || [ -d "$TARGET_DIR" ]; then
           rm -rf "$TARGET_DIR" 2>/dev/null || rm -f "$TARGET_DIR" 2>/dev/null || true
       fi
 
-      # Create symlink to Homebrew-managed files
-      # Try multiple approaches for macOS compatibility
+      # Install a REAL copy of the Homebrew-managed files (never a symlink).
+      # Use a tar pipe rather than `cp -R`: tar copies symlinks AS symlinks, so the
+      # intentionally-broken governance test fixtures don't abort the copy on macOS
+      # BSD cp. LINK_SUCCESS gates the success/fallback branches below.
       LINK_SUCCESS=false
-
-      # Method 1: ln -sfh (macOS, replaces symlink atomically, prevents circular symlinks)
-      if ln -sfh "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 2: Standard symlink
-      elif ln -sf "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
-      # Method 3: Remove and recreate
-      elif rm -f "$TARGET_DIR" 2>/dev/null && ln -s "$SOURCE_DIR" "$TARGET_DIR" 2>/dev/null; then
-          LINK_SUCCESS=true
+      if [ -d "$SOURCE_DIR" ] && mkdir -p "$TARGET_DIR" 2>/dev/null; then
+          if ( cd "$SOURCE_DIR" && tar cf - . ) 2>/dev/null | ( cd "$TARGET_DIR" && tar xf - ) 2>/dev/null; then
+              # Verify the copy actually landed before declaring success
+              if [ -f "$TARGET_DIR/.claude-plugin/plugin.json" ]; then
+                  LINK_SUCCESS=true
+              fi
+          fi
+          [ "$LINK_SUCCESS" = true ] || rm -rf "$TARGET_DIR" 2>/dev/null || true
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
-          # Also create symlink in local-marketplace for plugin discovery
+          # Mirror into local-marketplace for plugin discovery — a REAL copy, not a
+          # symlink (also migrates a legacy symlink here). Costs ~2x disk per plugin;
+          # accepted tradeoff for the no-symlinks install policy.
           MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
           mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
-          ln -sfh "$TARGET_DIR" "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+          if [ -d "$TARGET_DIR" ]; then
+              rm -rf "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || rm -f "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+              mkdir -p "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
+              ( cd "$TARGET_DIR" && tar cf - . ) 2>/dev/null | ( cd "$MARKETPLACE_DIR/$PLUGIN_NAME" && tar xf - ) 2>/dev/null || true
+          fi
 
           # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
           MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
@@ -153,11 +162,11 @@ class Craft < Formula
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
-          echo "⚠️  Automatic symlink failed (macOS permissions)."
+          echo "⚠️  Automatic install failed (could not copy plugin files)."
           echo ""
-          echo "Run this command manually to complete installation:"
+          echo "Copy the plugin into place manually to complete installation:"
           echo ""
-          echo "  ln -sf $SOURCE_DIR $TARGET_DIR"
+          echo "  mkdir -p $TARGET_DIR && ( cd $SOURCE_DIR && tar cf - . ) | ( cd $TARGET_DIR && tar xf - )"
           echo ""
           exit 0  # Don't fail the brew install
       fi
@@ -225,6 +234,28 @@ class Craft < Formula
       if which("claude")
         system "claude", "plugin", "marketplace", "update", "local-plugins"
         system "claude", "plugin", "update", "craft@local-plugins"
+      else
+        opoo "claude not on PATH - run: claude plugin install craft@local-plugins to finish"
+      end
+    rescue
+      nil
+    end
+
+    # Prune old cached plugin versions (keep newest 3)
+    begin
+      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/craft")
+      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
+    rescue
+      nil
+    end
+
+    # Warn if the installed copy's version drifts from this formula
+    begin
+      require "json"
+      installed = Pathname.new("#{Dir.home}/.claude/plugins/craft/.claude-plugin/plugin.json")
+      if installed.file?
+        iv = JSON.parse(installed.read)["version"]
+        opoo "installed craft v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
       end
     rescue
       nil
@@ -254,8 +285,8 @@ class Craft < Formula
       After upgrades, sync Claude Code registry:
         claude plugin update craft@local-plugins
 
-      If symlink failed (macOS permissions), run manually:
-        ln -sf $(brew --prefix)/opt/craft/libexec ~/.claude/plugins/craft
+      If the automatic copy failed (macOS permissions), run manually:
+        mkdir -p ~/.claude/plugins/craft && ( cd $(brew --prefix)/opt/craft/libexec && tar cf - . ) | ( cd ~/.claude/plugins/craft && tar xf - )
 
       For more information:
         https://github.com/Data-Wise/craft
