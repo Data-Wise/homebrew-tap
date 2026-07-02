@@ -365,11 +365,31 @@ def generate_formula(formula_name, config, defaults):
     # Refresh the local-plugins marketplace index BEFORE updating, so the
     # update reads the freshly-installed version rather than a stale cached
     # manifest (otherwise `plugin update` no-ops on the prior version).
+    #
+    # Retry the marketplace-update call once: Step 2's spawned install script
+    # can return (Process.waitpid) slightly before its marketplace-mirror
+    # write (blocks/marketplace.sh) is fully visible to a freshly-spawned
+    # `claude` CLI process, causing a spurious "marketplace not found" on the
+    # first attempt even though the manifest is actually correct. If both
+    # attempts fail, degrade to an advisory `opoo` with the manual fix-it
+    # command rather than a raw failed-system-call trace.
     lines.append(f'    # Step {"3" if features.get("schema_cleanup") else "2"}: Sync Claude Code plugin registry (optional)')
     lines.append("    begin")
     lines.append('      if which("claude")')
-    lines.append('        system "claude", "plugin", "marketplace", "update", "local-plugins"')
-    lines.append(f'        system "claude", "plugin", "update", "{formula_name}@local-plugins"')
+    lines.append("        synced = false")
+    lines.append("        2.times do |attempt|")
+    lines.append('          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")')
+    lines.append("          break if synced")
+    lines.append("")
+    lines.append("          sleep 1 if attempt.zero?")
+    lines.append("        end")
+    lines.append("        if synced")
+    lines.append(f'          system "claude", "plugin", "update", "{formula_name}@local-plugins"')
+    lines.append("        else")
+    lines.append('          opoo "marketplace sync didn\'t settle in time - run: " \\')
+    lines.append('               "claude plugin marketplace update local-plugins && " \\')
+    lines.append(f'               "claude plugin update {formula_name}@local-plugins"')
+    lines.append("        end")
     lines.append("      else")
     lines.append(f'        opoo "claude not on PATH - run: claude plugin install {formula_name}@local-plugins to finish"')
     lines.append("      end")
