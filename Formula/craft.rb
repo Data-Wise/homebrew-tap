@@ -158,7 +158,7 @@ class Craft < Formula
               echo "Branch guard hook installed (protects main/dev branches)."
           fi
           echo ""
-          echo "117 commands available:"
+          echo "116 commands available:"
           echo "  /craft:do, /craft:orchestrate, /brainstorm, /craft:check"
           echo "  Categories: arch, ci, code, dist, docs, git, plan, site, test, workflow"
       else
@@ -268,7 +268,7 @@ class Craft < Formula
 
   def caveats
     <<~EOS
-      117 commands for full-stack development:
+      116 commands for full-stack development:
         - Architecture & planning
         - Code generation & refactoring
         - Testing & CI/CD
