@@ -384,7 +384,7 @@ def generate_formula(formula_name, config, defaults):
     lines.append("          sleep 1 if attempt.zero?")
     lines.append("        end")
     lines.append("        if synced")
-    lines.append(f'          system "claude", "plugin", "update", "{formula_name}@local-plugins"')
+    lines.append(f'          system "claude", "plugin", "install", "{formula_name}@local-plugins"')
     lines.append("        else")
     lines.append('          opoo "marketplace sync didn\'t settle in time - run: " \\')
     lines.append('               "claude plugin marketplace update local-plugins && " \\')
