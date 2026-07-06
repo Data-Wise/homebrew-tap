@@ -26,6 +26,7 @@ class HimalayaMcp < Formula
     cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
     libexec.install ".mcp.json"
     libexec.install "dist"
+    libexec.install "man"
     cp_r "himalaya-mcp-plugin/skills", libexec/"skills"
     cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
 
