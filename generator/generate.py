@@ -266,7 +266,9 @@ def generate_formula(formula_name, config, defaults):
     # Libexec install
     if "libexec_paths" in config:
         for path in config["libexec_paths"]:
-            lines.append(f'    libexec.install "{path}"')
+            # Conditionally install: skip if path doesn't exist (e.g. man pages
+            # added in a later version, or optional paths)
+            lines.append(f'    libexec.install "{path}" if (buildpath/"{path}").exist?')
     elif "libexec_subdir" in config:
         lines.append(f'    libexec.install Dir["{config["libexec_subdir"]}/*"]')
     else:
@@ -281,6 +283,16 @@ def generate_formula(formula_name, config, defaults):
     if "libexec_copy_map_optional" in config:
         for src, dest in config["libexec_copy_map_optional"].items():
             lines.append(f'    cp_r "{src}", libexec/"{dest}" if (buildpath/"{src}").exist?')
+
+    # Share/man install — install groff man pages to share/man/manN/ so
+    # `man <cmd>` works after brew install. Optional; only emitted if
+    # `man_pages` is set in the manifest. Guarded for builds where man/
+    # doesn't exist (e.g. older tarball before man pages were added).
+    if config.get("man_pages"):
+        man_section = config.get("man_section", 1)
+        lines.append("")
+        lines.append("    # Install groff man pages to share/man/manN/")
+        lines.append(f"    man{man_section}.install Dir[\"man/man{man_section}/*\"] if (buildpath/\"man/man{man_section}\").exist?")
 
     lines.append("")
 
@@ -438,6 +450,12 @@ def generate_formula(formula_name, config, defaults):
     caveats_text = config.get("caveats_extra", f"The {class_name} plugin has been installed to:\n  ~/.claude/plugins/{formula_name}")
     for line in caveats_text.split("\n"):
         lines.append(f"      {line}" if line.strip() else "")
+    if config.get("man_pages"):
+        man_section = config.get("man_section", 1)
+        lines.append("")
+        lines.append(f"      Man pages installed to share/man/man{man_section}/:")
+        lines.append(f"        man {formula_name}")
+        lines.append(f"        man {formula_name}-doctor")
     if not config.get("caveats_no_footer"):
         lines.append("")
         lines.append(f"      For more information:")
@@ -460,6 +478,11 @@ def generate_formula(formula_name, config, defaults):
                 lines.append(f'    assert_path_exists libexec/"{path}"')
         else:
             lines.append(f'    assert_path_exists libexec/"{tp}"')
+    # Man pages — assert each listed page exists
+    if config.get("man_pages"):
+        man_section = config.get("man_section", 1)
+        for page in config["man_pages"]:
+            lines.append(f'    assert_predicate man{man_section}/"{page}", :file?')
     lines.append("  end")
 
     lines.append("end")

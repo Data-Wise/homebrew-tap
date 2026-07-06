@@ -160,7 +160,15 @@
       "caveats_extra": "15 email skills for Claude Code:\n  /email:inbox   /email:triage   /email:digest\n  /email:reply   /email:compose  /email:forward\n  /email:attachments  /email:export  /email:threads\n  /email:search  /email:manage   /email:stats\n  /email:config  /email:morning  /email:help\n\n22 MCP tools available (incl. health_check for IMAP diagnostics).\n\nFor Claude Desktop: himalaya-mcp setup\n\nRequires himalaya CLI with at least one configured account.\nSee: https://github.com/Data-Wise/himalaya-mcp\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update himalaya-mcp@local-plugins\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/himalaya-mcp && ( cd /opt/homebrew/opt/himalaya-mcp/libexec && tar cf - . ) | ( cd ~/.claude/plugins/himalaya-mcp && tar xf - )",
       "libexec_extra_paths": [
         "man"
-      ]
+      ],
+      "man_pages": [
+        "himalaya-mcp.1",
+        "himalaya-mcp-doctor.1",
+        "himalaya-mcp-setup.1",
+        "himalaya-mcp-install-ext.1",
+        "himalaya-mcp-remove-ext.1"
+      ],
+      "man_section": 1
     },
     "scholar": {
       "type": "claude-plugin",

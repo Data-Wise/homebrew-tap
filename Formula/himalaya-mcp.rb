@@ -24,11 +24,14 @@ class HimalayaMcp < Formula
     cp "himalaya-mcp-plugin/.claude-plugin/plugin.json", libexec/".claude-plugin/plugin.json"
     cp_r "himalaya-mcp-plugin/.claude-plugin/hooks", libexec/".claude-plugin/hooks"
     cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
-    libexec.install ".mcp.json"
-    libexec.install "dist"
-    libexec.install "man"
+    libexec.install ".mcp.json" if (buildpath/".mcp.json").exist?
+    libexec.install "dist" if (buildpath/"dist").exist?
+    libexec.install "man" if (buildpath/"man").exist?
     cp_r "himalaya-mcp-plugin/skills", libexec/"skills"
     cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
+
+    # Install groff man pages to share/man/manN/
+    man1.install Dir["man/man1/*"] if (buildpath/"man/man1").exist?
 
     (bin/"himalaya-mcp").write <<~EOS
       #!/bin/bash
@@ -299,6 +302,10 @@ class HimalayaMcp < Formula
       If the automatic copy failed (macOS permissions), run manually:
         mkdir -p ~/.claude/plugins/himalaya-mcp && ( cd /opt/homebrew/opt/himalaya-mcp/libexec && tar cf - . ) | ( cd ~/.claude/plugins/himalaya-mcp && tar xf - )
 
+      Man pages installed to share/man/man1/:
+        man himalaya-mcp
+        man himalaya-mcp-doctor
+
       For more information:
         https://github.com/Data-Wise/himalaya-mcp
     EOS
@@ -312,5 +319,10 @@ class HimalayaMcp < Formula
     assert_path_exists libexec/"dist/index.js"
     assert_predicate libexec/"skills", :directory?
     assert_predicate libexec/"agents", :directory?
+    assert_predicate man1/"himalaya-mcp.1", :file?
+    assert_predicate man1/"himalaya-mcp-doctor.1", :file?
+    assert_predicate man1/"himalaya-mcp-setup.1", :file?
+    assert_predicate man1/"himalaya-mcp-install-ext.1", :file?
+    assert_predicate man1/"himalaya-mcp-remove-ext.1", :file?
   end
 end
