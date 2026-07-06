@@ -104,7 +104,7 @@
       "extra_scripts": [
         {
           "name": "himalaya-mcp",
-          "body": "#!/bin/bash\nexec node \"#{libexec}/dist/cli/setup.js\" \"$@\""
+          "body": "#!/bin/bash\nexec node \"#{libexec}/dist/cli/index.js\" \"\""
         }
       ],
       "install_script_desc": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",

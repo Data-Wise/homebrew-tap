@@ -31,7 +31,7 @@ class HimalayaMcp < Formula
 
     (bin/"himalaya-mcp").write <<~EOS
       #!/bin/bash
-      exec node "#{libexec}/dist/cli/setup.js" "$@"
+      exec node "#{libexec}/dist/cli/index.js" ""
     EOS
     chmod "+x", bin/"himalaya-mcp"
 
