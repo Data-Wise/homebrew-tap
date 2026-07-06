@@ -145,14 +145,20 @@ class Craft < Formula
           fi
 
           echo "✅ Craft plugin installed successfully!"
+
+          # Register plugin in Claude Code if not already installed
+          if [ "$CLAUDE_RUNNING" = false ] && command -v claude &>/dev/null; then
+              if ! claude plugin list 2>/dev/null | grep -q "craft@local-plugins"; then
+                  claude plugin install "craft@local-plugins" 2>/dev/null || true
+              fi
+          fi
+
           echo ""
           if [ "$AUTO_ENABLED" = true ]; then
               echo "Plugin auto-enabled in Claude Code."
           elif [ "$CLAUDE_RUNNING" = true ]; then
               echo "Claude Code is running - skipped auto-enable to avoid conflicts."
-              echo "Run: claude plugin install craft@local-plugins"
-          else
-              echo "To enable, run: claude plugin install craft@local-plugins"
+              echo "After restarting Claude Code, the craft plugin will be available."
           fi
           if [ "$HOOK_INSTALLED" = true ]; then
               echo "Branch guard hook installed (protects main/dev branches)."
@@ -240,7 +246,7 @@ class Craft < Formula
           sleep 1 if attempt.zero?
         end
         if synced
-          system "claude", "plugin", "update", "craft@local-plugins"
+          system "claude", "plugin", "install", "craft@local-plugins"
         else
           opoo "marketplace sync didn't settle in time - run: " \
                "claude plugin marketplace update local-plugins && " \
