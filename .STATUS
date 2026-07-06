@@ -4,6 +4,7 @@ milestone: Homebrew refactor complete
 
 progress: All phases merged to main, repo cleaned up, CI verified
 
+<<<<<<< Updated upstream
 📋 Session 2026-07-02 (post_install marketplace-sync race fix):
 - PR #134 (main, merged): post_install Step 3 (`claude plugin marketplace update
   local-plugins`) fired immediately after Step 2's `Process.waitpid` returned,
@@ -28,6 +29,13 @@ progress: All phases merged to main, repo cleaned up, CI verified
   switched to `main`, pulled, confirmed 0 unmerged work lost.
 - Worktree `feature-post-install-marketplace-resilience` created and removed
   same session (merged, no orphan left).
+=======
+📋 Session 2026-07-02 (flow-cli man-page collision fix):
+- Fixed `flow-cli.rb` man-page install: unconditionally excludes `r.1` (flow-cli's `r`-dispatcher man page collided with the `r` (R-language) formula's `R.1` on case-insensitive filesystems, breaking `brew link` for anyone with both installed) — PR #135 (main 05a2e17)
+- Verified via `brew reinstall flow-cli`: clean install, 0 errors, `r.1` correctly absent from flow-cli's Cellar, `r` formula's own man page untouched
+- Worktree `fix/flow-cli-r-man-conflict` removed, branch deleted (squash-merged)
+- Tradeoff: flow-cli's `r`-dispatcher man page is no longer installed via Homebrew at all (unconditional exclusion, not conditional-on-collision) — dispatcher itself unaffected, only `man r` via brew
+>>>>>>> Stashed changes
 
 📋 Session 2026-06-10 (depends_on macos deprecation fix):
 - Fixed `depends_on macos:` deprecation in scribe + scribe-dev casks (string form `">= :catalina"` → bare symbol `:catalina`) — PR #112 (main c3e2e38)

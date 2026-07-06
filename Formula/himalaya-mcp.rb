@@ -5,8 +5,8 @@
 class HimalayaMcp < Formula
   desc "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
   homepage "https://github.com/Data-Wise/himalaya-mcp"
-  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.7.0.tar.gz"
-  sha256 "ec63631cca2ad28422a721fabf5365834ce594f6e7540b7815046bcf673f5714"
+  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v1.8.0.tar.gz"
+  sha256 "UPDATED_AFTER_RELEASE"
   license "MIT"
 
   depends_on "himalaya"
@@ -126,24 +126,33 @@ class HimalayaMcp < Formula
           fi
 
           echo "✅ Himalaya MCP plugin installed successfully!"
+
+          # Register plugin in Claude Code if not already installed
+          if [ "$CLAUDE_RUNNING" = false ] && command -v claude &>/dev/null; then
+              if ! claude plugin list 2>/dev/null | grep -q "himalaya-mcp@local-plugins"; then
+                  claude plugin install "himalaya-mcp@local-plugins" 2>/dev/null || true
+              fi
+          fi
+
           echo ""
           if [ "$AUTO_ENABLED" = true ]; then
               echo "Plugin auto-enabled in Claude Code."
           elif [ "$CLAUDE_RUNNING" = true ]; then
               echo "Claude Code is running - skipped auto-enable to avoid conflicts."
-              echo "Run: claude plugin install himalaya-mcp@local-plugins"
-          else
-              echo "To enable, run: claude plugin install himalaya-mcp@local-plugins"
+              echo "After restarting Claude Code, the himalaya-mcp plugin will be available."
           fi
 
           echo ""
-          echo "12 email skills available:"
+          echo "15 email skills available:"
           echo "  /email:inbox       - List and browse inbox"
           echo "  /email:triage      - Classify emails (actionable/FYI/skip)"
           echo "  /email:digest      - Daily email digest"
           echo "  /email:reply       - Draft and send replies"
           echo "  /email:compose     - Compose new emails"
+          echo "  /email:forward     - Forward email with context"
           echo "  /email:attachments - Manage attachments"
+          echo "  /email:export      - Export to markdown + clipboard"
+          echo "  /email:threads     - View conversation threads"
           echo "  /email:search      - Search emails by keyword, sender, flags"
           echo "  /email:manage      - Bulk email operations"
           echo "  /email:stats       - Inbox statistics"
@@ -229,7 +238,7 @@ class HimalayaMcp < Formula
           sleep 1 if attempt.zero?
         end
         if synced
-          system "claude", "plugin", "update", "himalaya-mcp@local-plugins"
+          system "claude", "plugin", "install", "himalaya-mcp@local-plugins"
         else
           opoo "marketplace sync didn't settle in time - run: " \
                "claude plugin marketplace update local-plugins && " \
@@ -269,9 +278,10 @@ class HimalayaMcp < Formula
 
   def caveats
     <<~EOS
-      12 email skills for Claude Code:
+      15 email skills for Claude Code:
         /email:inbox   /email:triage   /email:digest
-        /email:reply   /email:compose  /email:attachments
+        /email:reply   /email:compose  /email:forward
+        /email:attachments  /email:export  /email:threads
         /email:search  /email:manage   /email:stats
         /email:config  /email:morning  /email:help
 
@@ -286,7 +296,7 @@ class HimalayaMcp < Formula
         claude plugin update himalaya-mcp@local-plugins
 
       If the automatic copy failed (macOS permissions), run manually:
-        mkdir -p ~/.claude/plugins/himalaya-mcp && ( cd $(brew --prefix)/opt/himalaya-mcp/libexec && tar cf - . ) | ( cd ~/.claude/plugins/himalaya-mcp && tar xf - )
+        mkdir -p ~/.claude/plugins/himalaya-mcp && ( cd /opt/homebrew/opt/himalaya-mcp/libexec && tar cf - . ) | ( cd ~/.claude/plugins/himalaya-mcp && tar xf - )
 
       For more information:
         https://github.com/Data-Wise/himalaya-mcp
