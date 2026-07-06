@@ -292,7 +292,7 @@ def generate_formula(formula_name, config, defaults):
         man_section = config.get("man_section", 1)
         lines.append("")
         lines.append("    # Install groff man pages to share/man/manN/")
-        lines.append(f"    man{man_section}.install Dir.glob(\"man/man{man_section}/*\", base: buildpath) if (buildpath/\"man/man{man_section}\").exist?")
+        lines.append(f"    man{man_section}.install Dir.glob(\"libexec/man/man{man_section}/*\") if (libexec/\"man/man{man_section}\").exist?")
 
     lines.append("")
 
