@@ -31,7 +31,7 @@ class HimalayaMcp < Formula
     cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
 
     # Install groff man pages to share/man/manN/
-    man1.install Dir.glob("libexec/man/man1/*") if (libexec/"man/man1").exist?
+    man1.install Dir.glob("#{libexec}/man/man1/*") if (libexec/"man/man1").exist?
 
     (bin/"himalaya-mcp").write <<~EOS
       #!/bin/bash
