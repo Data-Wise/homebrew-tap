@@ -117,9 +117,9 @@ class Rforge < Formula
           fi
 
           echo ""
-          echo "15 commands available:"
-          echo "  /rforge:analyze, /rforge:status, /rforge:deps, /rforge:cascade"
-          echo "  /rforge:release, /rforge:impact, /rforge:next, /rforge:complete"
+          echo "42 commands available:"
+          echo "  /rforge:analyze, /rforge:status, /rforge:health, /rforge:r:check"
+          echo "  /rforge:release, /rforge:next, /rforge:cascade, /rforge:r:test"
       else
           echo "⚠️  Automatic install failed (could not copy plugin files)."
           echo ""
@@ -231,7 +231,7 @@ class Rforge < Formula
       If not auto-enabled, run:
         claude plugin install rforge@local-plugins
 
-      35 commands for R package ecosystem management.
+      42 commands for R package ecosystem management.
 
       If the automatic copy failed (macOS permissions), run manually:
         mkdir -p ~/.claude/plugins/rforge && ( cd $(brew --prefix)/opt/rforge/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge && tar xf - )

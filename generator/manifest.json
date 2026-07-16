@@ -225,6 +225,7 @@
       "version": "2.19.0",
       "sha256": "d3f4cc1b43a3f6f3565b0ff28b6fc232ce3813812d8b3af3b1e693baef2ca980",
       "head": "https://github.com/Data-Wise/rforge.git",
+      "command_count": 42,
       "dependencies": {
         "runtime": [
           "jq"
@@ -235,11 +236,14 @@
         "marketplace": true,
         "claude_detection": true
       },
+      "dynamic_counts": [
+        "commands"
+      ],
       "install_script_desc": "R package ecosystem orchestrator - analyze, test, release, cascade changes",
       "install_script_summary": [
-        "15 commands available:",
-        "  /rforge:analyze, /rforge:status, /rforge:deps, /rforge:cascade",
-        "  /rforge:release, /rforge:impact, /rforge:next, /rforge:complete"
+        "{command_count} commands available:",
+        "  /rforge:analyze, /rforge:status, /rforge:health, /rforge:r:check",
+        "  /rforge:release, /rforge:next, /rforge:cascade, /rforge:r:test"
       ],
       "test_paths": [
         {
@@ -255,7 +259,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n35 commands for R package ecosystem management.\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge && ( cd $(brew --prefix)/opt/rforge/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge && tar xf - )"
+      "caveats_extra": "The RForge plugin has been installed to:\n  ~/.claude/plugins/rforge\n\nIf not auto-enabled, run:\n  claude plugin install rforge@local-plugins\n\n{command_count} commands for R package ecosystem management.\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge && ( cd $(brew --prefix)/opt/rforge/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge && tar xf - )"
     },
     "rforge-orchestrator": {
       "type": "claude-plugin",
