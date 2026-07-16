@@ -471,6 +471,16 @@
       "install_script_summary": [
         "{command_count} commands available:",
         "  /folio:hub, /folio:do, /folio:docs:tutorial, /folio:docs:guide, ..."
+      ],
+      "test_paths": [
+        {
+          "path": ".claude-plugin/plugin.json",
+          "type": "file"
+        },
+        {
+          "path": "commands",
+          "type": "directory"
+        }
       ]
     }
   }

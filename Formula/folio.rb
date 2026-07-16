@@ -187,5 +187,7 @@ class Folio < Formula
   end
 
   test do
+    assert_path_exists libexec/".claude-plugin/plugin.json"
+    assert_predicate libexec/"commands", :directory?
   end
 end
