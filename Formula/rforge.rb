@@ -3,10 +3,10 @@
 
 # Rforge formula for the data-wise/tap Homebrew tap.
 class Rforge < Formula
-  desc "R package ecosystem orchestrator — 41 commands — Claude Code plugin"
+  desc "R package ecosystem orchestrator — 42 commands — Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.18.0.tar.gz"
-  sha256 "7683de54d5aaa15f03490236ac5817f4c0f04e4858fd9dc8e7ca05cc53a6ffe2"
+  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.19.0.tar.gz"
+  sha256 "d3f4cc1b43a3f6f3565b0ff28b6fc232ce3813812d8b3af3b1e693baef2ca980"
   license "MIT"
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
