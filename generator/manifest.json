@@ -447,6 +447,32 @@
       "version": "0.3.0",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "generated": false
+    },
+    "folio": {
+      "type": "claude-plugin",
+      "desc": "Docs-authoring toolkit for Claude Code",
+      "homepage": "https://github.com/Data-Wise/folio",
+      "source": "github",
+      "repo": "Data-Wise/folio",
+      "version": "0.1.0",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "command_count": 0,
+      "dependencies": {
+        "runtime": [
+          "jq"
+        ]
+      },
+      "dynamic_counts": [
+        "commands",
+        "agents",
+        "skills"
+      ],
+      "install_script_desc": "Docs-authoring toolkit - tutorials, guides, API docs, mermaid, site management",
+      "install_script_summary": [
+        "{command_count} commands available:",
+        "  /folio:hub, /folio:do, /folio:docs:tutorial, /folio:docs:guide, ..."
+      ],
+      "_placeholder_note": "sha256/version/command_count are PLACEHOLDERS - real values land when folio v1.0.0 releases (homebrew-release.yml regenerates). DO NOT publish this formula before then."
     }
   }
 }
