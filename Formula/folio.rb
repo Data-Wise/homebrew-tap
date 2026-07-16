@@ -5,8 +5,8 @@
 class Folio < Formula
   desc "Docs-authoring toolkit for Claude Code"
   homepage "https://github.com/Data-Wise/folio"
-  url "https://github.com/Data-Wise/folio/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  url "https://github.com/Data-Wise/folio/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "d0cb30e26ba620a78fc3da3737102407816b9a1b7331d9156a0e1a6c996255cb"
   license "MIT"
 
   depends_on "jq"
@@ -71,7 +71,7 @@ class Folio < Formula
           fi
 
           echo ""
-          echo "0 commands available:"
+          echo "17 commands available:"
           echo "  /folio:hub, /folio:do, /folio:docs:tutorial, /folio:docs:guide, ..."
       else
           echo "⚠️  Automatic install failed (could not copy plugin files)."
