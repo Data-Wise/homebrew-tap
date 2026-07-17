@@ -68,17 +68,19 @@ mkdocs build --strict     # Build and validate
 
 ## Formula Generator
 
-6 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA. Key manifest fields include `libexec_copy_map` for directory layout, `extra_scripts` for CLI wrappers, and feature flags for schema cleanup and branch guards.
+7 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA. Key manifest fields include `libexec_copy_map` for directory layout, `extra_scripts` for CLI wrappers, and a `features` object gating optional install-script blocks (`schema_cleanup`, `branch_guard`, `marketplace`, `claude_detection`).
+
+**`features.marketplace` and `features.claude_detection` are required for every `claude-plugin` entry**, not optional extras — omitting either silently drops the corresponding install-script block with no error at generate- or install-time (folio#18: a new entry shipped with no `features` key at all, so `brew install` reported success but never registered the plugin with Claude Code). `tests/test_manifest_required_features.sh` gates this in CI.
 
 ```bash
-python3 generator/generate.py              # Generate all 6 plugin formulas
+python3 generator/generate.py              # Generate all 7 plugin formulas
 python3 generator/generate.py craft        # Generate one formula
 python3 generator/generate.py --diff       # Diff vs existing (no overwrite)
 python3 generator/generate.py --validate   # Validate output with ruby -c
 python3 generator/generate.py --list       # List all formulas in manifest
 ```
 
-Generated formulas: craft, himalaya-mcp, scholar, rforge, rforge-orchestrator, workflow. The other 8 are hand-crafted (different enough to not benefit from generation).
+Generated formulas: craft, himalaya-mcp, scholar, rforge, rforge-orchestrator, workflow, folio. The other 8 are hand-crafted (different enough to not benefit from generation).
 
 When editing a plugin formula, edit `manifest.json` + `blocks/` then regenerate — do NOT edit the generated `.rb` directly.
 
