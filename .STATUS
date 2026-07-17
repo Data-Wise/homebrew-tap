@@ -1,10 +1,24 @@
 status: Active
-last_session: 2026-07-02
+last_session: 2026-07-16
 milestone: Homebrew refactor complete
 
 progress: All phases merged to main, repo cleaned up, CI verified
 
-<<<<<<< Updated upstream
+📋 Session 2026-07-16 (folio-install silent registration failure fix):
+- PR #143 (feature/fix-folio-install-registration, open): folio's
+  `generator/manifest.json` entry had no `"features"` key at all, so
+  `generate.py` silently omitted both the marketplace.json-mirroring block
+  and the `CLAUDE_RUNNING` detection block from `Formula/folio.rb` — `brew
+  install` reported success but never registered folio with Claude Code
+  (Data-Wise/folio#18). Fix: added `features.marketplace` +
+  `features.claude_detection` to folio's manifest entry, regenerated
+  `Formula/folio.rb` (not hand-edited) — `--diff` confirmed all other 6
+  formulas byte-identical. Added `tests/test_manifest_required_features.sh`
+  as a structural guard (verified red against the pre-fix manifest, green
+  after); documented the required-flags convention in CLAUDE.md's Formula
+  Generator section (same doc gap that let this ship unnoticed).
+- Spec: folio repo's `docs/specs/SPEC-fix-install-registration-2026-07-16.md`.
+
 📋 Session 2026-07-02 (post_install marketplace-sync race fix):
 - PR #134 (main, merged): post_install Step 3 (`claude plugin marketplace update
   local-plugins`) fired immediately after Step 2's `Process.waitpid` returned,
@@ -29,13 +43,12 @@ progress: All phases merged to main, repo cleaned up, CI verified
   switched to `main`, pulled, confirmed 0 unmerged work lost.
 - Worktree `feature-post-install-marketplace-resilience` created and removed
   same session (merged, no orphan left).
-=======
+
 📋 Session 2026-07-02 (flow-cli man-page collision fix):
 - Fixed `flow-cli.rb` man-page install: unconditionally excludes `r.1` (flow-cli's `r`-dispatcher man page collided with the `r` (R-language) formula's `R.1` on case-insensitive filesystems, breaking `brew link` for anyone with both installed) — PR #135 (main 05a2e17)
 - Verified via `brew reinstall flow-cli`: clean install, 0 errors, `r.1` correctly absent from flow-cli's Cellar, `r` formula's own man page untouched
 - Worktree `fix/flow-cli-r-man-conflict` removed, branch deleted (squash-merged)
 - Tradeoff: flow-cli's `r`-dispatcher man page is no longer installed via Homebrew at all (unconditional exclusion, not conditional-on-collision) — dispatcher itself unaffected, only `man r` via brew
->>>>>>> Stashed changes
 
 📋 Session 2026-06-10 (depends_on macos deprecation fix):
 - Fixed `depends_on macos:` deprecation in scribe + scribe-dev casks (string form `">= :catalina"` → bare symbol `:catalina`) — PR #112 (main c3e2e38)
@@ -66,6 +79,7 @@ progress: All phases merged to main, repo cleaned up, CI verified
 | rforge | plugin (generated) | No | CLEAN (stable 1.2.0, 2026-05-10) |
 | rforge-orchestrator | plugin (legacy) | Yes | DEPRECATED 2026-05-10 → migrate to `rforge` |
 | workflow | plugin (generated) | Yes | CLEAN |
+| folio | plugin (generated) | Yes | CLEAN (registration fix PR #143 pending merge) |
 | aiterm | python | Yes | CLEAN |
 | atlas | node | Yes | CLEAN |
 | nexus-cli | python | Yes | CLEAN |
@@ -75,6 +89,7 @@ progress: All phases merged to main, repo cleaned up, CI verified
 | scribe-cli | swift | No | CLEAN (placeholder SHA) |
 
 🎯 Next Action:
+→ Get PR #143 (folio registration fix) reviewed/merged; comment back on folio#18 once merged
 → Replace scribe-cli placeholder SHA when v0.3.0 release is created
 → Verify update-formula workflow uses App token correctly (next time a project releases)
 → Monitor: push-trigger suppression may need further investigation (PR #94 fix didn't fully resolve)
