@@ -10,7 +10,7 @@ class Atlas < Formula
   license "MIT"
 
   depends_on "python@3.12" => :build
-  depends_on "node@20" # Required for node-gyp (better-sqlite3)
+  depends_on "node"
 
   def install
     system "npm", "install", *std_npm_args
