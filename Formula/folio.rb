@@ -8,6 +8,7 @@ class Folio < Formula
   url "https://github.com/Data-Wise/folio/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "d0cb30e26ba620a78fc3da3737102407816b9a1b7331d9156a0e1a6c996255cb"
   license "MIT"
+  revision 1
 
   depends_on "jq"
 

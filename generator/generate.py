@@ -215,6 +215,12 @@ def generate_formula(formula_name, config, defaults):
         if "head" in config:
             lines.append(f'  head "{config["head"]}", branch: "main"')
 
+        # Revision — bump when install-script/post_install logic changes with no
+        # version change, so `brew upgrade` detects it (plain content edits are
+        # otherwise invisible to upgrade's version-only comparison).
+        if config.get("revision"):
+            lines.append(f'  revision {config["revision"]}')
+
     # deprecate! directive — after license/head (matches Homebrew convention)
     # Emits a blank line before deprecate! to match standard formatting
     if "deprecate" in config:
