@@ -1,8 +1,42 @@
 status: Active
 last_session: 2026-07-17
-milestone: Homebrew refactor complete
+milestone: release-drift-gates plan complete (Tasks 1-10 all shipped)
 
-progress: All phases merged to main, repo cleaned up, CI verified
+progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified
+
+📋 Session 2026-07-17 (release-drift-gates: driving the plan, Tasks 2-10 — plan complete):
+- PR #157 (main, merged): Task 2 — `generator/check-revision-bump.sh` (minimal version). Diffs
+  `Formula/*.rb` between two refs, fails if content changed but neither `version` nor `revision`
+  did. Dogfood-replayed against the real folio#18 incident (`8fb7bc9`→`5c08475` correctly fails;
+  `5c08475`→`dcecd5c` correctly passes for folio). Side-effect finding: an unrelated `atlas`
+  formula has the same unrevisioned-content-change gap in that range — logged as out-of-scope,
+  not fixed here.
+- PR #158 (main, merged): Task 3 — `is_cosmetic_only_diff()` excludes comment/whitespace-only
+  diffs (both Ruby `#` comments and bash comments embedded in the install/post_install heredoc
+  share the `#` prefix, so one line-level check covers both nesting levels) from the revision-bump
+  requirement.
+- PR #159 (main, merged): Tasks 4-5 — `PR_LABELS=revision-exempt` bypasses the check entirely
+  (per-PR label, nothing persisted to forget); wired into `formula-drift.yml` via a
+  `Determine revision-drift check inputs` step that derives base ref + labels differently for
+  `pull_request` vs `push` triggers (reads `$GITHUB_EVENT_PATH` via `jq`, never interpolates
+  untrusted PR data into a `run:` block directly) and skips gracefully on a brand-new branch
+  (`before` = all-zeros sentinel). Task 6 — `tests/test_revision_bump_check.sh`, 6
+  planted-defect/dogfood cases (6/6 pass). Fixed a `pipefail` bug found while writing the tests:
+  piping a command that itself exits non-zero (the atlas cross-contamination above) into
+  `grep -q` under `set -o pipefail` reports the pipeline's exit code, not grep's match — fixed by
+  capturing output to a variable first, then grepping the string.
+- PR #160 (main, merged): Task 8 — `generator/check-status-conflict-markers.sh` fails on a
+  literal `<<<<<<<`/`=======`/`>>>>>>>` line in `.STATUS`, with a planted-defect test (3/3 pass).
+  Task 9 — new `status-guard.yml` workflow, triggered on any push/PR touching `.STATUS`;
+  E2E-verified live on the PR itself (pushed a throwaway commit planting a real conflict marker,
+  confirmed the check went red in the GitHub PR checks UI, then reverted before merge — not just
+  YAML-validated). Task 10 — `CLAUDE.md` paragraph documenting the revision-drift gate and the
+  `revision-exempt` label escape hatch, placed adjacent to the existing `features`-flag paragraph.
+- All 10 tasks in `tasks/todo.md` are now shipped. Worktrees `feature-drift-gate-wireup` and
+  `feature-status-guard` removed after merge.
+- Note: this session's shared main checkout stayed on a different concurrent session's branch
+  (`feature/craft-v4.1.0`) throughout — all work here went through disposable worktrees off
+  `origin/main` instead, per the same practice as the prior session.
 
 📋 Session 2026-07-17 (release-drift-gates: driving the plan, Task 1):
 - PR #154 (main, merged): docs-site currency fix — "Install Pattern" section in
