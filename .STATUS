@@ -20,6 +20,19 @@ progress: All phases merged to main, repo cleaned up, CI verified
 - Spec: folio repo's `docs/specs/SPEC-fix-install-registration-2026-07-16.md`.
 - folio#18 auto-closed on merge ("Fixes #18" in PR body); confirmation comment posted.
 - Worktree `feature-fix-folio-install` removed, local + remote branch deleted (merged, no orphan).
+- Follow-up PR #147 (main, merged dcecd5c, squash, branch deleted): #143 fixed the install
+  script but never bumped version/revision, so `brew upgrade` couldn't detect the change on
+  already-installed folio 1.0.0 — only an explicit `brew reinstall` picked it up. Added generator
+  support for an optional `revision` manifest field (emitted as `revision N` after `license`);
+  set `revision: 1` on folio's entry. Verified live twice: (1) copied the regenerated formula
+  into the local tap checkout pre-merge — `brew outdated` correctly flagged folio; (2) after
+  merge, plain `brew update` pulled the change and `brew outdated` showed
+  `data-wise/tap/folio` without any manual copy — confirms the real propagation path works, not
+  just the local test.
+- Separately observed during manual `brew reinstall` testing: the post_install marketplace-sync
+  retry (PR #134, 2 attempts/1s apart) still lost the race on a real run — degraded to the
+  advisory fallback as designed, not a crash, but flagged as a follow-up (background task
+  `task_5812724d`, tracked outside this repo's session).
 
 📋 Session 2026-07-02 (post_install marketplace-sync race fix):
 - PR #134 (main, merged): post_install Step 3 (`claude plugin marketplace update
@@ -81,7 +94,7 @@ progress: All phases merged to main, repo cleaned up, CI verified
 | rforge | plugin (generated) | No | CLEAN (stable 1.2.0, 2026-05-10) |
 | rforge-orchestrator | plugin (legacy) | Yes | DEPRECATED 2026-05-10 → migrate to `rforge` |
 | workflow | plugin (generated) | Yes | CLEAN |
-| folio | plugin (generated) | Yes | CLEAN (registration fix PR #143 merged) |
+| folio | plugin (generated) | Yes | CLEAN (rev 1 — PR #143 registration + PR #147 revision-bump merged) |
 | aiterm | python | Yes | CLEAN |
 | atlas | node | Yes | CLEAN |
 | nexus-cli | python | Yes | CLEAN |
