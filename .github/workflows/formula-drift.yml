@@ -23,7 +23,12 @@ jobs:
     name: Regen vs committed
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 (full history) — the upcoming revision-drift check needs to
+      # diff Formula/*.rb against the PR base ref / previous push commit, which the
+      # default shallow (depth-1) checkout doesn't have available.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
