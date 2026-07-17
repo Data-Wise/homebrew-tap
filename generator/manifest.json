@@ -462,6 +462,10 @@
           "jq"
         ]
       },
+      "features": {
+        "marketplace": true,
+        "claude_detection": true
+      },
       "dynamic_counts": [
         "commands",
         "agents",
