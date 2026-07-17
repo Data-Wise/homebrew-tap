@@ -151,3 +151,7 @@ progress: All phases merged to main, repo cleaned up, CI verified
 → Verify update-formula workflow uses App token correctly (next time a project releases)
 → Monitor: push-trigger suppression may need further investigation (PR #94 fix didn't fully resolve)
 → After next craft release lands, confirm regenerated casks emit `depends_on macos: :catalina` (proves the generator root-cause fix holds in practice)
+<<<<<<< HEAD
+planted defect for CI trigger verification (Task 9) — will be reverted
+=======
+>>>>>>> test
