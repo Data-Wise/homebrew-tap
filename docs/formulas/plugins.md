@@ -16,8 +16,8 @@ flowchart TD
     D --> E{"`**Claude running?**
     pgrep -x claude`"}
     E -->|No| F["`**Auto-enable**
-    Symlink + marketplace + settings.json`"]
-    E -->|Yes| G["`**Symlink only**
+    Real copy + marketplace + settings.json`"]
+    E -->|Yes| G["`**Copy only**
     Skip settings.json modification`"]
     F --> H["`**Ready to use**
     Plugin active in Claude Code`"]
@@ -26,13 +26,17 @@ flowchart TD
 
 ## Install Pattern
 
-All 6 plugin formulas share these features:
+All 7 plugin formulas share these features:
 
-### Symlink Creation (3 fallback methods)
+### Real-Copy Install (no symlinks)
 
-1. `ln -sfh` (atomic, prevents circular symlinks)
-2. `ln -sf` (standard)
-3. `rm -f && ln -s` (force recreate)
+Installs a **real copy** of the Homebrew-managed files via a `tar` pipe (`tar cf - . | tar xf -`),
+never a symlink — this also migrates any pre-existing symlink install (from older formula
+versions) to a real directory on the next `brew reinstall`/`brew upgrade`. `tar` is used instead
+of `cp -R` because it copies symlinks *as* symlinks rather than following them, which matters for
+test fixtures containing intentionally-broken symlinks. The copy is verified (checks
+`.claude-plugin/plugin.json` landed) before being declared successful; the marketplace mirror
+step (below) uses the same tar-pipe pattern.
 
 ### Schema Cleanup
 
@@ -43,8 +47,9 @@ Strips unrecognized keys from `plugin.json` (e.g., `claude_md_budget`). Dual def
 
 ### Marketplace Registration
 
-- Creates symlink in `~/.claude/local-marketplace/`
-- Adds entry to `marketplace.json` via `jq`
+- Mirrors a real copy into `~/.claude/local-marketplace/<name>/` (same tar-pipe pattern as the
+  install step, not a symlink)
+- Adds entry to `marketplace.json` via `jq` (gated on `features.marketplace`)
 - Auto-enables plugin in `settings.json`
 
 ### Claude Detection
@@ -116,3 +121,14 @@ ADHD-friendly workflow automation plugin.
 ```bash
 brew install data-wise/tap/workflow
 ```
+
+### folio
+
+Docs-authoring toolkit — tutorials, guides, API docs, mermaid diagrams, doc health checks, and
+site management. 17 commands, 6 agents, 6 skills.
+
+```bash
+brew install data-wise/tap/folio
+```
+
+Site: [data-wise.github.io/folio](https://data-wise.github.io/folio/).
