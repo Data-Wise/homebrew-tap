@@ -1,8 +1,33 @@
 status: Active
-last_session: 2026-07-16
+last_session: 2026-07-17
 milestone: Homebrew refactor complete
 
 progress: All phases merged to main, repo cleaned up, CI verified
+
+📋 Session 2026-07-17 (release-drift-gates: brainstorm → SPEC → plan):
+- PR #149 (main, merged): BRAINSTORM + SPEC for two gaps found while shipping #143/#147 — no
+  gate catches a formula content change with no version/revision bump; `.STATUS` can silently
+  hold unresolved git conflict markers. SPEC scoped to a revision-drift CI check + a `.STATUS`
+  conflict-marker guard; deferred a `/craft:release`-side pre-flight variant and an age-based
+  `.STATUS` staleness threshold as open questions.
+- PR #150 (main, merged): corrected the SPEC's integration point — reuse the existing
+  `formula-drift.yml` ("Formula Drift Guard") workflow (already triggers on `generator/**` +
+  `Formula/**`, already runs `check-drift.sh`'s regen+diff pattern) instead of proposing a new
+  workflow.
+- Adversarial review of the SPEC surfaced two real gaps neither draft had caught: `main` has no
+  `required_status_checks` at all (guardrails-only protection, documented tradeoff for
+  `update-formula.yml`'s `auto_merge: true`) — so a failing gate wouldn't actually block a
+  merge; and `formula-drift.yml`'s `actions/checkout@v4` has no `fetch-depth` override (default
+  shallow clone), so the planned base-ref diff can't run without a fix first.
+- PR #151 (main, merged 8a8273b): `tasks/plan.md` + `tasks/todo.md` — 10-task, 5-phase
+  breakdown incorporating both review findings (Task 1 fixes fetch-depth before any diff logic;
+  Phase 3's checkpoint makes the required-status-checks decision an explicit human gate).
+  Cosmetic-only escape hatch resolved as a `revision-exempt` PR label (per-PR scoped, no
+  standing manifest flag to forget). Code review of the plan itself found one further gap not
+  yet folded in: the label doesn't survive to the `push`-triggered re-run after a squash-merge,
+  so an exempted change could show a false-failure red X on `main` post-merge — needs an
+  acceptance-criterion fix to Task 4 before implementing it.
+- Nothing implemented yet — Tasks 1-10 are still open. Next real work is driving Task 1.
 
 📋 Session 2026-07-16 (folio-install silent registration failure fix):
 - PR #143 (main, merged 5c08475, squash, branch deleted): folio's
