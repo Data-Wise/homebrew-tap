@@ -27,6 +27,7 @@ The manifest (`generator/manifest.json`) is the single source of truth for all f
 | `repo` | string | Yes | GitHub repo slug (e.g., `Data-Wise/craft`) |
 | `version` | string | Yes | Current version (CI updates this in formula, not manifest) |
 | `sha256` | string | Yes | SHA256 of release tarball |
+| `revision` | integer | No | Bump when formula/install-script content changes with no version bump — `brew upgrade` compares version+revision only, not file content, so a content-only edit is invisible to it without this |
 | `generated` | boolean | Yes | Whether the generator produces this formula |
 
 ## Plugin-Specific Fields

@@ -7,7 +7,7 @@
 | | Category | Count | Description |
 |---|----------|-------|-------------|
 | :material-console: | [**CLI Tools**](formulas/cli-tools.md) | 9 formulas | Terminal optimizers, workflow tools, exam generators |
-| :material-puzzle: | [**Claude Code Plugins**](formulas/plugins.md) | 6 formulas | Auto-registering plugins via Homebrew |
+| :material-puzzle: | [**Claude Code Plugins**](formulas/plugins.md) | 7 formulas | Auto-registering plugins via Homebrew |
 | :material-cog: | [**Formula Generator**](generator/index.md) | 1 tool | Produces plugin formulas from a single manifest |
 | :material-sync: | [**Automated CI/CD**](ci/index.md) | 2 workflows | Version updates + weekly validation |
 

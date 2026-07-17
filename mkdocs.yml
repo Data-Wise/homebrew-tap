@@ -71,6 +71,7 @@ markdown_extensions:
 
 exclude_docs: |
   specs/
+  brainstorm/
 
 nav:
   - Home: index.md

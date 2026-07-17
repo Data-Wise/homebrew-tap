@@ -7,12 +7,12 @@ The generator produces consistent Ruby formulas for Claude Code plugins from a s
 ```mermaid
 flowchart LR
     M["`**manifest.json**
-    14 formula entries`"] --> G["`**generate.py**
+    16 formula entries`"] --> G["`**generate.py**
     Python 3, stdlib only`"]
     B["`**blocks/**
     Composable bash fragments`"] --> G
     G --> F["`**Formula/*.rb**
-    6 plugin formulas`"]
+    7 plugin formulas`"]
 ```
 
 ## Ownership Model
@@ -26,7 +26,7 @@ flowchart LR
 ## Usage
 
 ```bash
-# Generate all 6 plugin formulas
+# Generate all 7 plugin formulas
 python3 generator/generate.py
 
 # Generate a specific formula
@@ -52,10 +52,11 @@ python3 generator/generate.py --list
 | rforge | Head-only (no releases) |
 | rforge-orchestrator | Monorepo URL pattern |
 | workflow | Monorepo tarball URL |
+| folio | Standard plugin pattern, `revision`-tracked |
 
 All generated plugin formulas use a 3-step `post_install` pattern: (1) JSON schema cleanup, (2) auto-install with 30s timeout, (3) registry sync — each in its own `begin/rescue/end` block.
 
-The other 8 formulas are hand-crafted (Python virtualenv, Node npm, Shell, Swift patterns that differ enough from the plugin template).
+The other 9 formulas are hand-crafted (Python virtualenv, Node npm, Shell, Swift patterns that differ enough from the plugin template).
 
 !!! warning "Edit the manifest, not the .rb"
     When modifying a plugin formula, edit `manifest.json` + `blocks/` then regenerate. Do not edit the generated `.rb` directly — changes will be overwritten.
