@@ -12,17 +12,23 @@
 # Comment-only and whitespace-only diffs are excluded (Task 3) — a rewrapped
 # bash comment inside the install/post_install heredoc, or a pure Ruby
 # comment change, doesn't affect installed behavior and shouldn't force a
-# revision bump. No revision-exempt label escape hatch yet (Task 4).
+# revision bump.
 #
-# Usage:  bash generator/check-revision-bump.sh <base-ref> [<head-ref>]
-#         head-ref defaults to HEAD.
-# Exit:   0 = no drift (or version/revision bumped) · 1 = drift detected · 2 = usage error
+# A PR labeled "revision-exempt" bypasses the check entirely (Task 4) — the
+# label is per-PR (never stored in the manifest/codebase, so there's nothing
+# to forget and leave permanently bypassed) and only recognized on
+# pull_request-triggered runs; a push event has no PR/label context and
+# always runs the full check.
+#
+# Usage:  PR_LABELS="label-one,label-two" bash generator/check-revision-bump.sh <base-ref> [<head-ref>]
+#         PR_LABELS is optional (unset/empty on push events); head-ref defaults to HEAD.
+# Exit:   0 = no drift (or version/revision bumped, or exempt) · 1 = drift detected · 2 = usage error
 #
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [ $# -lt 1 ]; then
-  echo "Usage: bash generator/check-revision-bump.sh <base-ref> [<head-ref>]" >&2
+  echo "Usage: PR_LABELS=\"...\" bash generator/check-revision-bump.sh <base-ref> [<head-ref>]" >&2
   exit 2
 fi
 
@@ -32,6 +38,11 @@ HEAD_REF="${2:-HEAD}"
 if ! git rev-parse --verify --quiet "$BASE_REF" >/dev/null; then
   echo "⚠️  base ref '$BASE_REF' not found — is this checkout shallow? (needs fetch-depth: 0)" >&2
   exit 2
+fi
+
+if printf '%s' "${PR_LABELS:-}" | tr ',' '\n' | grep -qx "revision-exempt"; then
+  echo "⚠️  PR labeled 'revision-exempt' — skipping the revision-bump check entirely."
+  exit 0
 fi
 
 # Extract a field ("version" or "revision") from a Formula/*.rb file at a given ref.

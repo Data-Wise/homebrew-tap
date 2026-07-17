@@ -39,3 +39,31 @@ jobs:
 
       - name: No-symlink install contract (claude-plugin formulas)
         run: bash tests/test_no_symlink_install.sh
+
+      # Base ref differs by trigger: pull_request compares against the PR's base
+      # commit; push compares against the previous tip (github.event.before). A
+      # push event for a brand-new branch has `before` as the all-zeros sentinel —
+      # skip gracefully rather than error, since there's no real "before" state.
+      - name: Determine revision-drift check inputs
+        id: drift_inputs
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base_sha=$(jq -r '.pull_request.base.sha' "$GITHUB_EVENT_PATH")
+            labels=$(jq -r '[(.pull_request.labels // [])[].name] | join(",")' "$GITHUB_EVENT_PATH")
+          else
+            base_sha="${{ github.event.before }}"
+            labels=""
+          fi
+          if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+            echo "labels=$labels" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Revision-drift check (formula content changed without version/revision bump)
+        if: steps.drift_inputs.outputs.skip == 'false'
+        env:
+          PR_LABELS: ${{ steps.drift_inputs.outputs.labels }}
+        run: bash generator/check-revision-bump.sh "${{ steps.drift_inputs.outputs.base_sha }}"
