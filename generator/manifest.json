@@ -456,6 +456,7 @@
       "repo": "Data-Wise/folio",
       "version": "1.0.0",
       "sha256": "d0cb30e26ba620a78fc3da3737102407816b9a1b7331d9156a0e1a6c996255cb",
+      "revision": 1,
       "command_count": 17,
       "dependencies": {
         "runtime": [
