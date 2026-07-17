@@ -19,14 +19,28 @@ manual post-hoc inspection rather than any automated gate:
    conflict markers from a prior stash/pull collision, undetected until a human happened to open
    the file during an unrelated update.
 
+## Integration point (corrected 2026-07-16, post-merge)
+
+The original draft proposed a new CI workflow for the revision-drift gate. **`homebrew-tap`
+already has one** — `.github/workflows/formula-drift.yml` ("Formula Drift Guard") already
+triggers on exactly the right paths (`generator/**`, `Formula/**`, both `push` and
+`pull_request`) and already runs `generator/check-drift.sh`, which regenerates every formula and
+diffs against what's committed. It's the same job that passed as "Regen vs committed" on both
+#143 and #147. The revision-drift gate belongs as a **second script + step in this same
+workflow**, not a new one — `check-drift.sh` checks "does committed match a regen at this
+commit" (catches hand-edits bypassing the generator); the new script checks "if content changed
+since the base ref, did version/revision also change" (catches exactly the #143 gap). Sibling
+scripts, sibling steps, same trigger — no new workflow file needed.
+
 ## Scope
 
 ### In scope
 
-- **Revision-drift CI gate** (Option 1 from the brainstorm): a check, run on every PR touching
-  `Formula/*.rb` or `generator/manifest.json`, that regenerates all formulas and fails if any
-  formula's content differs from its base-ref content (excluding whitespace/comment-only diffs)
-  while `version` and `revision` are both unchanged.
+- **Revision-drift check** (Option 1 from the brainstorm, revised integration point above): a
+  new script (e.g. `generator/check-revision-bump.sh`), added as a step in the existing
+  `formula-drift.yml` workflow, that diffs each `Formula/*.rb` between the PR's base ref (or
+  `git merge-base`) and HEAD and fails if any formula differs (excluding whitespace/comment-only
+  diffs) while `version` and `revision` are both unchanged.
 - **`.STATUS` conflict-marker guard** (the blocking half of Option 3): a check — CI job, or a
   pre-commit/local hook, whichever integrates more cleanly with the existing hook stack — that
   fails/blocks if `.STATUS` contains a literal `<<<<<<<`, `=======`, or `>>>>>>>` line.
@@ -49,11 +63,12 @@ manual post-hoc inspection rather than any automated gate:
 
 ## Acceptance Criteria
 
-- [ ] A CI job (new workflow or an addition to `validate-formulas.yml`) regenerates every
-      formula from `generator/manifest.json` at PR HEAD, diffs each against its base-ref
-      content, and fails the PR if any formula differs (non-whitespace/comment lines) while both
-      `version` and `revision` are unchanged from base — the failure message names the exact
-      formula and states `revision: N` as the fix.
+- [ ] A new step in `.github/workflows/formula-drift.yml` runs `generator/check-revision-bump.sh`
+      (new script, sibling to `check-drift.sh`), which diffs each `Formula/*.rb` between the PR
+      base ref and HEAD and fails if any formula differs (non-whitespace/comment lines) while
+      both `version` and `revision` are unchanged — the failure message names the exact formula
+      and states `revision: N` as the fix. No new workflow file — this reuses
+      `formula-drift.yml`'s existing `generator/**`/`Formula/**` path triggers.
 - [ ] A "cosmetic-only" escape hatch exists — e.g. a manifest-level marker consumed by the gate
       for that specific regeneration — so a genuinely behavior-inert change (comment rewrap,
       `desc` typo fix) doesn't force a revision bump. Document what counts as cosmetic in the
@@ -85,8 +100,10 @@ manual post-hoc inspection rather than any automated gate:
 
 ## Key Files
 
-- `homebrew-tap/.github/workflows/` — new workflow, or addition to `validate-formulas.yml`
-  (exact placement TBD by whoever drives this — follow existing workflow-file conventions)
+- `homebrew-tap/.github/workflows/formula-drift.yml` — add the new step here (no new workflow)
+- `homebrew-tap/generator/check-drift.sh` — read-only reference for the sibling script's
+  structure/conventions (`set -euo pipefail`, exit codes 0/1/2, restore-working-tree-on-exit)
+- `homebrew-tap/generator/check-revision-bump.sh` — new script, this SPEC's actual deliverable
 - `homebrew-tap/generator/generate.py` — read-only reference for the existing `--diff` pattern
   this gate reuses
 - `homebrew-tap/tests/` — new test file(s) for both gates, following the existing
