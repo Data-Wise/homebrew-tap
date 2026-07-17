@@ -72,6 +72,8 @@ mkdocs build --strict     # Build and validate
 
 **`features.marketplace` and `features.claude_detection` are required for every `claude-plugin` entry**, not optional extras — omitting either silently drops the corresponding install-script block with no error at generate- or install-time (folio#18: a new entry shipped with no `features` key at all, so `brew install` reported success but never registered the plugin with Claude Code). `tests/test_manifest_required_features.sh` gates this in CI.
 
+**A `revision` bump is required whenever a `Formula/*.rb`'s content changes with no `version` change** — `brew upgrade` compares only `version`+`revision` against the installed receipt, not file content, so a content-only fix (e.g. an install-script tweak) is otherwise invisible to already-installed machines. `formula-drift.yml`'s revision-drift check (`generator/check-revision-bump.sh`) fails CI on this class of change; fix by adding/bumping `"revision": N` on the affected entry in `generator/manifest.json` and regenerating. A PR can bypass the check entirely by adding the `revision-exempt` label (e.g. for changes that are genuinely cosmetic but not caught by the check's own comment/whitespace-diff exclusion) — the label is per-PR, not persisted anywhere, so there's no manifest flag to remember or forget; the PR's own label history is the audit trail.
+
 ```bash
 python3 generator/generate.py              # Generate all 7 plugin formulas
 python3 generator/generate.py craft        # Generate one formula
