@@ -5,7 +5,7 @@ milestone: Homebrew refactor complete
 progress: All phases merged to main, repo cleaned up, CI verified
 
 📋 Session 2026-07-16 (folio-install silent registration failure fix):
-- PR #143 (feature/fix-folio-install-registration, open): folio's
+- PR #143 (main, merged 5c08475, squash, branch deleted): folio's
   `generator/manifest.json` entry had no `"features"` key at all, so
   `generate.py` silently omitted both the marketplace.json-mirroring block
   and the `CLAUDE_RUNNING` detection block from `Formula/folio.rb` — `brew
@@ -18,6 +18,8 @@ progress: All phases merged to main, repo cleaned up, CI verified
   after); documented the required-flags convention in CLAUDE.md's Formula
   Generator section (same doc gap that let this ship unnoticed).
 - Spec: folio repo's `docs/specs/SPEC-fix-install-registration-2026-07-16.md`.
+- folio#18 auto-closed on merge ("Fixes #18" in PR body); confirmation comment posted.
+- Worktree `feature-fix-folio-install` removed, local + remote branch deleted (merged, no orphan).
 
 📋 Session 2026-07-02 (post_install marketplace-sync race fix):
 - PR #134 (main, merged): post_install Step 3 (`claude plugin marketplace update
@@ -79,7 +81,7 @@ progress: All phases merged to main, repo cleaned up, CI verified
 | rforge | plugin (generated) | No | CLEAN (stable 1.2.0, 2026-05-10) |
 | rforge-orchestrator | plugin (legacy) | Yes | DEPRECATED 2026-05-10 → migrate to `rforge` |
 | workflow | plugin (generated) | Yes | CLEAN |
-| folio | plugin (generated) | Yes | CLEAN (registration fix PR #143 pending merge) |
+| folio | plugin (generated) | Yes | CLEAN (registration fix PR #143 merged) |
 | aiterm | python | Yes | CLEAN |
 | atlas | node | Yes | CLEAN |
 | nexus-cli | python | Yes | CLEAN |
@@ -89,7 +91,6 @@ progress: All phases merged to main, repo cleaned up, CI verified
 | scribe-cli | swift | No | CLEAN (placeholder SHA) |
 
 🎯 Next Action:
-→ Get PR #143 (folio registration fix) reviewed/merged; comment back on folio#18 once merged
 → Replace scribe-cli placeholder SHA when v0.3.0 release is created
 → Verify update-formula workflow uses App token correctly (next time a project releases)
 → Monitor: push-trigger suppression may need further investigation (PR #94 fix didn't fully resolve)
