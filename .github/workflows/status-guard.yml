@@ -1,0 +1,25 @@
+# .STATUS Conflict-Marker Guard
+#
+# .STATUS is hand-edited frequently, often across concurrent worktrees/PRs.
+# This fails CI if a literal git merge-conflict marker (<<<<<<<, =======,
+# >>>>>>>) was committed by mistake.
+
+name: Status Guard
+
+on:
+  push:
+    paths:
+      - '.STATUS'
+  pull_request:
+    paths:
+      - '.STATUS'
+
+jobs:
+  conflict-markers:
+    name: Check .STATUS for conflict markers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check .STATUS for conflict markers
+        run: bash generator/check-status-conflict-markers.sh .STATUS
