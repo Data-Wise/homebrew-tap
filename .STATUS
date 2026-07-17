@@ -4,6 +4,24 @@ milestone: Homebrew refactor complete
 
 progress: All phases merged to main, repo cleaned up, CI verified
 
+📋 Session 2026-07-17 (release-drift-gates: driving the plan, Task 1):
+- PR #154 (main, merged): docs-site currency fix — "Install Pattern" section in
+  `docs/formulas/plugins.md` still described the old symlink-based install (generator has used
+  a real-copy tar-pipe install for several releases); folio was entirely missing from the
+  per-plugin list; stale "6 plugin formulas"/"14 formula entries" counts across 3 files
+  (actual: 7/16); `generator/manifest.md` never documented the `revision` field; `mkdocs.yml`
+  excluded `specs/` but not `brainstorm/`. `mkdocs build --strict` now 0 warnings (was 1).
+- PR #155 (main, merged a21056f): Task 1 of `tasks/todo.md` — added `fetch-depth: 0` to
+  `formula-drift.yml`'s checkout step (default shallow clone had no history; the planned
+  revision-drift check needs to diff against a base commit that doesn't exist in depth-1).
+  Live-verified via the PR's own CI run logs (`fetch-depth: 0` confirmed in the actual
+  `actions/checkout@v4` step output, not just asserted) — existing `check-drift.sh` and
+  `test_no_symlink_install.sh` steps unaffected.
+- Tasks 2-10 still open. Next: Task 2 (`check-revision-bump.sh`, minimal version).
+- Note: this session's shared main checkout was mid-task on a different concurrent session's
+  branch (`feature/craft-v4.1.0`) — all work here went through disposable worktrees off
+  `origin/main` instead, to avoid disturbing it.
+
 📋 Session 2026-07-17 (release-drift-gates: brainstorm → SPEC → plan):
 - PR #149 (main, merged): BRAINSTORM + SPEC for two gaps found while shipping #143/#147 — no
   gate catches a formula content change with no version/revision bump; `.STATUS` can silently
