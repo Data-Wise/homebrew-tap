@@ -12,12 +12,18 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   `formula-drift.yml`'s existing "Determine revision-drift check inputs" step for the PR-vs-push
   event branching, per the grill's Decision 1 reasoning (applied here to the *pattern*, not the
   literal step, since `status-guard.yml` had no equivalent step to extend).
-- E2E case 1 (path not touched) verified live on this PR: initial commit touched only the
-  workflow YAML; job log shows "`.STATUS not touched — skipping the real check.`" and the
-  conflict-marker step never ran — job still completed green, fast.
-- E2E cases 2 (real check still runs when `.STATUS` is touched — this very commit) and 3 (planted
-  conflict-marker still fails) to follow in this same PR before merge, per
-  `SPEC-required-checks-self-skip-2026-07-19.md`'s Acceptance Criteria.
+- All 3 E2E cases verified live on PR #170, per `SPEC-required-checks-self-skip-2026-07-19.md`'s
+  Acceptance Criteria:
+  1. Path not touched (workflow-YAML-only commit): job log shows "`.STATUS not touched —
+     skipping the real check.`", conflict-marker step never ran, job green and fast.
+  2. Path touched, real content (`.STATUS` update commit): `run_check=true`, real script ran,
+     "`✅ .STATUS: no conflict markers.`".
+  3. Path touched, planted defect (throwaway conflict-marker commit): real script ran, correctly
+     failed — "`❌ conflict marker(s) found in .STATUS`", job conclusion `failure`. Reverted
+     before merge (`git revert`, not force-push/history-rewrite).
+- `status-guard.yml` half of `SPEC-required-checks-self-skip-2026-07-19.md` complete. Second half
+  (`formula-drift.yml`, extending its existing "Determine revision-drift check inputs" step per
+  the grill's Decision 1) is a separate future PR — not started.
 
 📋 Session 2026-07-19 (cont. — fixing the required-checks list):
 - PR #162 (main, merged with `--admin`) hit `mergeStateStatus: BLOCKED` on green CI: `Regen vs
