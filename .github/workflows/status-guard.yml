@@ -10,9 +10,11 @@ on:
   push:
     paths:
       - '.STATUS'
+  # No path filter on pull_request: this job is a required status check, and a
+  # path-filtered required check never reports on PRs outside its paths —
+  # permanently blocking them (e.g. every bot formula PR). The check is a grep;
+  # run it on every PR so branch protection can always resolve.
   pull_request:
-    paths:
-      - '.STATUS'
 
 jobs:
   conflict-markers:
