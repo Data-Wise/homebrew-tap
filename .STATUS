@@ -1,8 +1,18 @@
 status: Active
-last_session: 2026-07-17
-milestone: release-drift-gates plan complete (Tasks 1-10 all shipped)
+last_session: 2026-07-19
+milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed
 
-progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified
+progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed
+
+📋 Session 2026-07-19 (closing the SPEC's deferred open question):
+- `main` branch protection now requires `Regen vs committed`, `Check .STATUS for conflict markers`,
+  and `Validate all formulas` (the job-level check-run names, not the workflow-level names) to pass
+  before merge — applied via `gh api -X PUT repos/Data-Wise/homebrew-tap/branches/main/protection`.
+  Job names were confirmed by reading `formula-drift.yml`, `validate-formulas.yml`, and
+  `origin/main:.github/workflows/status-guard.yml` directly (the last via `git show`, since the
+  local shared checkout was on an unrelated stale branch — avoided switching it).
+  All prior settings preserved: `strict: false`, 0 required reviewers (deliberate,
+  single-maintainer), `enforce_admins: false`, no force-push, no deletions.
 
 📋 Session 2026-07-17 (release-drift-gates: driving the plan, Tasks 2-10 — plan complete):
 - PR #157 (main, merged): Task 2 — `generator/check-revision-bump.sh` (minimal version). Diffs
