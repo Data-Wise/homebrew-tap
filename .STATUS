@@ -221,5 +221,21 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   the tag out of the `url` line when no explicit field is present, so a real
   version bump is recognized without needing the `revision-exempt` label.
   Covered by new Case 6 in `tests/test_revision_bump_check.sh` (verified to
-  fail without the fix, pass with it). Branch:
-  `feature/fix-revision-check-url-tag-version`.
+  fail without the fix, pass with it). PR #165 merged (`d49ba00`, squash),
+  clean merge with no `--admin` override needed — first `generator/**`-
+  touching PR since the branch-protection fix (below), so this also live-
+  verified `Regen vs committed` actually gates: it ran, passed, and
+  `mergeStateStatus` reported `CLEAN`.
+→ RESOLVED (2026-07-19): `main` branch protection now requires
+  `required_status_checks` at all (previously none — CI red never blocked a
+  merge). PRs #162/#163 record the setup: initially added 3 contexts
+  (`Regen vs committed`, `Check .STATUS for conflict markers`,
+  `Validate all formulas`); `Validate all formulas` was then removed because
+  it's `schedule`/`workflow_dispatch`-only and could never satisfy a PR gate
+  (would have permanently blocked every merge). Current required contexts:
+  `Regen vs committed`, `Check .STATUS for conflict markers` — both are
+  path-filtered (`generator/**`/`Formula/**` and `.STATUS` respectively), so
+  a PR touching neither still merges ungated by either (accepted trade-off,
+  not yet revisited). Live-verified both directions: #162/#163 (`.STATUS`-
+  only) needed `--admin` since `Regen vs committed` never triggered; #165
+  (`generator/**`) went `CLEAN` with no override.
