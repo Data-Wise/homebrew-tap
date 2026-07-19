@@ -1,8 +1,29 @@
 status: Active
 last_session: 2026-07-19
-milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected
+milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected + status-guard.yml self-skip fix (in progress)
 
-progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug
+progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) now driving — status-guard.yml's self-skip fix is in this PR (#170), formula-drift.yml's follows separately per the grill's staged-rollout decision
+
+📋 Session 2026-07-19 (cont. — driving SPEC-required-checks-self-skip-2026-07-19.md, status-guard.yml half):
+- PR #170 (in progress): `status-guard.yml`'s `pull_request` trigger dropped its `.STATUS` path
+  filter (unconditional now); a new "Determine whether .STATUS changed" step diffs against the
+  PR base ref / push `before` and skips the real conflict-marker check fast when `.STATUS` wasn't
+  touched — fail-closed (job fails, doesn't skip) if the diff itself can't be resolved. Modeled on
+  `formula-drift.yml`'s existing "Determine revision-drift check inputs" step for the PR-vs-push
+  event branching, per the grill's Decision 1 reasoning (applied here to the *pattern*, not the
+  literal step, since `status-guard.yml` had no equivalent step to extend).
+- All 3 E2E cases verified live on PR #170, per `SPEC-required-checks-self-skip-2026-07-19.md`'s
+  Acceptance Criteria:
+  1. Path not touched (workflow-YAML-only commit): job log shows "`.STATUS not touched —
+     skipping the real check.`", conflict-marker step never ran, job green and fast.
+  2. Path touched, real content (`.STATUS` update commit): `run_check=true`, real script ran,
+     "`✅ .STATUS: no conflict markers.`".
+  3. Path touched, planted defect (throwaway conflict-marker commit): real script ran, correctly
+     failed — "`❌ conflict marker(s) found in .STATUS`", job conclusion `failure`. Reverted
+     before merge (`git revert`, not force-push/history-rewrite).
+- `status-guard.yml` half of `SPEC-required-checks-self-skip-2026-07-19.md` complete. Second half
+  (`formula-drift.yml`, extending its existing "Determine revision-drift check inputs" step per
+  the grill's Decision 1) is a separate future PR — not started.
 
 📋 Session 2026-07-19 (cont. — fixing the required-checks list):
 - PR #162 (main, merged with `--admin`) hit `mergeStateStatus: BLOCKED` on green CI: `Regen vs
