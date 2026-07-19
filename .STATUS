@@ -1,8 +1,22 @@
 status: Active
 last_session: 2026-07-19
-milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed
+milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected
 
-progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed
+progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug
+
+📋 Session 2026-07-19 (cont. — fixing the required-checks list):
+- PR #162 (main, merged with `--admin`) hit `mergeStateStatus: BLOCKED` on green CI: `Regen vs
+  committed` and `Validate all formulas` never ran (path-filtered / cron-only), so GitHub treated
+  them as permanently "Expected — waiting". Investigation found `Validate all formulas`
+  (validate-formulas.yml) has **no `pull_request` trigger at all** — `schedule` + `workflow_dispatch`
+  only — so as a required check it could never be satisfied by any PR, not just docs-only ones.
+  This was a setup mistake in the same-day branch-protection change, caught the same day.
+- Fix applied via a second `gh api -X PUT .../branches/main/protection`: dropped `Validate all
+  formulas` from `required_status_checks.contexts`, keeping only `Regen vs committed` and
+  `Check .STATUS for conflict markers` (both still path-filtered — accepted trade-off: a PR
+  touching neither `Formula/**`/`generator/**` nor `.STATUS` still won't be gated by either,
+  same limitation as before this whole change, just without the always-blocked check). All other
+  settings unchanged (`strict: false`, 0 required reviewers, no force-push/deletions).
 
 📋 Session 2026-07-19 (closing the SPEC's deferred open question):
 - `main` branch protection now requires `Regen vs committed`, `Check .STATUS for conflict markers`,
