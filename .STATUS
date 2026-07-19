@@ -1,8 +1,23 @@
 status: Active
 last_session: 2026-07-19
-milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected
+milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected + status-guard.yml self-skip fix (in progress)
 
-progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug
+progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) now driving — status-guard.yml's self-skip fix is in this PR (#170), formula-drift.yml's follows separately per the grill's staged-rollout decision
+
+📋 Session 2026-07-19 (cont. — driving SPEC-required-checks-self-skip-2026-07-19.md, status-guard.yml half):
+- PR #170 (in progress): `status-guard.yml`'s `pull_request` trigger dropped its `.STATUS` path
+  filter (unconditional now); a new "Determine whether .STATUS changed" step diffs against the
+  PR base ref / push `before` and skips the real conflict-marker check fast when `.STATUS` wasn't
+  touched — fail-closed (job fails, doesn't skip) if the diff itself can't be resolved. Modeled on
+  `formula-drift.yml`'s existing "Determine revision-drift check inputs" step for the PR-vs-push
+  event branching, per the grill's Decision 1 reasoning (applied here to the *pattern*, not the
+  literal step, since `status-guard.yml` had no equivalent step to extend).
+- E2E case 1 (path not touched) verified live on this PR: initial commit touched only the
+  workflow YAML; job log shows "`.STATUS not touched — skipping the real check.`" and the
+  conflict-marker step never ran — job still completed green, fast.
+- E2E cases 2 (real check still runs when `.STATUS` is touched — this very commit) and 3 (planted
+  conflict-marker still fails) to follow in this same PR before merge, per
+  `SPEC-required-checks-self-skip-2026-07-19.md`'s Acceptance Criteria.
 
 📋 Session 2026-07-19 (cont. — fixing the required-checks list):
 - PR #162 (main, merged with `--admin`) hit `mergeStateStatus: BLOCKED` on green CI: `Regen vs
