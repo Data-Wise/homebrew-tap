@@ -254,3 +254,9 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   not yet revisited). Live-verified both directions: #162/#163 (`.STATUS`-
   only) needed `--admin` since `Regen vs committed` never triggered; #165
   (`generator/**`) went `CLEAN` with no override.
+
+<<<<<<< PLANTED-DEFECT-TEST
+throwaway
+=======
+other
+>>>>>>> PLANTED-DEFECT-TEST
