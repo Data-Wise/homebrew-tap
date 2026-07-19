@@ -88,4 +88,26 @@ check "Case 5: PR_LABELS=revision-exempt bypasses the check entirely" 0 \
 check "Case 5b: an unrelated label does NOT bypass" 1 \
   env PR_LABELS="some-other-label" bash generator/check-revision-bump.sh "$COSMETIC_SHA" "$LOGIC_SHA"
 
+# --- Case 6: URL-tag-versioned formula (no explicit `version` field) ---
+#
+# craft.rb has no `version "..."` line — Homebrew infers the version from the
+# `url`'s git tag. Before the extract_version() fallback, base/head version
+# both read as "" for every bump, so a real logic change alongside a version
+# bump false-positived as "content changed but version did not" (the
+# incident that forced the "revision-exempt" label workaround on v4.2.0).
+
+git checkout --quiet "$SCRATCH_BRANCH"
+CRAFT_BASE_SHA=$(git rev-parse HEAD)
+sed -i.bak \
+  -e 's/refs\/tags\/v4\.2\.0\.tar\.gz/refs\/tags\/v4.3.0.tar.gz/' \
+  -e 's/desc "Full-stack developer toolkit for Claude Code with 48 commands"/desc "Full-stack developer toolkit for Claude Code with 49 commands"/' \
+  Formula/craft.rb
+rm -f Formula/craft.rb.bak
+git add Formula/craft.rb
+git commit --quiet -m "test: url-tag version bump + real content change"
+CRAFT_BUMP_SHA=$(git rev-parse HEAD)
+
+check "Case 6: url-tag version bump is recognized (no false positive)" 0 \
+  bash generator/check-revision-bump.sh "$CRAFT_BASE_SHA" "$CRAFT_BUMP_SHA"
+
 exit "$fail"

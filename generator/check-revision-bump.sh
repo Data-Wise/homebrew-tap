@@ -53,6 +53,26 @@ extract_field() {
     | grep -oE '[^ \"]+$' | tr -d '"' || true
 }
 
+# Version for a Formula/*.rb at a given ref. Most formulas here have no
+# explicit `version` line — Homebrew infers it from the `url`'s git tag
+# (e.g. `url ".../archive/refs/tags/v4.2.0.tar.gz"`) — so fall back to
+# extracting the tag when the literal field is absent. Without this,
+# base_version/head_version are both "" for every URL-tag-versioned formula,
+# and a real version bump reads as "content changed, version did not".
+extract_version() {
+  local ref="$1" formula="$2"
+  local explicit
+  explicit=$(extract_field "$ref" "$formula" version)
+  if [ -n "$explicit" ]; then
+    printf '%s' "$explicit"
+    return
+  fi
+  git show "$ref:$formula" 2>/dev/null \
+    | grep -oE '^\s*url\s+"[^"]+"' \
+    | grep -oE '/tags/v?[^/"]+\.(tar\.gz|zip|tar\.bz2)"' \
+    | sed -E 's#^/tags/v?##; s#\.(tar\.gz|zip|tar\.bz2)"$##' || true
+}
+
 # True (exit 0) if every added/removed line in the diff is blank or a comment
 # (leading '#', after stripping the +/- marker and whitespace). Both Ruby's
 # top-level comments and bash comments embedded in the install/post_install
@@ -84,8 +104,8 @@ fi
 for formula in $changed_formulas; do
   name=$(basename "$formula" .rb)
 
-  base_version=$(extract_field "$BASE_REF" "$formula" version)
-  head_version=$(extract_field "$HEAD_REF" "$formula" version)
+  base_version=$(extract_version "$BASE_REF" "$formula")
+  head_version=$(extract_version "$HEAD_REF" "$formula")
   base_revision=$(extract_field "$BASE_REF" "$formula" revision)
   head_revision=$(extract_field "$HEAD_REF" "$formula" revision)
 
