@@ -195,14 +195,17 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
 → Verify update-formula workflow uses App token correctly (next time a project releases)
 → Monitor: push-trigger suppression may need further investigation (PR #94 fix didn't fully resolve)
 → After next craft release lands, confirm regenerated casks emit `depends_on macos: :catalina` (proves the generator root-cause fix holds in practice)
-→ craft's `homebrew-release.yml` still does a direct `git push origin main` — now
-  rejected by this repo's branch protection (added since the workflow was last
-  updated). It needs to switch to a PR-based push. Manually recovered v4.2.0's
-  formula update via PR #164 as a one-off (2026-07-19); fix the workflow before
-  the next craft release to avoid repeating this.
-→ `check-revision-bump.sh`'s `extract_field` looks for an explicit `version "..."`
-  line in the formula — craft.rb (and any URL-versioned formula) has none,
-  Homebrew infers version from the `url` tag. This produces a false-positive
-  "content changed without version bump" on every version-only craft update.
-  Used the `revision-exempt` label to unblock PR #164; the script needs to also
-  diff the `url` line's version segment, not just a literal `version` field.
+→ RESOLVED (2026-07-19): craft's `homebrew-release.yml` "Commit and push to tap"
+  step switched from a direct `git push origin main` to pushing a
+  `craft-release/vX.Y.Z` branch and opening + auto-merging a PR (via the same
+  GitHub App token) against this repo's protected `main`. Fixed in the craft
+  repo, not here — see craft's own `.github/workflows/homebrew-release.yml`.
+→ RESOLVED (2026-07-19): `check-revision-bump.sh`'s `extract_field` only
+  matched an explicit `version "..."` line, which craft.rb (and any
+  URL-tag-versioned formula) doesn't have — Homebrew infers the version from
+  the `url`'s git tag. Added `extract_version()`, which falls back to parsing
+  the tag out of the `url` line when no explicit field is present, so a real
+  version bump is recognized without needing the `revision-exempt` label.
+  Covered by new Case 6 in `tests/test_revision_bump_check.sh` (verified to
+  fail without the fix, pass with it). Branch:
+  `feature/fix-revision-check-url-tag-version`.
