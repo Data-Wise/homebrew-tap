@@ -319,3 +319,32 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   session just fixed here — flagged in PR #175's body, NOT fixed (different repo, not authorized
   this session; contradicts an earlier, apparently premature `.STATUS` note claiming it was
   already fixed — needs re-verification if picked up).
+- UPDATE (2026-07-20): craft's fix was already sitting on craft's `dev` (PR #299, unreleased since
+  2026-07-01) and has now been released to `main` via craft#301 — the earlier note above is
+  resolved, not just flagged.
+
+📋 Session 2026-07-20 (formula-count docs fix, rebase + fail-closed edge case):
+- Reviewed and merged PR #173 (`docs: fix stale 14/15-formula counts, add agy/obsidian-cli-ops to
+  inventory`) — a separate background-task session's work, `CONFLICTING`/`DIRTY` against a stale
+  cached base sha. A live 3-way merge-tree test showed the real conflict was narrower than
+  GitHub's cache implied: only `docs/ci/index.md` had a genuine textual conflict (PR #172's
+  self-skip rewrite of the `validate-formulas.yml` description vs. PR #173's `14→16` count edit to
+  the same line) — resolved by keeping `main`'s newer self-skip description (no formula count
+  left to fix there). `docs/ci/validation.md`'s matching count auto-merged clean.
+- Discovered a real, narrow gap in the self-skip fail-closed logic (SPEC-required-checks-self-skip
+  from 2026-07-19): a `git push --force-with-lease` rebase orphans the pre-rebase SHA, so the
+  `push`-triggered "Determine whether .STATUS changed"/"Determine formula-drift check inputs"
+  steps — which diff against `github.event.before` — hit `Invalid symmetric difference expression`
+  (base SHA unreachable after the rewrite) and correctly fail closed (exit 1) per their documented
+  contract. This produced a same-named FAILURE check-run sitting alongside the correct PASSING
+  `pull_request`-triggered run in the PR's status rollup, which was enough to keep
+  `mergeStateStatus: BLOCKED` even though the actual PR-gating checks had passed. Worked around by
+  pushing a fresh non-force commit (new valid `before`), which superseded the failed run. Not
+  fixed at the workflow level this session (narrow, only triggered by force-pushing a rebased
+  branch) — a real fix would need the push-triggered path to treat an unreachable base as "assume
+  changed, run the real check" rather than hard-failing, since force-push is a normal rebase
+  outcome, not genuine ambiguity about what changed.
+- Worktree cleanup: removed `docs-formula-count-fix` (#173, merged), branch deleted. This update
+  made via a new throwaway worktree (`status-update-2026-07-20`), same pattern as 2026-07-19's
+  `.STATUS` update — shared checkout still lands on `main` between sessions and this repo has no
+  `dev` to fall back to.
