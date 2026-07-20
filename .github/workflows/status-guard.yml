@@ -36,10 +36,14 @@ jobs:
       # as the all-zeros sentinel — skip gracefully rather than error, since there's no real
       # "before" state to diff against.
       #
-      # Fail-closed contract: if base-ref resolution or the diff itself errors for any other
-      # reason, this step FAILS (not skips) — an unresolvable "what changed?" must never be
-      # silently treated as "nothing changed," or this required check would always report green
-      # while checking nothing.
+      # Fail-closed contract: if the diff can't be resolved for an UNEXPLAINED reason, this step
+      # FAILS (not skips) — an unresolvable "what changed?" must never be silently treated as
+      # "nothing changed," or this required check would always report green while checking
+      # nothing. The one identifiable, non-ambiguous exception: a force-pushed branch orphans the
+      # push event's `before` SHA (it's simply gone, not just hard to diff), which is a routine
+      # rebase side effect, not genuine uncertainty — in that case we know exactly why the diff
+      # can't run, so fall back to running the real check (base-independent — it just scans
+      # .STATUS directly) rather than failing the job outright.
       - name: Determine whether .STATUS changed
         id: status_inputs
         run: |
@@ -52,6 +56,13 @@ jobs:
           if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
             echo "New branch / no prior state — skipping (nothing to diff against)."
             echo "run_check=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
+            echo "Base $base_sha is unreachable (likely a force-push/rebase orphaned it) —"
+            echo "running the real check rather than guessing what changed."
+            echo "run_check=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 

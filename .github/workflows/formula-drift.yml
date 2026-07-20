@@ -44,14 +44,19 @@ jobs:
       # branch has `before` as the all-zeros sentinel — skip gracefully rather than error, since
       # there's no real "before" state to diff against.
       #
-      # Fail-closed contract: if base-ref resolution or the diff itself errors for any other
-      # reason, this step FAILS (not skips) — an unresolvable "what changed?" must never be
-      # silently treated as "nothing changed," or this required check would always report green
-      # while checking nothing.
+      # Fail-closed contract: if the diff can't be resolved for an UNEXPLAINED reason, this step
+      # FAILS (not skips) — an unresolvable "what changed?" must never be silently treated as
+      # "nothing changed," or this required check would always report green while checking
+      # nothing. The one identifiable, non-ambiguous exception: a force-pushed branch orphans the
+      # push event's `before` SHA (it's simply gone, not just hard to diff), which is a routine
+      # rebase side effect, not genuine uncertainty — in that case we know exactly why the diff
+      # can't run.
       #
-      # run_check gates ALL the real checks below (drift regen, no-symlink contract,
-      # revision-bump) — none of them are relevant unless generator/** or Formula/** actually
-      # changed since base.
+      # run_check gates the two base-independent real checks (drift regen, no-symlink contract) —
+      # both just inspect the current committed state, so they can safely run even when we can't
+      # tell what changed since base. revision_bump_runnable additionally requires a resolvable
+      # base_sha (check-revision-bump.sh diffs against it directly and errors without one), so the
+      # unreachable-base fallback below enables run_check but NOT revision_bump_runnable.
       - name: Determine formula-drift check inputs
         id: drift_inputs
         run: |
@@ -66,6 +71,15 @@ jobs:
           if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
             echo "New branch / no prior state — skipping (nothing to diff against)."
             echo "run_check=false" >> "$GITHUB_OUTPUT"
+            echo "revision_bump_runnable=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
+            echo "Base $base_sha is unreachable (likely a force-push/rebase orphaned it) —"
+            echo "running the base-independent checks rather than guessing what changed."
+            echo "run_check=true" >> "$GITHUB_OUTPUT"
+            echo "revision_bump_runnable=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -79,9 +93,11 @@ jobs:
 
           if echo "$changed_files" | grep -qE '^(generator/|Formula/)'; then
             echo "run_check=true" >> "$GITHUB_OUTPUT"
+            echo "revision_bump_runnable=true" >> "$GITHUB_OUTPUT"
           else
             echo "Neither generator/** nor Formula/** touched — skipping the real checks."
             echo "run_check=false" >> "$GITHUB_OUTPUT"
+            echo "revision_bump_runnable=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check formula drift (regen vs committed)
@@ -93,7 +109,7 @@ jobs:
         run: bash tests/test_no_symlink_install.sh
 
       - name: Revision-drift check (formula content changed without version/revision bump)
-        if: steps.drift_inputs.outputs.run_check == 'true'
+        if: steps.drift_inputs.outputs.run_check == 'true' && steps.drift_inputs.outputs.revision_bump_runnable == 'true'
         env:
           PR_LABELS: ${{ steps.drift_inputs.outputs.labels }}
         run: bash generator/check-revision-bump.sh "${{ steps.drift_inputs.outputs.base_sha }}"
