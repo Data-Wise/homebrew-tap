@@ -398,8 +398,7 @@
       "repo": "Data-Wise/atlas",
       "version": "0.16.0",
       "sha256": "cdbcfeb171d4f048856d16f30a6c5891deaa5bdb64745f1984320f6dd1edf7a3",
-      "generated": false,
-      "revision": 1
+      "generated": false
     },
     "examark": {
       "type": "node-npm",

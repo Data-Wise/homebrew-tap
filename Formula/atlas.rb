@@ -8,7 +8,6 @@ class Atlas < Formula
   url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.16.0.tar.gz"
   sha256 "cdbcfeb171d4f048856d16f30a6c5891deaa5bdb64745f1984320f6dd1edf7a3"
   license "MIT"
-  revision 1
 
   depends_on "python@3.12" => :build
   depends_on "node"
