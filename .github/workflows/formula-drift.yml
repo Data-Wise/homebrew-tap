@@ -4,6 +4,14 @@
 # generator/manifest.json. This fails CI if a generated formula was hand-edited
 # without updating the source — preventing silent manifest-drift that the next
 # release regen would revert.
+#
+# This check is required by main's branch protection (SPEC-release-drift-gates-2026-07-16.md).
+# Required checks must report on every PR — GitHub has no path-awareness of its own, so a
+# `pull_request: paths: generator/**, Formula/**` trigger left the job permanently
+# "expected/waiting" (and the PR permanently BLOCKED) on any PR that doesn't touch those paths.
+# Fixed per SPEC-required-checks-self-skip-2026-07-19.md: the pull_request trigger is
+# unconditional, and the job itself decides fast whether to run the real checks or skip. (push
+# stays path-filtered — unaffected by this change, out of scope per the SPEC.)
 
 name: Formula Drift Guard
 
@@ -14,18 +22,15 @@ on:
       - 'Formula/**'
       - '.github/workflows/formula-drift.yml'
   pull_request:
-    paths:
-      - 'generator/**'
-      - 'Formula/**'
 
 jobs:
   drift:
     name: Regen vs committed
     runs-on: ubuntu-latest
     steps:
-      # fetch-depth: 0 (full history) — the upcoming revision-drift check needs to
-      # diff Formula/*.rb against the PR base ref / previous push commit, which the
-      # default shallow (depth-1) checkout doesn't have available.
+      # fetch-depth: 0 (full history) — both the self-skip decision below and the
+      # revision-drift check need to diff against the PR base ref / previous push commit,
+      # which the default shallow (depth-1) checkout doesn't have available.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -34,17 +39,20 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Check formula drift (regen vs committed)
-        run: bash generator/check-drift.sh
-
-      - name: No-symlink install contract (claude-plugin formulas)
-        run: bash tests/test_no_symlink_install.sh
-
-      # Base ref differs by trigger: pull_request compares against the PR's base
-      # commit; push compares against the previous tip (github.event.before). A
-      # push event for a brand-new branch has `before` as the all-zeros sentinel —
-      # skip gracefully rather than error, since there's no real "before" state.
-      - name: Determine revision-drift check inputs
+      # Base ref differs by trigger: pull_request compares against the PR's base commit; push
+      # compares against the previous tip (github.event.before). A push event for a brand-new
+      # branch has `before` as the all-zeros sentinel — skip gracefully rather than error, since
+      # there's no real "before" state to diff against.
+      #
+      # Fail-closed contract: if base-ref resolution or the diff itself errors for any other
+      # reason, this step FAILS (not skips) — an unresolvable "what changed?" must never be
+      # silently treated as "nothing changed," or this required check would always report green
+      # while checking nothing.
+      #
+      # run_check gates ALL the real checks below (drift regen, no-symlink contract,
+      # revision-bump) — none of them are relevant unless generator/** or Formula/** actually
+      # changed since base.
+      - name: Determine formula-drift check inputs
         id: drift_inputs
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
@@ -54,16 +62,38 @@ jobs:
             base_sha="${{ github.event.before }}"
             labels=""
           fi
+
           if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
-            echo "labels=$labels" >> "$GITHUB_OUTPUT"
+            echo "New branch / no prior state — skipping (nothing to diff against)."
+            echo "run_check=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
+          if ! changed_files=$(git diff --name-only "$base_sha"...HEAD 2>&1); then
+            echo "::error::Could not diff against base $base_sha — failing closed: $changed_files"
+            exit 1
+          fi
+
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          echo "labels=$labels" >> "$GITHUB_OUTPUT"
+
+          if echo "$changed_files" | grep -qE '^(generator/|Formula/)'; then
+            echo "run_check=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Neither generator/** nor Formula/** touched — skipping the real checks."
+            echo "run_check=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check formula drift (regen vs committed)
+        if: steps.drift_inputs.outputs.run_check == 'true'
+        run: bash generator/check-drift.sh
+
+      - name: No-symlink install contract (claude-plugin formulas)
+        if: steps.drift_inputs.outputs.run_check == 'true'
+        run: bash tests/test_no_symlink_install.sh
+
       - name: Revision-drift check (formula content changed without version/revision bump)
-        if: steps.drift_inputs.outputs.skip == 'false'
+        if: steps.drift_inputs.outputs.run_check == 'true'
         env:
           PR_LABELS: ${{ steps.drift_inputs.outputs.labels }}
         run: bash generator/check-revision-bump.sh "${{ steps.drift_inputs.outputs.base_sha }}"
