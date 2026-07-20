@@ -314,7 +314,7 @@
     },
     "workflow": {
       "type": "claude-plugin",
-      "desc": "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin",
+      "desc": "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin (E2E test touch, will be reverted)",
       "homepage": "https://github.com/Data-Wise/claude-plugins",
       "source": "github",
       "repo": "Data-Wise/claude-plugins",
@@ -359,7 +359,8 @@
           "type": "file"
         }
       ],
-      "caveats_extra": "The Workflow plugin has been installed to:\n  ~/.claude/plugins/workflow\n\nIf not auto-enabled, run:\n  claude plugin install workflow@local-plugins\n\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/workflow && ( cd $(brew --prefix)/opt/workflow/libexec && tar cf - . ) | ( cd ~/.claude/plugins/workflow && tar xf - )"
+      "caveats_extra": "The Workflow plugin has been installed to:\n  ~/.claude/plugins/workflow\n\nIf not auto-enabled, run:\n  claude plugin install workflow@local-plugins\n\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/workflow && ( cd $(brew --prefix)/opt/workflow/libexec && tar cf - . ) | ( cd ~/.claude/plugins/workflow && tar xf - )",
+      "revision": 1
     },
     "agy": {
       "type": "python-virtualenv",

@@ -3,11 +3,12 @@
 
 # Workflow formula for the data-wise/tap Homebrew tap.
 class Workflow < Formula
-  desc "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin"
+  desc "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin (E2E test touch, will be reverted)"
   homepage "https://github.com/Data-Wise/claude-plugins"
   url "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v0.1.0/workflow-v0.1.0.tar.gz"
   sha256 "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783"
   license "MIT"
+  revision 1
 
   depends_on "jq"
 
