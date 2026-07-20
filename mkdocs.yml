@@ -90,4 +90,6 @@ nav:
     - Overview: ci/index.md
     - Update Workflow: ci/update-formula.md
     - Validation: ci/validation.md
+    - Formula Drift Guard: ci/drift-guard.md
+    - Status Guard: ci/status-guard.md
   - Reference Card: REFCARD.md
