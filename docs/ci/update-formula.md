@@ -10,7 +10,7 @@ Reusable workflow called by project repos on release.
 | `version` | Yes | - | Version without `v` prefix |
 | `sha256` | Yes | - | SHA256 hash of tarball |
 | `source_type` | No | `github` | `github`, `pypi`, `npm`, or `cran` |
-| `auto_merge` | No | `false` | Push directly (true) or create PR (false) |
+| `auto_merge` | No | `false` | PR + GitHub native auto-merge (true) or PR for manual review (false) |
 | `command_count` | No | - | Dynamic command count for desc |
 | `agent_count` | No | - | Dynamic agent count for desc |
 | `skill_count` | No | - | Dynamic skill count for desc |
@@ -30,7 +30,11 @@ Reusable workflow called by project repos on release.
 2. Checkout homebrew-tap main branch
 3. Update version and SHA via `sed` based on source type
 4. Run `brew style` (non-blocking)
-5. Push to main or create PR
+5. Open a PR against `main` (always — `main`'s branch protection requires a PR, direct pushes
+   are rejected regardless of required-approval count). `auto_merge: true` additionally enables
+   GitHub's native auto-merge on the PR, so it merges itself once the required checks
+   ([Regen vs committed](drift-guard.md), [Check .STATUS for conflict markers](status-guard.md))
+   pass — no human click needed, but the checks still gate it.
 
 ## Caller Example
 

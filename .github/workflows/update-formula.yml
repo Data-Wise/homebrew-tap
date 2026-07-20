@@ -57,7 +57,7 @@ on:
         type: string
         default: 'github'
       auto_merge:
-        description: 'Auto-merge: true = direct push to main, false = create PR'
+        description: 'Auto-merge: true = PR + GitHub native auto-merge (no human click needed), false = PR for manual review'
         required: false
         type: boolean
         default: false
@@ -244,53 +244,17 @@ jobs:
           brew style "Formula/${FORMULA_NAME}.rb" || echo "⚠️ Style check found issues (non-blocking)"
 
       # When auto_merge is true, commit directly to main (no PR race condition)
-      # persist-credentials: false above prevents actions/checkout from setting
-      # an extraheader with the caller's GITHUB_TOKEN, so we auth via remote URL
-      - name: Direct push to main
-        if: inputs.auto_merge
-        env:
-          FORMULA_NAME: ${{ inputs.formula_name }}
-          VERSION: ${{ inputs.version }}
-          TAP_TOKEN: ${{ steps.app-token.outputs.token || secrets.tap_token }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          PUSH_URL="https://x-access-token:${TAP_TOKEN}@github.com/Data-Wise/homebrew-tap.git"
-          git remote set-url origin "$PUSH_URL"
-          git add "Formula/${FORMULA_NAME}.rb"
-          if [ -f generator/manifest.json ] && ! git diff --quiet -- generator/manifest.json; then
-            git add "generator/manifest.json"
-          fi
-
-          # Handle idempotent re-runs: skip if formula already up to date
-          if git diff --cached --quiet; then
-            echo "✅ Formula already up to date — nothing to commit"
-            exit 0
-          fi
-
-          git commit -m "${FORMULA_NAME}: update to v${VERSION}"
-
-          # Unset GITHUB_TOKEN so the runner's credential helper doesn't
-          # intercept and use the caller workflow's token (which lacks push
-          # access to homebrew-tap). Auth comes from the URL-embedded TAP_TOKEN.
-          unset GITHUB_TOKEN
-
-          for attempt in 1 2 3; do
-            if git push origin HEAD:main; then
-              echo "✅ Pushed to main (attempt $attempt)"
-              exit 0
-            fi
-            echo "⚠️ Push failed (attempt $attempt/3), rebasing..."
-            git pull --rebase origin main
-          done
-
-          echo "❌ Failed to push after 3 attempts"
-          exit 1
-
-      # When auto_merge is false, create a PR for manual review
+      # Direct push to main is no longer possible: main's branch protection now
+      # requires a pull request (required_pull_request_reviews, added
+      # 2026-07-19 — see docs/specs/SPEC-release-drift-gates-2026-07-16.md).
+      # GitHub rejects a direct push to a branch with that setting regardless
+      # of the required-approval count (0 here). Both auto_merge: true and
+      # auto_merge: false now go through a PR; auto_merge: true additionally
+      # enables GitHub's native auto-merge so no human has to click merge —
+      # it still waits for the required status checks (Regen vs committed,
+      # Check .STATUS for conflict markers) to pass first.
       - name: Create Pull Request
         id: create-pr
-        if: ${{ !inputs.auto_merge }}
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.app-token.outputs.token || secrets.tap_token }}
@@ -310,6 +274,15 @@ jobs:
           base: main
           delete-branch: true
 
+      - name: Enable auto-merge
+        if: inputs.auto_merge && steps.create-pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.tap_token }}
+        run: |
+          gh pr merge --auto --squash \
+            --repo Data-Wise/homebrew-tap \
+            "${{ steps.create-pr.outputs.pull-request-number }}"
+
       - name: Summary
         env:
           FORMULA_NAME: ${{ inputs.formula_name }}
@@ -325,7 +298,7 @@ jobs:
           echo "| Formula | \`${FORMULA_NAME}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Version | \`v${VERSION}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Source | ${SOURCE_TYPE} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Method | $([ "$AUTO_MERGE" = "true" ] && echo "Direct push" || echo "Pull request") |" >> $GITHUB_STEP_SUMMARY
+          echo "| Method | $([ "$AUTO_MERGE" = "true" ] && echo "Pull request (auto-merge)" || echo "Pull request (manual review)") |" >> $GITHUB_STEP_SUMMARY
           if [ -n "$PR_URL" ]; then
             echo "| PR | ${PR_URL} |" >> $GITHUB_STEP_SUMMARY
           fi
