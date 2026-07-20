@@ -78,6 +78,16 @@ brew install data-wise/tap/nexus-cli
 
 **Type:** Python virtualenv | **Source:** PyPI
 
+## obsidian-cli-ops
+
+Obsidian vault CLI + MCP server (isolated venv, Rust deps).
+
+```bash
+brew install data-wise/tap/obsidian-cli-ops
+```
+
+**Type:** Python virtualenv | **Source:** GitHub
+
 ## scribe-cli
 
 Scribe document conversion CLI.

@@ -8,7 +8,7 @@ A Homebrew tap (`brew tap data-wise/tap`) distributing CLI tools, Claude Code pl
 
 ## Repository Layout
 
-- `Formula/*.rb` — 14 Homebrew formulas (CLI tools, plugins)
+- `Formula/*.rb` — 16 Homebrew formulas (CLI tools, plugins)
 - `Casks/*.rb` — Homebrew casks (scribe, scribe-dev)
 - `generator/` — Python formula generator for plugin formulas
   - `generate.py` — Reads manifest, produces `Formula/*.rb`
@@ -92,7 +92,7 @@ When editing a plugin formula, edit `manifest.json` + `blocks/` then regenerate 
 
 Other Data-Wise repos call `.github/workflows/update-formula.yml` on release. It accepts `formula_name`, `version`, `sha256`, `source_type` (github|pypi|npm|cran), and `auto_merge`. The workflow uses `sed` to update version/SHA in the formula file, then either pushes directly to main or creates a PR. Authentication uses the GitHub App "Data-Wise Homebrew Automation" (App ID: 2874502) with PAT fallback.
 
-Weekly validation (`validate-formulas.yml`) runs `brew style` + `ruby -c` on all 14 formulas every Monday at 06:00 UTC.
+Weekly validation (`validate-formulas.yml`) runs `brew style` + `ruby -c` on all 16 formulas every Monday at 06:00 UTC.
 
 ## Cask Conventions
 

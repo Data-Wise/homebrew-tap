@@ -1,18 +1,18 @@
 # Formula Overview
 
-The tap contains 15 formulas and 2 casks, organized into three categories:
+The tap contains 16 formulas and 2 casks, organized into three categories:
 
 ## Categories
 
 ### 1. Python Virtualenv Formulas
 
-**agy**, **aiterm**, **nexus-cli**
+**agy**, **aiterm**, **nexus-cli**, **obsidian-cli-ops**
 
 Use `Language::Python::Virtualenv`, depend on `python@3.12`. Installed via virtualenv patterns.
 
 ### 2. Claude Code Plugin Formulas
 
-**craft**, **himalaya-mcp**, **rforge**, **rforge-orchestrator**, **scholar**, **workflow**
+**craft**, **himalaya-mcp**, **rforge**, **rforge-orchestrator**, **scholar**, **workflow**, **folio**
 
 These are [generated](../generator/index.md) from a single manifest. They share a complex install pattern:
 
@@ -29,7 +29,7 @@ Direct file installation with minimal logic. Each has its own URL pattern and bu
 
 ## Audit Status
 
-All 14 formulas pass `brew audit --strict` and `brew style`.
+All 16 formulas pass `brew audit --strict` and `brew style`.
 
 !!! note "Audit reads from tap directory"
     `brew audit` reads formulas from `/opt/homebrew/Library/Taps/data-wise/homebrew-tap/`, not the current working directory. To audit local changes, copy formulas to the tap dir first.
