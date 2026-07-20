@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-19 · **Status:** Approved — ready to drive
 **Grill:** [GRILL-required-checks-self-skip-2026-07-19.md](GRILL-required-checks-self-skip-2026-07-19.md)
-**Brainstorm:** [BRAINSTORM-required-checks-path-filtering-2026-07-19.md](../../BRAINSTORM-required-checks-path-filtering-2026-07-19.md)
+**Brainstorm:** [BRAINSTORM-required-checks-path-filtering-2026-07-19.md](https://github.com/Data-Wise/homebrew-tap/blob/ba80d91/BRAINSTORM-required-checks-path-filtering-2026-07-19.md) (removed from the working tree 2026-07-20 as stale — fully superseded by this SPEC + GRILL)
 **Repo:** `homebrew-tap`
 **Related:** [#162](https://github.com/Data-Wise/homebrew-tap/pull/162), [#163](https://github.com/Data-Wise/homebrew-tap/pull/163), [#165](https://github.com/Data-Wise/homebrew-tap/pull/165), [#166](https://github.com/Data-Wise/homebrew-tap/pull/166), [SPEC-release-drift-gates-2026-07-16.md](SPEC-release-drift-gates-2026-07-16.md)
 
