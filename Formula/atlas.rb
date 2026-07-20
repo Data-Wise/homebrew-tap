@@ -8,6 +8,7 @@ class Atlas < Formula
   url "https://github.com/Data-Wise/atlas/archive/refs/tags/v0.15.0.tar.gz"
   sha256 "abd37d25fdadeca2957c9100fec4c448c8301a04b87d4696a5094261c035961b"
   license "MIT"
+  revision 1
 
   depends_on "python@3.12" => :build
   depends_on "node"
@@ -34,15 +35,12 @@ class Atlas < Formula
         atlas stats                   # Session analytics
         atlas dash                    # Interactive dashboard
 
-      New in v0.9.0:
-        React Ink TUI replaces blessed (73% code reduction)
-        Multi-panel dashboard: Tab cycles SINGLE/SPLIT/TRIPLE layouts
-        MCP Server with 10 tools for Claude integration
-        atlas plan                    # Guided daily planning
-
       Shell completions have been installed for bash, zsh, and fish.
 
-      Data is stored in: ~/.atlas/
+      Data is stored in $XDG_CONFIG_HOME/atlas (or ~/.config/atlas) on new
+      installs; existing ~/.atlas installs keep working unchanged until you
+      run `atlas migrate --xdg`. Run `atlas doctor` to check which location
+      is active.
 
       Documentation: https://data-wise.github.io/atlas/
     EOS
