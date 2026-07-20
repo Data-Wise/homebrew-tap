@@ -227,7 +227,7 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
 - Merged PR #91 (+2875/-404, 50 files), PR #92 (docs sync), PR #93 (.STATUS), PR #94 (workflow fix)
 - Cleaned up: worktree removed, 10+ stale remote branches deleted
 
-📊 Tap Inventory: 14 formulas + 2 casks (14/14 pass brew audit --strict)
+📊 Tap Inventory: 16 formulas + 2 casks (16/16 pass brew audit --strict)
 
 | Formula | Type | CI Caller | Audit Status |
 |---------|------|-----------|-------------|
@@ -239,11 +239,13 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
 | workflow | plugin (generated) | Yes | CLEAN |
 | folio | plugin (generated) | Yes | CLEAN (rev 1 — PR #143 registration + PR #147 revision-bump merged) |
 | aiterm | python | Yes | CLEAN |
+| agy | python | Yes | CLEAN |
 | atlas | node | Yes | CLEAN |
 | nexus-cli | python | Yes | CLEAN |
 | flow-cli | shell | Yes | CLEAN |
 | examark | npm | Yes | CLEAN |
 | mcp-bridge | node | Yes | CLEAN |
+| obsidian-cli-ops | python | Yes | CLEAN |
 | scribe-cli | swift | No | CLEAN (placeholder SHA) |
 
 🎯 Next Action:

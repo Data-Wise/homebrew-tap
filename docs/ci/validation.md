@@ -10,7 +10,7 @@ Runs every Monday at 06:00 UTC via `validate-formulas.yml`. Can also be triggere
 
 ### brew audit --strict
 
-Runs `brew audit --strict` on all 14 formulas using tap-qualified names (`data-wise/tap/<name>`). Reports pass/fail count and lists any failing formulas.
+Runs `brew audit --strict` on all 16 formulas using tap-qualified names (`data-wise/tap/<name>`). Reports pass/fail count and lists any failing formulas.
 
 ### ruby -c
 
