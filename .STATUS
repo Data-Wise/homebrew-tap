@@ -1,8 +1,8 @@
 status: Active
 last_session: 2026-07-19
-milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected + status-guard.yml self-skip fix (in progress)
+milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected + SPEC-required-checks-self-skip-2026-07-19.md fully shipped
 
-progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) now driving — status-guard.yml's self-skip fix is in this PR (#170), formula-drift.yml's follows separately per the grill's staged-rollout decision
+progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
 📋 Session 2026-07-19 (cont. — driving SPEC-required-checks-self-skip-2026-07-19.md, status-guard.yml half):
 - PR #170 (in progress): `status-guard.yml`'s `pull_request` trigger dropped its `.STATUS` path
@@ -21,9 +21,30 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   3. Path touched, planted defect (throwaway conflict-marker commit): real script ran, correctly
      failed — "`❌ conflict marker(s) found in .STATUS`", job conclusion `failure`. Reverted
      before merge (`git revert`, not force-push/history-rewrite).
-- `status-guard.yml` half of `SPEC-required-checks-self-skip-2026-07-19.md` complete. Second half
-  (`formula-drift.yml`, extending its existing "Determine revision-drift check inputs" step per
-  the grill's Decision 1) is a separate future PR — not started.
+- `status-guard.yml` half of `SPEC-required-checks-self-skip-2026-07-19.md` complete (PR #170,
+  merged).
+
+📋 Session 2026-07-19 (cont. — formula-drift.yml half of SPEC-required-checks-self-skip-2026-07-19.md):
+- `formula-drift.yml`'s `pull_request` trigger dropped its `generator/**`/`Formula/**` path
+  filter. The existing "Determine revision-drift check inputs" step (renamed "Determine
+  formula-drift check inputs") now also gates `check-drift.sh` and
+  `tests/test_no_symlink_install.sh`, not just the revision-bump check — same fail-closed
+  contract as `status-guard.yml`. `push` stays path-filtered, unchanged.
+- All 3 E2E cases verified live (PR #171), each requiring a real fix mid-flight to keep the test
+  scenario valid:
+  1. Path not touched (workflow-YAML-only commit) — all 3 real-check steps report `skipped`, job
+     green.
+  2. Path touched, real content — first attempt (desc-only change) correctly tripped the
+     *pre-existing* revision-bump check (content changed without version/revision bump — the
+     check working as designed, not a bug in this fix); corrected by bumping `revision` alongside
+     the `desc` change, then `Regen vs committed` passed cleanly.
+  3. Path touched, planted drift defect (hand-edited `Formula/workflow.rb` without updating
+     `manifest.json`) — `check-drift.sh` correctly failed: "`❌ Formula drift detected`".
+  All 3 test commits reverted via `git revert` before merge (not force-push/history-rewrite);
+  `Formula/` and `generator/manifest.json` confirmed byte-identical to `origin/main` afterward.
+- Both halves of `SPEC-required-checks-self-skip-2026-07-19.md` now shipped. Remaining scope from
+  the SPEC/GRILL, explicitly deferred (not bugs): CI-minutes usage glance in a few weeks (GRILL
+  Decision 4); `Validate all formulas` PR-trigger question stays out of scope (GRILL Decision 5).
 
 📋 Session 2026-07-19 (cont. — fixing the required-checks list):
 - PR #162 (main, merged with `--admin`) hit `mergeStateStatus: BLOCKED` on green CI: `Regen vs
