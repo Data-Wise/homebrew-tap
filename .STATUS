@@ -348,3 +348,18 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   made via a new throwaway worktree (`status-update-2026-07-20`), same pattern as 2026-07-19's
   `.STATUS` update — shared checkout still lands on `main` between sessions and this repo has no
   `dev` to fall back to.
+- RESOLVED (2026-07-20, PR #184): the force-push fail-closed edge case flagged above is fixed.
+  Both `status-guard.yml` and `formula-drift.yml`'s self-skip logic now check whether `base_sha`
+  resolves to a real commit object (`git cat-file -e "$base_sha^{commit}"`) before diffing. If
+  it's unreachable (force-push/rebase orphaned it — an identifiable cause, not genuine ambiguity),
+  they run the base-independent real check instead of failing the job; any other diff failure
+  still fails closed exactly as before. `formula-drift.yml`'s `check-revision-bump.sh` genuinely
+  needs a resolvable base to diff against, so it gets its own `revision_bump_runnable` gate and is
+  skipped (not force-passed) in the fallback — the one real, narrow gap this leaves (only affects
+  a force-pushed PR that also touches `Formula/**`/`generator/**`). E2E-verified live: force-pushed
+  a rewritten commit on the fix's own branch (so the fixed workflow version applied to the
+  push-triggered run) and confirmed the log line "Base ... is unreachable (likely a
+  force-push/rebase orphaned it)" fired and the job passed, reproducing then resolving the exact
+  #173 failure mode; also confirmed a planted `.STATUS` conflict marker still fails the real check
+  regardless of which path enabled it. Worktree `fix-force-push-fail-closed` removed, branch
+  deleted, post-merge.
