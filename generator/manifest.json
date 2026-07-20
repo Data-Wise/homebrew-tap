@@ -314,7 +314,7 @@
     },
     "workflow": {
       "type": "claude-plugin",
-      "desc": "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin (E2E test touch, will be reverted)",
+      "desc": "ADHD-friendly workflow automation with auto-delegation - Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/claude-plugins",
       "source": "github",
       "repo": "Data-Wise/claude-plugins",
