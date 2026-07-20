@@ -363,3 +363,18 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   #173 failure mode; also confirmed a planted `.STATUS` conflict marker still fails the real check
   regardless of which path enabled it. Worktree `fix-force-push-fail-closed` removed, branch
   deleted, post-merge.
+
+📋 Session 2026-07-20 (stale root doc cleanup, PR #186):
+- Removed three completed/superseded root docs: `ORCHESTRATE-homebrew-refactor.md` (marked
+  COMPLETE, merged via PR #91 on 2026-02-16, stale "14 formulas" count, two "Remaining Items"
+  checkboxes for things long since verified — App token usage, GitHub Pages deploy);
+  `.reconcile-report.md` (a completed, dated 2026-06-23 one-off manifest-reconciliation report,
+  hidden root dotfile, no ongoing purpose); `BRAINSTORM-required-checks-path-filtering-2026-07-19.md`
+  (fully superseded by `docs/specs/SPEC-required-checks-self-skip-2026-07-19.md` + its GRILL, both
+  already shipped — this was the only orphaned BRAINSTORM left at root instead of `docs/specs/`).
+- Fixed the two now-dead "Brainstorm:" cross-links in the SPEC and GRILL files (pointed at the
+  GitHub blob history commit `ba80d91` instead of the deleted local path). `mkdocs build --strict`
+  clean before and after.
+- Worktree cleanup: removed `cleanup-stale-docs`, branch deleted. This update made via a new
+  throwaway worktree (`status-update-2026-07-20c`), same pattern as prior `.STATUS` updates this
+  session.
