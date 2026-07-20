@@ -281,3 +281,39 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
   not yet revisited). Live-verified both directions: #162/#163 (`.STATUS`-
   only) needed `--admin` since `Regen vs committed` never triggered; #165
   (`generator/**`) went `CLEAN` with no override.
+
+📋 Session 2026-07-19 (cont. — self-skipping required checks + auto-merge fix, prioritize/merge pass):
+- Designed, spec'd, grilled (SPEC/GRILL-required-checks-self-skip-2026-07-19.md, PR #169) and
+  shipped a self-skip pattern for both required checks so a PR touching neither path set (or only
+  one of the two) merges `CLEAN` without `--admin`: `status-guard.yml` (PR #170) and
+  `formula-drift.yml` (PR #171), each with live 3-case E2E (skip / real-pass / real-fail-on-
+  planted-defect). Docs updated to match: `docs/ci/drift-guard.md`, `docs/ci/status-guard.md`,
+  `docs/ci/index.md`, `CLAUDE.md` (PR #172).
+- Found `update-formula.yml`'s `auto_merge: true` path still did a direct `git push origin
+  HEAD:main` — broken by this session's earlier branch-protection change (main now rejects direct
+  pushes regardless of required-approval count), previously unexercised because no project had
+  released since. Replaced with: PR always opened (`peter-evans/create-pull-request@v7`, no
+  longer conditional on `auto_merge`), plus `gh pr merge --auto --squash` when `auto_merge: true`
+  — GitHub's native auto-merge, gated by the same two required checks. Mechanism E2E-verified via
+  a safe throwaway PR (#174, `.github/E2E-AUTOMERGE-TEST.md`) rather than risking a real formula's
+  version/SHA; auto-merged cleanly once a GitHub Actions platform outage (~02:43–03:23 UTC,
+  confirmed via githubstatus.com, unrelated to this repo) cleared. Fix shipped as PR #175;
+  throwaway test file removed via PR #177. `docs/ci/update-formula.md` updated to match.
+  `/savant:adhd-report` restructuring of the SPEC+GRILL shipped as PR #176 (docs only, no new
+  content).
+- Closed PR #168 (`feature/update-formula-pr-auto-merge`) as a stale duplicate of #171+#175 —
+  opened before the self-skip/auto-merge work landed, same fix, content superseded.
+- Merge order this pass: #177 → #175 → #176, all green, zero `--admin` overrides needed (the
+  self-skip fix from #170/#171 paying for itself on real PRs). PR #173 (formula-count-drift docs,
+  separate background-task session) explicitly left untouched — `CONFLICTING`, not this session's
+  work.
+- Worktree cleanup: removed `e2e-automerge-test` (#174, merged), `feature-pr-auto-merge` (#168,
+  closed), `fix-update-formula-direct-push` (#175, merged) — local branches deleted with each.
+  `docs-formula-count-fix` (#173) and `feature-fix-revision-check`/`feature-folio-manifest-entry`
+  left in place (open/unrelated). This update itself made via a new throwaway worktree
+  (`status-update-2026-07-19`, branch `chore/status-update-2026-07-19`) since the shared checkout
+  sat on `main` (writes blocked) and this repo has no `dev` branch to fall back to.
+- craft's `homebrew-release.yml` was found to have the same direct-push-to-main pattern this
+  session just fixed here — flagged in PR #175's body, NOT fixed (different repo, not authorized
+  this session; contradicts an earlier, apparently premature `.STATUS` note claiming it was
+  already fixed — needs re-verification if picked up).
