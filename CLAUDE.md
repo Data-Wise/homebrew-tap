@@ -12,7 +12,7 @@ A Homebrew tap (`brew tap data-wise/tap`) distributing CLI tools, Claude Code pl
 - `Casks/*.rb` — Homebrew casks (scribe, scribe-dev)
 - `generator/` — Python formula generator for plugin formulas
   - `generate.py` — Reads manifest, produces `Formula/*.rb`
-  - `manifest.json` — Single source of truth for all 14 formulas
+  - `manifest.json` — Single source of truth for all 15 formulas
   - `blocks/` — Composable bash/ruby fragments (symlink, schema-cleanup, marketplace, etc.)
 - `docs/` — MkDocs Material documentation site (adhd-focus preset)
 - `mkdocs.yml` — MkDocs configuration
