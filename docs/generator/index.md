@@ -48,7 +48,6 @@ python3 generator/generate.py --list
 |---------|-----------------|
 | craft | Branch guard hook, build steps |
 | himalaya-mcp | npm build, copy_map layout, CLI wrapper |
-| scholar | Standard plugin pattern |
 | rforge | Head-only (no releases) |
 | rforge-orchestrator | Monorepo URL pattern |
 | workflow | Monorepo tarball URL |

@@ -35,7 +35,6 @@ brew install data-wise/tap/<formula>
     ```bash
     brew install data-wise/tap/craft        # 109 commands, 80+ skills
     brew install data-wise/tap/himalaya-mcp # Email MCP server
-    brew install data-wise/tap/scholar      # Academic research
     ```
 
 === "Desktop Apps"

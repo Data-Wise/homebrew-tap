@@ -32,7 +32,6 @@ brew tap data-wise/tap
 | **himalaya-mcp** | Email MCP server for Claude Code via himalaya |
 | **rforge** | R package ecosystem orchestrator |
 | **rforge-orchestrator** | Auto-delegation orchestrator for RForge MCP tools |
-| **scholar** | Academic research toolkit (28 commands) |
 | **workflow** | ADHD-friendly workflow automation plugin |
 
 ```bash
@@ -141,7 +140,7 @@ The generator reads `generator/manifest.json` and composes bash blocks from `gen
 ## CI/CD
 
 - **update-formula.yml** — Reusable workflow called by project repos on release. Supports `github`, `pypi`, `npm`, and `cran` source types. Uses GitHub App token (Data-Wise Homebrew Automation) with PAT fallback.
-- **validate-formulas.yml** — Weekly `brew style` + `ruby -c` validation of all 16 formulas (Monday 06:00 UTC).
+- **validate-formulas.yml** — Weekly `brew style` + `ruby -c` validation of all 15 formulas (Monday 06:00 UTC).
 
 ## More Info
 

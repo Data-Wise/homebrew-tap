@@ -8,7 +8,7 @@ A Homebrew tap (`brew tap data-wise/tap`) distributing CLI tools, Claude Code pl
 
 ## Repository Layout
 
-- `Formula/*.rb` — 16 Homebrew formulas (CLI tools, plugins)
+- `Formula/*.rb` — 15 Homebrew formulas (CLI tools, plugins)
 - `Casks/*.rb` — Homebrew casks (scribe, scribe-dev)
 - `generator/` — Python formula generator for plugin formulas
   - `generate.py` — Reads manifest, produces `Formula/*.rb`
@@ -26,7 +26,7 @@ A Homebrew tap (`brew tap data-wise/tap`) distributing CLI tools, Claude Code pl
 There are three distinct formula patterns in use:
 
 1. **Python virtualenv formulas** (aiterm, nexus-cli): Use `include Language::Python::Virtualenv`, depend on `python@3.12`, install via `venv.pip_install` or `virtualenv_install_with_resources`
-2. **Claude Code plugin formulas** (craft, himalaya-mcp, rforge, scholar, workflow, rforge-orchestrator): Install to `libexec`, generate `*-install` and `*-uninstall` bash scripts that symlink into `~/.claude/plugins/`, handle Claude Code running detection and `settings.json` modification
+2. **Claude Code plugin formulas** (craft, himalaya-mcp, rforge, workflow, rforge-orchestrator): Install to `libexec`, generate `*-install` and `*-uninstall` bash scripts that symlink into `~/.claude/plugins/`, handle Claude Code running detection and `settings.json` modification
 3. **Simple install formulas** (flow-cli, atlas, mcp-bridge, examark): Direct file installation with minimal logic
 
 ## Claude Code Plugin Formula Pattern
@@ -68,7 +68,7 @@ mkdocs build --strict     # Build and validate
 
 ## Formula Generator
 
-7 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA. Key manifest fields include `libexec_copy_map` for directory layout, `extra_scripts` for CLI wrappers, and a `features` object gating optional install-script blocks (`schema_cleanup`, `branch_guard`, `marketplace`, `claude_detection`).
+6 plugin formulas are generated from `generator/manifest.json`. The generator owns structure; CI owns version/SHA. Key manifest fields include `libexec_copy_map` for directory layout, `extra_scripts` for CLI wrappers, and a `features` object gating optional install-script blocks (`schema_cleanup`, `branch_guard`, `marketplace`, `claude_detection`).
 
 **`features.marketplace` and `features.claude_detection` are required for every `claude-plugin` entry**, not optional extras — omitting either silently drops the corresponding install-script block with no error at generate- or install-time (folio#18: a new entry shipped with no `features` key at all, so `brew install` reported success but never registered the plugin with Claude Code). `tests/test_manifest_required_features.sh` gates this in CI.
 
@@ -77,14 +77,14 @@ mkdocs build --strict     # Build and validate
 **`main` requires two status checks to pass before merge**: `Regen vs committed` (`formula-drift.yml`) and `Check .STATUS for conflict markers` (`status-guard.yml`) — see [SPEC-release-drift-gates-2026-07-16.md](docs/specs/SPEC-release-drift-gates-2026-07-16.md). Both `pull_request` triggers are unconditional (no path filter) and self-skip fast when their relevant path wasn't touched, rather than being path-filtered at the trigger level — GitHub's required-status-checks have no path-awareness of their own, so a path-filtered trigger left a check permanently "expected — waiting" and the PR permanently blocked on any PR that didn't happen to touch that path (see [SPEC-required-checks-self-skip-2026-07-19.md](docs/specs/SPEC-required-checks-self-skip-2026-07-19.md)). If a PR is `BLOCKED` on green checks anyway, the required-check name likely doesn't match any check-run that actually reported — verify with `gh pr view <n> --json mergeStateStatus` and the commit's check-runs, not just `gh pr checks`.
 
 ```bash
-python3 generator/generate.py              # Generate all 7 plugin formulas
+python3 generator/generate.py              # Generate all 6 plugin formulas
 python3 generator/generate.py craft        # Generate one formula
 python3 generator/generate.py --diff       # Diff vs existing (no overwrite)
 python3 generator/generate.py --validate   # Validate output with ruby -c
 python3 generator/generate.py --list       # List all formulas in manifest
 ```
 
-Generated formulas: craft, himalaya-mcp, scholar, rforge, rforge-orchestrator, workflow, folio. The other 8 are hand-crafted (different enough to not benefit from generation).
+Generated formulas: craft, himalaya-mcp, rforge, rforge-orchestrator, workflow, folio. The other 9 are hand-crafted (different enough to not benefit from generation).
 
 When editing a plugin formula, edit `manifest.json` + `blocks/` then regenerate — do NOT edit the generated `.rb` directly.
 
@@ -92,7 +92,7 @@ When editing a plugin formula, edit `manifest.json` + `blocks/` then regenerate 
 
 Other Data-Wise repos call `.github/workflows/update-formula.yml` on release. It accepts `formula_name`, `version`, `sha256`, `source_type` (github|pypi|npm|cran), and `auto_merge`. The workflow uses `sed` to update version/SHA in the formula file, then either pushes directly to main or creates a PR. Authentication uses the GitHub App "Data-Wise Homebrew Automation" (App ID: 2874502) with PAT fallback.
 
-Weekly validation (`validate-formulas.yml`) runs `brew style` + `ruby -c` on all 16 formulas every Monday at 06:00 UTC.
+Weekly validation (`validate-formulas.yml`) runs `brew style` + `ruby -c` on all 15 formulas every Monday at 06:00 UTC.
 
 ## Cask Conventions
 
