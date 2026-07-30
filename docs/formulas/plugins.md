@@ -26,7 +26,7 @@ flowchart TD
 
 ## Install Pattern
 
-All 7 plugin formulas share these features:
+All 6 plugin formulas share these features:
 
 ### Real-Copy Install (no symlinks)
 
@@ -77,14 +77,6 @@ brew install data-wise/tap/himalaya-mcp
 ```
 
 Build step: `npm install && npm run build:bundle`
-
-### scholar
-
-Academic research toolkit with 28 commands for literature, manuscripts, and teaching.
-
-```bash
-brew install data-wise/tap/scholar
-```
 
 ### rforge
 

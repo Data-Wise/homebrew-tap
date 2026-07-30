@@ -4,6 +4,18 @@ milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred bra
 
 progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
+📋 Session 2026-07-29 (remove scholar formula — repo went private):
+- Data-Wise/scholar flipped to a private GitHub repo, so `Formula/scholar.rb`'s public tarball
+  URL 404s for every user (`brew upgrade` reported `curl: (56) ... 404` on the v3.2.0 tag) —
+  structural, not a stale-SHA bug, since a private repo's release tarball is unreachable without
+  auth that `brew`'s public tap install never carries.
+- Removed `Formula/scholar.rb`, its `generator/manifest.json` entry, and every doc reference
+  (CLAUDE.md, README.md, docs/index.md, docs/REFCARD.md, docs/generator/{index,help}.md,
+  docs/formulas/{index,plugins}.md) — matches how `savant` (also private) is already handled:
+  no Homebrew distribution, local-plugin install only.
+- Formula count 16→15 (6 generated, 9 hand-crafted) updated everywhere it was asserted.
+  `docs/specs/SPEC-formula-generator-fix-2026-02-25.md` left untouched (historical record).
+
 📋 Session 2026-07-19 (cont. — driving SPEC-required-checks-self-skip-2026-07-19.md, status-guard.yml half):
 - PR #170 (in progress): `status-guard.yml`'s `pull_request` trigger dropped its `.STATUS` path
   filter (unconditional now); a new "Determine whether .STATUS changed" step diffs against the
@@ -227,12 +239,11 @@ progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to
 - Merged PR #91 (+2875/-404, 50 files), PR #92 (docs sync), PR #93 (.STATUS), PR #94 (workflow fix)
 - Cleaned up: worktree removed, 10+ stale remote branches deleted
 
-📊 Tap Inventory: 16 formulas + 2 casks (16/16 pass brew audit --strict)
+📊 Tap Inventory: 15 formulas + 2 casks (15/15 pass brew audit --strict)
 
 | Formula | Type | CI Caller | Audit Status |
 |---------|------|-----------|-------------|
 | craft | plugin (generated) | Yes | CLEAN |
-| scholar | plugin (generated) | Yes | CLEAN |
 | himalaya-mcp | plugin (generated) | Yes | CLEAN |
 | rforge | plugin (generated) | No | CLEAN (stable 1.2.0, 2026-05-10) |
 | rforge-orchestrator | plugin (legacy) | Yes | DEPRECATED 2026-05-10 → migrate to `rforge` |

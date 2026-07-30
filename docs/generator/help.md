@@ -25,7 +25,7 @@ python3 generator/generate.py --validate   # Check output with ruby -c
 
 Reads `generator/manifest.json` and composes bash blocks from `generator/blocks/` to produce Ruby formula files in `Formula/`. The generator owns formula **structure** (install method, test block, caveats, install script); CI workflows own **version and SHA** (updated via `sed`).
 
-Only formulas with `"generated": true` in the manifest are produced. Currently: craft, himalaya-mcp, scholar, rforge, rforge-orchestrator, workflow.
+Only formulas with `"generated": true` in the manifest are produced. Currently: craft, himalaya-mcp, rforge, rforge-orchestrator, workflow.
 
 ---
 
@@ -50,7 +50,7 @@ Flags can be combined with a formula name:
 
 ```bash
 python3 generator/generate.py craft --diff       # Diff just craft
-python3 generator/generate.py scholar --validate  # Validate just scholar
+python3 generator/generate.py rforge --validate  # Validate just rforge
 ```
 
 ---
