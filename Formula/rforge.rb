@@ -3,10 +3,10 @@
 
 # Rforge formula for the data-wise/tap Homebrew tap.
 class Rforge < Formula
-  desc "R package ecosystem orchestrator — 42 commands — Claude Code plugin"
+  desc "R package ecosystem orchestrator — 44 commands — Claude Code plugin"
   homepage "https://github.com/Data-Wise/rforge"
-  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.19.0.tar.gz"
-  sha256 "d3f4cc1b43a3f6f3565b0ff28b6fc232ce3813812d8b3af3b1e693baef2ca980"
+  url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.20.0.tar.gz"
+  sha256 "157fa5ba9f2212154d7b038aa2b27e6cffdc72df7b16e7a5b03b94a924c46c07"
   license "MIT"
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
@@ -117,7 +117,7 @@ class Rforge < Formula
           fi
 
           echo ""
-          echo "42 commands available:"
+          echo "44 commands available:"
           echo "  /rforge:analyze, /rforge:status, /rforge:health, /rforge:r:check"
           echo "  /rforge:release, /rforge:next, /rforge:cascade, /rforge:r:test"
       else
@@ -231,7 +231,7 @@ class Rforge < Formula
       If not auto-enabled, run:
         claude plugin install rforge@local-plugins
 
-      42 commands for R package ecosystem management.
+      44 commands for R package ecosystem management.
 
       If the automatic copy failed (macOS permissions), run manually:
         mkdir -p ~/.claude/plugins/rforge && ( cd $(brew --prefix)/opt/rforge/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge && tar xf - )
