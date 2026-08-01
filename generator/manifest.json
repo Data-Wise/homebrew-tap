@@ -172,14 +172,14 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator — 42 commands — Claude Code plugin",
+      "desc": "R package ecosystem orchestrator — 44 commands — Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
-      "version": "2.19.0",
-      "sha256": "d3f4cc1b43a3f6f3565b0ff28b6fc232ce3813812d8b3af3b1e693baef2ca980",
+      "version": "2.20.0",
+      "sha256": "157fa5ba9f2212154d7b038aa2b27e6cffdc72df7b16e7a5b03b94a924c46c07",
       "head": "https://github.com/Data-Wise/rforge.git",
-      "command_count": 42,
+      "command_count": 44,
       "dependencies": {
         "runtime": [
           "jq"
