@@ -350,8 +350,8 @@
       "homepage": "https://github.com/Data-Wise/atlas",
       "source": "github",
       "repo": "Data-Wise/atlas",
-      "version": "0.18.0",
-      "sha256": "7aacc2bd4e59c642071ae20e4e85b01838db77bb61636752f65f229ab562cc82",
+      "version": "0.18.1",
+      "sha256": "6c88bf5344e1697b0c196a3a3fcfca8625757a37b3f118e1d14a0b3d65d5c05e",
       "generated": false
     },
     "examark": {
