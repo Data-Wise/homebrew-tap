@@ -2,7 +2,8 @@ status: Active
 last_session: 2026-07-19
 milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected + SPEC-required-checks-self-skip-2026-07-19.md fully shipped
 
-progress: SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
+progress: 100
+# progress-note (moved out of the machine field): SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
 📋 Session 2026-07-29 (remove scholar formula — repo went private):
 - Data-Wise/scholar flipped to a private GitHub repo, so `Formula/scholar.rb`'s public tarball
