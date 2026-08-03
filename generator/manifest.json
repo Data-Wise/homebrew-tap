@@ -61,8 +61,8 @@
       "homepage": "https://github.com/Data-Wise/himalaya-mcp",
       "source": "github",
       "repo": "Data-Wise/himalaya-mcp",
-      "version": "2.0.0",
-      "sha256": "ed467bdb06727185b3e605691c5f623f0fa989a2616a9b5f97db9601369a0a67",
+      "version": "2.0.1",
+      "sha256": "47e91dd996431474190d98a28c21dc50a26ad4aba234467112952c74391d621f",
       "bin_mkpath": true,
       "dependencies": {
         "runtime": [
@@ -172,7 +172,7 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator \u2014 44 commands \u2014 Claude Code plugin",
+      "desc": "R package ecosystem orchestrator — 44 commands — Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
@@ -264,7 +264,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge"
+      "caveats_extra": "⚠️  DEPRECATED — This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n──────────────────────────────────────────────────────\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge"
     },
     "workflow": {
       "type": "claude-plugin",
