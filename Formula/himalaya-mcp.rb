@@ -8,6 +8,7 @@ class HimalayaMcp < Formula
   url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v2.0.4.tar.gz"
   sha256 "889e4ff028d2b95172490388228369fa917cf5c1d98d3d1ece043b9fae0ed481"
   license "MIT"
+  revision 1
 
   depends_on "himalaya"
   depends_on "jq"
@@ -22,13 +23,14 @@ class HimalayaMcp < Formula
 
     mkdir_p libexec/".claude-plugin"
     cp "himalaya-mcp-plugin/.claude-plugin/plugin.json", libexec/".claude-plugin/plugin.json"
-    cp_r "himalaya-mcp-plugin/.claude-plugin/hooks", libexec/".claude-plugin/hooks"
     cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
     libexec.install ".mcp.json" if (buildpath/".mcp.json").exist?
     libexec.install "dist" if (buildpath/"dist").exist?
     libexec.install "man" if (buildpath/"man").exist?
     cp_r "himalaya-mcp-plugin/skills", libexec/"skills"
     cp_r "himalaya-mcp-plugin/agents", libexec/"agents"
+    cp_r "himalaya-mcp-plugin/.claude-plugin/hooks", libexec/".claude-plugin/hooks" if (buildpath/"himalaya-mcp-plugin/.claude-plugin/hooks").exist?
+    cp_r "himalaya-mcp-plugin/hooks", libexec/"hooks" if (buildpath/"himalaya-mcp-plugin/hooks").exist?
 
     # Install groff man pages to share/man/manN/
     man1.install Dir.glob("#{libexec}/man/man1/*") if (libexec/"man/man1").exist?
@@ -313,8 +315,12 @@ class HimalayaMcp < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
-    assert_path_exists libexec/".claude-plugin/hooks/session-start.sh"
-    assert_path_exists libexec/".claude-plugin/hooks/pre-send.sh"
+    hook_path = ".claude-plugin/hooks/session-start.sh"
+    hook_path = "hooks/session-start.sh" unless (libexec/".claude-plugin/hooks/session-start.sh").exist?
+    assert_path_exists libexec/hook_path
+    hook_path = ".claude-plugin/hooks/pre-send.sh"
+    hook_path = "hooks/pre-send.sh" unless (libexec/".claude-plugin/hooks/pre-send.sh").exist?
+    assert_path_exists libexec/hook_path
     assert_path_exists bin/"himalaya-mcp"
     assert_path_exists libexec/"dist/index.js"
     assert_predicate libexec/"skills", :directory?

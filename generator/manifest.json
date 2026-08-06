@@ -63,6 +63,7 @@
       "repo": "Data-Wise/himalaya-mcp",
       "version": "2.0.4",
       "sha256": "889e4ff028d2b95172490388228369fa917cf5c1d98d3d1ece043b9fae0ed481",
+      "revision": 1,
       "bin_mkpath": true,
       "dependencies": {
         "runtime": [
@@ -88,10 +89,9 @@
         "himalaya-mcp-plugin/.claude-plugin/plugin.json": ".claude-plugin/plugin.json",
         ".claude-plugin/marketplace.json": ".claude-plugin/marketplace.json"
       },
-      "libexec_copy_map_after": {
-        "himalaya-mcp-plugin/.claude-plugin/plugin.json": {
-          "himalaya-mcp-plugin/.claude-plugin/hooks": ".claude-plugin/hooks"
-        }
+      "libexec_copy_map_optional": {
+        "himalaya-mcp-plugin/.claude-plugin/hooks": ".claude-plugin/hooks",
+        "himalaya-mcp-plugin/hooks": "hooks"
       },
       "libexec_paths": [
         ".mcp.json",
@@ -133,12 +133,18 @@
           "type": "file"
         },
         {
-          "path": ".claude-plugin/hooks/session-start.sh",
-          "type": "file"
+          "paths": [
+            ".claude-plugin/hooks/session-start.sh",
+            "hooks/session-start.sh"
+          ],
+          "type": "any"
         },
         {
-          "path": ".claude-plugin/hooks/pre-send.sh",
-          "type": "file"
+          "paths": [
+            ".claude-plugin/hooks/pre-send.sh",
+            "hooks/pre-send.sh"
+          ],
+          "type": "any"
         },
         {
           "type": "bin",
