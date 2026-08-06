@@ -474,13 +474,21 @@ def generate_formula(formula_name, config, defaults):
     lines.append("  test do")
     for tp in config.get("test_paths", []):
         if isinstance(tp, dict):
-            path = tp["path"]
             tp_type = tp["type"]
             if tp_type == "directory":
+                path = tp["path"]
                 lines.append(f'    assert_predicate libexec/"{path}", :directory?')
             elif tp_type == "bin":
+                path = tp["path"]
                 lines.append(f'    assert_path_exists bin/"{path}"')
+            elif tp_type == "any":
+                paths = tp["paths"]
+                lines.append(f'    hook_path = "{paths[0]}"')
+                for alternative in paths[1:]:
+                    lines.append(f'    hook_path = "{alternative}" unless (libexec/"{paths[0]}").exist?')
+                lines.append('    assert_path_exists libexec/hook_path')
             else:
+                path = tp["path"]
                 lines.append(f'    assert_path_exists libexec/"{path}"')
         else:
             lines.append(f'    assert_path_exists libexec/"{tp}"')
