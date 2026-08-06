@@ -22,7 +22,13 @@ class HimalayaMcp < Formula
 
     mkdir_p libexec/".claude-plugin"
     cp "himalaya-mcp-plugin/.claude-plugin/plugin.json", libexec/".claude-plugin/plugin.json"
-    cp_r "himalaya-mcp-plugin/.claude-plugin/hooks", libexec/".claude-plugin/hooks"
+    if (buildpath/"himalaya-mcp-plugin/hooks").directory?
+      cp_r "himalaya-mcp-plugin/hooks", libexec/"hooks"
+    else
+      # Keep older release tarballs installable while the plugin moves hooks
+      # to the documented plugin-root location.
+      cp_r "himalaya-mcp-plugin/.claude-plugin/hooks", libexec/".claude-plugin/hooks"
+    end
     cp ".claude-plugin/marketplace.json", libexec/".claude-plugin/marketplace.json"
     libexec.install ".mcp.json" if (buildpath/".mcp.json").exist?
     libexec.install "dist" if (buildpath/"dist").exist?
@@ -313,8 +319,10 @@ class HimalayaMcp < Formula
 
   test do
     assert_path_exists libexec/".claude-plugin/plugin.json"
-    assert_path_exists libexec/".claude-plugin/hooks/session-start.sh"
-    assert_path_exists libexec/".claude-plugin/hooks/pre-send.sh"
+    hooks_dir = libexec/"hooks"
+    hooks_dir = libexec/".claude-plugin/hooks" unless hooks_dir.directory?
+    assert_path_exists hooks_dir/"session-start.sh"
+    assert_path_exists hooks_dir/"pre-send.sh"
     assert_path_exists bin/"himalaya-mcp"
     assert_path_exists libexec/"dist/index.js"
     assert_predicate libexec/"skills", :directory?
