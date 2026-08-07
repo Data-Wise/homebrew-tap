@@ -8,7 +8,6 @@ class HimalayaMcp < Formula
   url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v2.1.0.tar.gz"
   sha256 "d93b1bbc2defe099f64b5086bc2eeb215a3e70f4897ee01d7f1d4e896de9975b"
   license "MIT"
-  revision 0
 
   depends_on "himalaya"
   depends_on "jq"
