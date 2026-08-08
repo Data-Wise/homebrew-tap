@@ -11,6 +11,7 @@
       "source": "github",
       "repo": "Data-Wise/craft",
       "version": "4.5.0",
+      "revision": 1,
       "sha256": "21966e8cb9e518fe013d98de2edb279ec52639fe6cce4212faab12c0f5f3d948",
       "command_count": 48,
       "dependencies": {
