@@ -8,6 +8,7 @@ class Craft < Formula
   url "https://github.com/Data-Wise/craft/archive/refs/tags/v4.5.0.tar.gz"
   sha256 "21966e8cb9e518fe013d98de2edb279ec52639fe6cce4212faab12c0f5f3d948"
   license "MIT"
+  revision 1
 
   depends_on "jq"
 
@@ -295,7 +296,7 @@ class Craft < Formula
         - ADHD-friendly task management
 
       Branch guard protects main/dev from accidental edits.
-      Bypass: /craft:git:unprotect (session-scoped)
+      Bypass: ask "unprotect dev" or "bypass branch guard" (session-scoped)
 
       Try: /craft:do "your task"
       Or:  /brainstorm
