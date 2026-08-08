@@ -53,7 +53,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "{command_count} commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: /craft:git:unprotect (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/craft && ( cd $(brew --prefix)/opt/craft/libexec && tar cf - . ) | ( cd ~/.claude/plugins/craft && tar xf - )"
+      "caveats_extra": "{command_count} commands for full-stack development:\n  - Architecture & planning\n  - Code generation & refactoring\n  - Testing & CI/CD\n  - Documentation & site generation\n  - Git workflows & branch protection\n  - ADHD-friendly task management\n\nBranch guard protects main/dev from accidental edits.\nBypass: ask \"unprotect dev\" or \"bypass branch guard\" (session-scoped)\n\nTry: /craft:do \"your task\"\nOr:  /brainstorm\n\nAfter upgrades, sync Claude Code registry:\n  claude plugin update craft@local-plugins\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/craft && ( cd $(brew --prefix)/opt/craft/libexec && tar cf - . ) | ( cd ~/.claude/plugins/craft && tar xf - )"
     },
     "himalaya-mcp": {
       "type": "claude-plugin",

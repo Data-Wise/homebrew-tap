@@ -295,7 +295,7 @@ class Craft < Formula
         - ADHD-friendly task management
 
       Branch guard protects main/dev from accidental edits.
-      Bypass: /craft:git:unprotect (session-scoped)
+      Bypass: ask "unprotect dev" or "bypass branch guard" (session-scoped)
 
       Try: /craft:do "your task"
       Or:  /brainstorm
