@@ -62,8 +62,8 @@
       "homepage": "https://github.com/Data-Wise/himalaya-mcp",
       "source": "github",
       "repo": "Data-Wise/himalaya-mcp",
-      "version": "2.1.1",
-      "sha256": "5e171a56a9994913dfa9476f8f7930832eea33914971e3ae201b6a35c38f124a",
+      "version": "2.1.2",
+      "sha256": "81e273ad3f39764d43418d3afbb1fde9e9184af73e596468207ff1ca235854b7",
       "revision": 0,
       "bin_mkpath": true,
       "dependencies": {
