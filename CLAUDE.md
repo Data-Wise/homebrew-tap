@@ -98,7 +98,7 @@ Weekly validation (`validate-formulas.yml`) runs `brew style` + `ruby -c` on all
 
 Casks use architecture-specific blocks (`on_arm`/`on_intel`) with separate SHA256 hashes and URLs. Include `livecheck`, `conflicts_with` for dev/stable variants, `uninstall quit:`, and `zap trash:` for cleanup paths.
 
-- **`depends_on macos:` must use the bare-symbol form** — `depends_on macos: :catalina`, NOT the string-comparison form `depends_on macos: ">= :catalina"`. Homebrew deprecated the string form; a bare symbol already means "this version or newer" (minimum requirement). `brew style` flags the string form.
+- **Do not set a `depends_on macos:` floor at or below Catalina** — Homebrew has fully disabled `depends_on macos: :catalina` (and `:mojave`/`:high_sierra`/`:sierra`/`:el_capitan`) with no replacement syntax, in *either* the bare-symbol or string-comparison form (superseding the older guidance that preferred bare-symbol — see PR #112, now itself obsolete). Every macOS version Homebrew currently supports is already newer than these, so the constraint is meaningless; the fix is to drop the `depends_on macos:` line entirely, not migrate its syntax. Only add one if a cask genuinely needs a newer floor (e.g. `depends_on macos: :ventura`).
 - Cask templates for desktop apps are emitted by craft's `dist:homebrew` generator (`craft/commands/dist/homebrew.md`). When a cask convention changes, fix that template too — otherwise regenerated casks reintroduce the old form.
 
 ## Version Update Checklist

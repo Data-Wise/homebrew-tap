@@ -34,8 +34,6 @@ cask "scribe" do
 
   # Conflicts with dev version
   conflicts_with cask: "data-wise/tap/scribe-dev"
-  # Require macOS 10.15+ (Catalina)
-  depends_on macos: :catalina
 
   app "Scribe.app"
 
