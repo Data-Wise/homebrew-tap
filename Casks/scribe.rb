@@ -37,24 +37,6 @@ cask "scribe" do
 
   app "Scribe.app"
 
-  postflight do
-    ohai "Scribe v#{version} installed successfully!"
-    ohai ""
-    ohai "What's New in v#{version}:"
-    ohai "  - Responsive layout engine with auto-collapse sidebars"
-    ohai "  - Global UI zoom (Cmd+/Cmd-, 50%-200%)"
-    ohai "  - macOS 4-pane tiling support (350×350 minimum)"
-    ohai "  - Right sidebar resize handle"
-    ohai "  - 2,326 tests passing"
-    ohai ""
-    ohai "Quick Start:"
-    ohai "  - Global hotkey: Cmd+Shift+N (opens Scribe from anywhere)"
-    ohai "  - Command palette: Cmd+K"
-    ohai "  - Focus mode: Cmd+Shift+F"
-    ohai ""
-    ohai "Report issues: https://github.com/Data-Wise/scribe/issues"
-  end
-
   uninstall quit: "com.scribe.app"
 
   zap trash: [
