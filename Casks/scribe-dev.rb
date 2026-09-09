@@ -23,23 +23,6 @@ cask "scribe-dev" do
 
   app "Scribe.app"
 
-  postflight do
-    ohai "Scribe (Dev) v#{version} installed successfully!"
-    ohai ""
-    ohai "What's New in v1.9.0:"
-    ohai "  • Settings Enhancement - ⌘, fuzzy search, theme gallery"
-    ohai "  • Quick Actions Customization - drag-to-reorder, edit prompts, shortcuts"
-    ohai "  • Project Templates - Research+, Teaching+, Dev+, Writing+, Minimal"
-    ohai "  • 1033 tests passing - comprehensive test coverage"
-    ohai ""
-    ohai "Quick Start:"
-    ohai "  • Global hotkey: ⌘⇧N (opens Scribe from anywhere)"
-    ohai "  • Command palette: ⌘K"
-    ohai "  • Focus mode: ⌘⇧F"
-    ohai ""
-    ohai "Report issues: https://github.com/Data-Wise/scribe/issues"
-  end
-
   uninstall quit: "com.scribe.app"
 
   zap trash: [
