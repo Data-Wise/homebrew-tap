@@ -1,14 +1,14 @@
 cask "scribe" do
-  version "1.22.0"
+  version "1.23.0"
 
   # Architecture-specific SHA256 hashes
   on_arm do
-    sha256 "3d971ba3e7059fec448508310f6c43f7bb8e5c57097cd8ee862bd75f73075ae9"
+    sha256 "109e2786aefba140e1f4720e89aee0aa44fa4465da9e013ddf7d368b2dab2ecb"
 
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_aarch64.dmg"
   end
   on_intel do
-    sha256 "a7563fa74a0a35fee435e5f57dbd3a11fee9609067304d015d971549a282744a"
+    sha256 "bcbb6ae184e5032fe64b19ace7195e77d8f4b57fb61e9300531c74f75b34b87a"
 
     url "https://github.com/Data-Wise/scribe/releases/download/v#{version}/Scribe_#{version}_x64.dmg"
   end
@@ -51,12 +51,11 @@ cask "scribe" do
     Scribe v#{version} - ADHD-Friendly Distraction-Free Writer
 
     New in v#{version}:
-    - Responsive layout engine with auto-collapse sidebars
-    - Global UI zoom (Cmd+/Cmd-, 50%-200%) with persistent preferences
-    - macOS 4-pane tiling support (350×350 minimum window size)
-    - Right sidebar resize handle (200-600px)
-    - Touch resize + reduced-motion accessibility support
-    - 2,326 tests passing
+    - Explorer tab in the sidebar - status-grouped project tree alongside
+      Compact/Card, with expand/collapse per project
+    - New 3-pill tab selector (Compact/Card/Explorer) replaces the old
+      single toggle button
+    - 2,342 tests passing
 
     Features:
     - Three Editor Modes - Source (Cmd+1), Live Preview (Cmd+2), Reading (Cmd+3)
