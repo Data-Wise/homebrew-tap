@@ -16,6 +16,7 @@ class ObsidianCliOps < Formula
   url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v4.4.1.tar.gz"
   sha256 "bf288fe14aaff259d8db1c68fafa903e9e41d3e0bc0566181dc0ce616fbee2e2"
   license "MIT"
+  revision 1
   head "https://github.com/Data-Wise/obsidian-cli-ops.git", branch: "main"
 
   depends_on "rust" => :build
@@ -244,6 +245,12 @@ class ObsidianCliOps < Formula
     libexec.install "schema"
     (libexec/"src").install "src/obs.zsh"
 
+    # MCP registration helper. Kept one level under libexec (not flattened)
+    # because configure_mcp.py locates src/python/mcp_server.py via
+    # Path(__file__).resolve().parent.parent -- that math only lands on
+    # libexec/src/python if this script stays nested exactly like this.
+    (libexec/"scripts").install "scripts/configure_mcp.py"
+
     # Launcher → isolated venv interpreter (matches obs.zsh resolution tier 1).
     (bin/"obs").write <<~EOS
       #!/bin/zsh
@@ -265,9 +272,15 @@ class ObsidianCliOps < Formula
     man1.install "man/man1/obs.1" if (buildpath/"man/man1/obs.1").exist?
   end
 
-  def post_install
+  post_install_steps do
     # Initialize the database using the isolated interpreter (deps guaranteed).
-    system libexec/"venv/bin/python", "#{libexec}/src/python/obs_cli.py", "db", "init"
+    # {{libexec}} is a run-time template token, not Ruby interpolation --
+    # this block is evaluated at formula-definition time, before any
+    # instance (and its `libexec` accessor) exists.
+    # `run`'s must_succeed defaults to true (unlike the old plain `system`
+    # call, which silently ignored a failing exit code) -- a broken db init
+    # now correctly fails the install instead of shipping a half-working one.
+    run "venv/bin/python", base: :libexec, args: ["{{libexec}}/src/python/obs_cli.py", "db", "init"]
   end
 
   def caveats
@@ -292,8 +305,12 @@ class ObsidianCliOps < Formula
         obs ai status          # Check provider status
 
       Claude Desktop / Claude Code (MCP server "obsidian-ops", 38 tools):
-        After this upgrade, RESTART Claude Desktop (Cmd+Q, reopen) so it
-        reloads the server — MCP tools are read only at startup.
+        Install or update the MCP registration (safe to re-run):
+          python3 #{opt_libexec}/scripts/configure_mcp.py
+        Check status:
+          claude mcp list
+        After registering or upgrading, RESTART Claude Desktop (Cmd+Q,
+        reopen) so it reloads the server — MCP tools are read only at startup.
         ⚠ v4.0.0 renamed the MCP client key. If your config still has a
           "nexus" server, rename that key to "obsidian-ops".
         Setup + migration: https://data-wise.github.io/obsidian-cli-ops/claude-integration/
@@ -312,6 +329,7 @@ class ObsidianCliOps < Formula
     assert_path_exists libexec/"src/obs.zsh"
     assert_path_exists libexec/"src/python/obs_cli.py"
     assert_path_exists libexec/"schema/vault_db.sql"
+    assert_path_exists libexec/"scripts/configure_mcp.py"
 
     # Isolated venv has the deps (the v3.2.0 regression guard).
     system libexec/"venv/bin/python", "-c",
