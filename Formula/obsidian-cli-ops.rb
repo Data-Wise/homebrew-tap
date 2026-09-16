@@ -13,8 +13,8 @@ class ObsidianCliOps < Formula
 
   desc "CLI tool for Obsidian vault management with AI-powered graph analysis"
   homepage "https://data-wise.github.io/obsidian-cli-ops/"
-  url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v4.3.1.tar.gz"
-  sha256 "f9369f8df96524371d5471e7f78c2b084cf3716d6a87f1f493a91add7e104759"
+  url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v4.4.0.tar.gz"
+  sha256 "648dae1d259f449d7c7c4dc65032a9b4a513095504751b2fdfd9e7821316a96c"
   license "MIT"
   head "https://github.com/Data-Wise/obsidian-cli-ops.git", branch: "main"
 
