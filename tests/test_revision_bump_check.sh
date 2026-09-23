@@ -68,6 +68,10 @@ fi
 git checkout --quiet -b "$SCRATCH_BRANCH"
 sed -i.bak 's/— a REAL copy, not a/-- a REAL copy, not a/' Formula/folio.rb
 rm -f Formula/folio.rb.bak
+if git diff --quiet -- Formula/folio.rb; then
+  echo "❌ Case 3 setup: the comment-only sed matched nothing in Formula/folio.rb"
+  exit 1
+fi
 git add Formula/folio.rb
 git commit --quiet -m "test: cosmetic-only comment change"
 COSMETIC_SHA=$(git rev-parse HEAD)
@@ -78,8 +82,12 @@ check "Case 3: comment-only change PASSES without a revision bump" 0 \
 # --- Case 4: real logic change (no bump) still fails ---
 
 git checkout --quiet "$SCRATCH_BRANCH"
-sed -i.bak 's/mkdir -p "\$MARKETPLACE_DIR" 2>\/dev\/null || true/mkdir -p "$MARKETPLACE_DIR_TEST" 2>\/dev\/null || true/' Formula/folio.rb
+sed -i.bak 's/mkdir -p "\$HOME\/.claude\/plugins" 2>\/dev\/null || true/mkdir -p "$HOME\/.claude\/plugins_test" 2>\/dev\/null || true/' Formula/folio.rb
 rm -f Formula/folio.rb.bak
+if git diff --quiet -- Formula/folio.rb; then
+  echo "❌ Case 4 setup: the logic-change sed matched nothing in Formula/folio.rb"
+  exit 1
+fi
 git add Formula/folio.rb
 git commit --quiet -m "test: real logic change, no revision bump"
 LOGIC_SHA=$(git rev-parse HEAD)
