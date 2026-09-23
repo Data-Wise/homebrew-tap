@@ -18,7 +18,7 @@ progress: 100
     #165, folio-manifest-entry #141, caveats-prose-drift → #234; then 25 more — 23 merged by the
     gate, plus superseded `feature/folio-formula` (placeholder draft; real formula via #141) and
     `feature/scholar-3.1.0` (#128 closed; scholar formula removed 2026-07-29)).
-  - GitHub: 16 deleted (5 that also existed locally + 11 remote-only). Two non-gate cases:
+  - GitHub: 16 deleted (5 that also existed locally + 11 remote-only). Two kinds of non-gate case:
     `feature/remove-scholar-formula` had one commit after #195's head (2713225, CLAUDE.md
     "all 14 formulas" → 15) — already on main, which says 15 (= 15 manifest entries, 15 .rb);
     `feature/atlas-node-dep` (#144 closed, superseded by -v2 #146) and
