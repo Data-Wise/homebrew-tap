@@ -1,11 +1,11 @@
 status: Active
-last_session: 2026-07-19
+last_session: 2026-09-23
 milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred branch-protection gap closed + required-checks list corrected + SPEC-required-checks-self-skip-2026-07-19.md fully shipped
 
 progress: 100
 # progress-note (moved out of the machine field): SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
-📋 Session 2026-09-23 (honest post_install — Homebrew sandbox can't reach ~/.claude):
+📋 Session 2026-09-23 (honest post_install — Homebrew sandbox can't reach ~/.claude; PR #229, squash 2d07cc7):
 - Root cause of every "Marketplace 'local-plugins' not found" on brew upgrade/reinstall
   (seen again on rforge 2.20.0→2.20.1): Homebrew 7 runs post_install sandboxed with an
   isolated temporary HOME (`formula.rb` run_post_install: Dir.mktmpdir) and `deny_read_home`
@@ -22,7 +22,16 @@ progress: 100
   "has been installed to" caveats removed. Revisions bumped on all 6.
 - tests/test_marketplace_sync_resilience.sh (locked in the retry) replaced by
   tests/test_post_install_sandbox_safe.sh, wired into formula-drift.yml.
-- Not changed: the user-run `<name>-install` scripts still target local-plugins — follow-up.
+- Verified: CI (Regen vs committed incl. the new test, .STATUS guard) green; planted defects
+  in rforge.rb caught 4/4; Formulary.from_contents rendered the new caveats. Real run after
+  merge: `brew update && brew reinstall data-wise/tap/rforge` → 2.20.1_1, no post_install, no
+  "installed successfully", no local-plugins error, caveats show the rforge@data-wise setup.
+  Same session: rforge v2.20.1 formula+manifest bump via PR #228 (squash cfb8df1).
+- Follow-ups: (1) user-run `<name>-install` scripts still enable/install `<name>@local-plugins`
+  (no such marketplace registered here) — workflow, in no marketplace, depends on it;
+  (2) tests/test_revision_bump_check.sh Case 6 fails on main too — its sed targets craft's
+  `v4.2.0` tarball but craft.rb is on v4.6.1; the test also checks out scratch branches in the
+  working tree, which reverted uncommitted Formula edits mid-session — run it on a clean tree.
 
 📋 Session 2026-07-29 (remove scholar formula — repo went private):
 - Data-Wise/scholar flipped to a private GitHub repo, so `Formula/scholar.rb`'s public tarball
