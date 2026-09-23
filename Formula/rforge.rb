@@ -8,8 +8,8 @@ class Rforge < Formula
   url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.20.1.tar.gz"
   sha256 "99877e0349c9200b5907835885bfe1eb833a4be0f9e8f18f0fc343cc6f8b4ed4"
   license "MIT"
-  head "https://github.com/Data-Wise/rforge.git", branch: "main"
   revision 1
+  head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
   depends_on "jq"
 

@@ -199,18 +199,16 @@ class HimalayaMcp < Formula
 
   def post_install
     # Strip keys not recognized by Claude Code's strict plugin.json schema
-    begin
-      require "json"
-      plugin_json = libexec/".claude-plugin/plugin.json"
-      if plugin_json.exist?
-        allowed_keys = %w[name version description author]
-        data = JSON.parse(plugin_json.read)
-        cleaned = data.slice(*allowed_keys)
-        plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
-      end
-    rescue
-      nil
-    end
+    require "json"
+    plugin_json = libexec/".claude-plugin/plugin.json"
+    return unless plugin_json.exist?
+
+    allowed_keys = %w[name version description author]
+    data = JSON.parse(plugin_json.read)
+    cleaned = data.slice(*allowed_keys)
+    plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
+  rescue
+    nil
   end
 
   def post_uninstall

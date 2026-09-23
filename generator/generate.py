@@ -211,15 +211,16 @@ def generate_formula(formula_name, config, defaults):
         lines.append(f'  sha256 "{config["sha256"]}"')
         lines.append(f'  license "{defaults["license"]}"')
 
+        # Revision — bump when install-script/post_install logic changes with no
+        # version change, so `brew upgrade` detects it (plain content edits are
+        # otherwise invisible to upgrade's version-only comparison). Emitted
+        # before head, per Homebrew's FormulaAudit/ComponentsOrder.
+        if config.get("revision"):
+            lines.append(f'  revision {config["revision"]}')
+
         # Head (if present — i.e., formula has both url and head)
         if "head" in config:
             lines.append(f'  head "{config["head"]}", branch: "main"')
-
-        # Revision — bump when install-script/post_install logic changes with no
-        # version change, so `brew upgrade` detects it (plain content edits are
-        # otherwise invisible to upgrade's version-only comparison).
-        if config.get("revision"):
-            lines.append(f'  revision {config["revision"]}')
 
     # deprecate! directive — after license/head (matches Homebrew convention)
     # Emits a blank line before deprecate! to match standard formatting
@@ -350,18 +351,16 @@ def generate_formula(formula_name, config, defaults):
         lines.append("")
         lines.append("  def post_install")
         lines.append("    # Strip keys not recognized by Claude Code's strict plugin.json schema")
-        lines.append("    begin")
-        lines.append('      require "json"')
-        lines.append('      plugin_json = libexec/".claude-plugin/plugin.json"')
-        lines.append("      if plugin_json.exist?")
-        lines.append('        allowed_keys = %w[name version description author]')
-        lines.append("        data = JSON.parse(plugin_json.read)")
-        lines.append("        cleaned = data.slice(*allowed_keys)")
-        lines.append('        plugin_json.write("#{JSON.pretty_generate(cleaned)}\\n") if cleaned.size < data.size')
-        lines.append("      end")
-        lines.append("    rescue")
-        lines.append("      nil")
-        lines.append("    end")
+        lines.append('    require "json"')
+        lines.append('    plugin_json = libexec/".claude-plugin/plugin.json"')
+        lines.append("    return unless plugin_json.exist?")
+        lines.append("")
+        lines.append('    allowed_keys = %w[name version description author]')
+        lines.append("    data = JSON.parse(plugin_json.read)")
+        lines.append("    cleaned = data.slice(*allowed_keys)")
+        lines.append('    plugin_json.write("#{JSON.pretty_generate(cleaned)}\\n") if cleaned.size < data.size')
+        lines.append("  rescue")
+        lines.append("    nil")
         lines.append("  end")
 
     # post_uninstall
