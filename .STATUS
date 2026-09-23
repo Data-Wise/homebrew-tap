@@ -5,6 +5,26 @@ milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred bra
 progress: 100
 # progress-note (moved out of the machine field): SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
+📋 Session 2026-09-23 (cont. — caveats spec saved + branch cleanup; PR #234):
+- PR #234 (squash d91526d): saved `docs/specs/SPEC-caveats-prose-drift-2026-08-15.md` (+ its
+  brainstorm, moved to `docs/brainstorm/`), which had lived only on the unpushed local branch
+  `feature/caveats-prose-drift`. Added an "Update 2026-09-23" block: workflow out of scope
+  (#232), caveats layout changed (#229); still drifted — himalaya-mcp "15 email skills / 22 MCP
+  tools" and rforge-orchestrator's legacy counts. Spec still not grilled.
+- Branch cleanup, local + GitHub → only `main` remains in both. Gate per branch: PR MERGED +
+  merge commit an ancestor of origin/main + branch tip == PR head (or tip already in main's
+  history); `content-differs` vs main is expected after a squash and was not a blocker.
+  - Local: 28 deleted (3 from the pruned /Users/dt worktrees: fix-revision-check-url-tag-version
+    #165, folio-manifest-entry #141, caveats-prose-drift → #234; then 25 more — 23 merged by the
+    gate, plus superseded `feature/folio-formula` (placeholder draft; real formula via #141) and
+    `feature/scholar-3.1.0` (#128 closed; scholar formula removed 2026-07-29)).
+  - GitHub: 16 deleted (5 that also existed locally + 11 remote-only). Two kinds of non-gate case:
+    `feature/remove-scholar-formula` had one commit after #195's head (2713225, CLAUDE.md
+    "all 14 formulas" → 15) — already on main, which says 15 (= 15 manifest entries, 15 .rb);
+    `feature/atlas-node-dep` (#144 closed, superseded by -v2 #146) and
+    `formula/himalaya-mcp-{1.8.0,2.1.0}` (#137/#209 closed; main is on v2.1.2) were superseded.
+- `delete_branch_on_merge` was already true, so merged heads no longer accumulate on GitHub.
+
 📋 Session 2026-09-23 (cont. — install scripts, revision-bump fixtures, workflow deprecated; PRs #231, #232):
 - PR #231 (squash 457e8a4) closes follow-up (1): the user-run `<name>-install` registers via the
   manifest's `claude_plugin` id (`marketplace update` + `plugin install`/`update` through the
