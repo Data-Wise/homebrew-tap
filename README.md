@@ -32,7 +32,7 @@ brew tap data-wise/tap
 | **himalaya-mcp** | Email MCP server for Claude Code via himalaya |
 | **rforge** | R package ecosystem orchestrator |
 | **rforge-orchestrator** | Auto-delegation orchestrator for RForge MCP tools |
-| **workflow** | ADHD-friendly workflow automation plugin |
+| **workflow** | *Deprecated 2026-09-23* — ADHD-friendly workflow automation plugin (unmaintained) |
 
 ```bash
 # Install any formula

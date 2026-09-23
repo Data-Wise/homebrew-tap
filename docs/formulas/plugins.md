@@ -105,10 +105,16 @@ brew install data-wise/tap/rforge
 
 ### workflow
 
-ADHD-friendly workflow automation plugin.
+> **Deprecated 2026-09-23** — unmaintained. workflow v0.1.0's `plugin.json` fails Claude Code's
+> manifest schema (`author` must be an object, `repository` a string), so
+> `claude plugin install workflow@local-plugins` is rejected, and no marketplace ships the plugin.
+> The formula stays so existing installs get the deprecation warning.
 
 ```bash
-brew install data-wise/tap/workflow
+# Don't install this. To remove an existing install:
+brew uninstall data-wise/tap/workflow
+rm -rf ~/.claude/plugins/workflow ~/.claude/local-marketplace/workflow
+claude plugin marketplace remove local-plugins   # if workflow-install added it
 ```
 
 ### folio
