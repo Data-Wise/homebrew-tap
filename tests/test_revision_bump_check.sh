@@ -14,6 +14,13 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+# This suite checks out a scratch branch in the CURRENT working tree, so any
+# uncommitted edit would be carried into (or clobbered by) the checkouts.
+if [ -n "$(git status --porcelain)" ]; then
+  echo "❌ working tree is dirty — commit or stash first (this test switches branches)" >&2
+  exit 2
+fi
+
 SCRATCH_BRANCH="_test-revision-bump-scratch-$$"
 ORIGINAL_BRANCH="$(git branch --show-current)"
 fail=0
@@ -98,11 +105,21 @@ check "Case 5b: an unrelated label does NOT bypass" 1 \
 
 git checkout --quiet "$SCRATCH_BRANCH"
 CRAFT_BASE_SHA=$(git rev-parse HEAD)
+# Derive the tag from the formula instead of hardcoding it: a hardcoded
+# v4.2.0 silently stopped matching once craft moved on, leaving only the desc
+# edit — a content change with no version change — so the case failed.
+CRAFT_TAG=$(grep -oE 'refs/tags/v[0-9]+\.[0-9]+\.[0-9]+\.tar\.gz' Formula/craft.rb | head -1 | sed -E 's#refs/tags/v##; s#\.tar\.gz##')
+IFS=. read -r C_MAJ C_MIN _ <<< "$CRAFT_TAG"
+CRAFT_NEXT="${C_MAJ}.$((C_MIN + 1)).0"
 sed -i.bak \
-  -e 's/refs\/tags\/v4\.2\.0\.tar\.gz/refs\/tags\/v4.3.0.tar.gz/' \
-  -e 's/desc "Full-stack developer toolkit for Claude Code with 48 commands"/desc "Full-stack developer toolkit for Claude Code with 49 commands"/' \
+  -e "s#refs/tags/v${CRAFT_TAG}\.tar\.gz#refs/tags/v${CRAFT_NEXT}.tar.gz#" \
+  -e 's/^\(  desc "[^"]*\)"/\1 (test)"/' \
   Formula/craft.rb
 rm -f Formula/craft.rb.bak
+if ! grep -qF "refs/tags/v${CRAFT_NEXT}.tar.gz" Formula/craft.rb || ! grep -q '^  desc ".* (test)"' Formula/craft.rb; then
+  echo "❌ Case 6 setup: could not bump craft's url tag (${CRAFT_TAG:-none found}) or desc"
+  exit 1
+fi
 git add Formula/craft.rb
 git commit --quiet -m "test: url-tag version bump + real content change"
 CRAFT_BUMP_SHA=$(git rev-parse HEAD)

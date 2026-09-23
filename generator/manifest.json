@@ -11,7 +11,7 @@
       "source": "github",
       "repo": "Data-Wise/craft",
       "version": "4.6.1",
-      "revision": 2,
+      "revision": 3,
       "sha256": "24b034f3771e0fc9b7766e35f3208140274c0edc84f115346bdf0db37b4ff05d",
       "command_count": 48,
       "dependencies": {
@@ -65,7 +65,7 @@
       "repo": "Data-Wise/himalaya-mcp",
       "version": "2.1.2",
       "sha256": "81e273ad3f39764d43418d3afbb1fde9e9184af73e596468207ff1ca235854b7",
-      "revision": 1,
+      "revision": 2,
       "bin_mkpath": true,
       "dependencies": {
         "runtime": [
@@ -224,7 +224,7 @@
       ],
       "caveats_extra": "{command_count} commands for R package ecosystem management.",
       "claude_plugin": "rforge@data-wise",
-      "revision": 1
+      "revision": 2
     },
     "rforge-orchestrator": {
       "type": "claude-plugin",
@@ -277,7 +277,7 @@
       ],
       "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge",
       "claude_setup": false,
-      "revision": 1
+      "revision": 2
     },
     "workflow": {
       "type": "claude-plugin",
@@ -327,7 +327,7 @@
         }
       ],
       "caveats_extra": "The plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns",
-      "revision": 1
+      "revision": 2
     },
     "agy": {
       "type": "python-virtualenv",
@@ -424,7 +424,7 @@
       "repo": "Data-Wise/folio",
       "version": "1.0.0",
       "sha256": "d0cb30e26ba620a78fc3da3737102407816b9a1b7331d9156a0e1a6c996255cb",
-      "revision": 2,
+      "revision": 3,
       "command_count": 17,
       "dependencies": {
         "runtime": [

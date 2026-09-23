@@ -8,7 +8,7 @@ class Craft < Formula
   url "https://github.com/Data-Wise/craft/archive/refs/tags/v4.6.1.tar.gz"
   sha256 "24b034f3771e0fc9b7766e35f3208140274c0edc84f115346bdf0db37b4ff05d"
   license "MIT"
-  revision 2
+  revision 3
 
   depends_on "jq"
 
@@ -20,9 +20,13 @@ class Craft < Formula
       # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="craft"
+      # Claude Code plugin id and the marketplace it is installed from (manifest
+      # `claude_plugin`; `<name>@local-plugins` when the plugin is in no marketplace).
+      PLUGIN_REF="craft@data-wise"
+      MARKETPLACE="data-wise"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Copy from the stable opt path — Homebrew repoints opt/<name> across upgrades,
-      # and post_install re-runs this installer to refresh the real copy.
+      # Copy from the stable opt path — Homebrew repoints opt/<name> across upgrades.
+      # Run by the user (Homebrew's sandboxed post_install cannot reach ~/.claude).
       SOURCE_DIR="$(brew --prefix)/opt/craft/libexec"
 
       # Strip unrecognized keys from plugin.json (Claude Code rejects them)
@@ -59,33 +63,6 @@ class Craft < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
-          # Mirror into local-marketplace for plugin discovery — a REAL copy, not a
-          # symlink (also migrates a legacy symlink here). Costs ~2x disk per plugin;
-          # accepted tradeoff for the no-symlinks install policy.
-          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
-          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
-          if [ -d "$TARGET_DIR" ]; then
-              rm -rf "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || rm -f "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
-              mkdir -p "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
-              ( cd "$TARGET_DIR" && tar cf - . ) 2>/dev/null | ( cd "$MARKETPLACE_DIR/$PLUGIN_NAME" && tar xf - ) 2>/dev/null || true
-          fi
-
-          # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
-          MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-          PLUGIN_DESC="Full-stack developer toolkit - code, git, site, docs, testing, and architecture commands"
-          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
-              # Check if plugin already exists in manifest
-              if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
-                  TEMP_FILE=$(mktemp)
-                  if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
-                      '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
-                      "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                      mv "$TEMP_FILE" "$MANIFEST_FILE"
-                  else
-                      rm -f "$TEMP_FILE" 2>/dev/null
-                  fi
-              fi
-          fi
 
           # Try to auto-enable via jq if available
           # Skip if Claude Code is running (holds file locks that can block mv)
@@ -99,7 +76,7 @@ class Craft < Formula
 
           if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
               TEMP_FILE=$(mktemp)
-              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+              if jq --arg plugin "$PLUGIN_REF" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
                   mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
               fi
               [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
@@ -145,21 +122,29 @@ class Craft < Formula
               fi
           fi
 
-          echo "✅ Craft plugin installed successfully!"
+          echo "✅ Craft plugin files copied to $TARGET_DIR"
 
-          # Register plugin in Claude Code if not already installed
-          if [ "$CLAUDE_RUNNING" = false ] && command -v claude &>/dev/null; then
-              if ! claude plugin list 2>/dev/null | grep -q "craft@local-plugins"; then
-                  claude plugin install "craft@local-plugins" 2>/dev/null || true
+          # Register with Claude Code through the marketplace it actually loads the
+          # plugin from. CLI registration is safe while Claude Code is running (the
+          # CLAUDE_RUNNING guard above only protects the direct settings.json edit).
+          REGISTERED=false
+          if command -v claude &>/dev/null; then
+
+              claude plugin marketplace update "$MARKETPLACE" >/dev/null 2>&1 || true
+              if claude plugin list 2>/dev/null | grep -qF "$PLUGIN_REF"; then
+                  claude plugin update "$PLUGIN_REF" >/dev/null 2>&1 && REGISTERED=true
+              else
+                  claude plugin install "$PLUGIN_REF" >/dev/null 2>&1 && REGISTERED=true
               fi
           fi
 
           echo ""
-          if [ "$AUTO_ENABLED" = true ]; then
-              echo "Plugin auto-enabled in Claude Code."
-          elif [ "$CLAUDE_RUNNING" = true ]; then
-              echo "Claude Code is running - skipped auto-enable to avoid conflicts."
-              echo "After restarting Claude Code, the craft plugin will be available."
+          if [ "$REGISTERED" = true ]; then
+              echo "Registered $PLUGIN_REF with Claude Code. Restart Claude Code to load it."
+          else
+              echo "Could not register $PLUGIN_REF automatically. Run:"
+              echo "  claude plugin marketplace update $MARKETPLACE"
+              echo "  claude plugin install $PLUGIN_REF"
           fi
           if [ "$HOOK_INSTALLED" = true ]; then
               echo "Branch guard hook installed (protects main/dev branches)."
