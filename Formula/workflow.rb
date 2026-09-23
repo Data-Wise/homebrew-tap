@@ -8,7 +8,9 @@ class Workflow < Formula
   url "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v0.1.0/workflow-v0.1.0.tar.gz"
   sha256 "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783"
   license "MIT"
-  revision 2
+  revision 3
+
+  deprecate! date: "2026-09-23", because: "is unmaintained; its plugin.json fails Claude Code's manifest schema and no marketplace ships it"
 
   depends_on "jq"
 
@@ -180,15 +182,26 @@ class Workflow < Formula
 
   def caveats
     <<~EOS
+      ⚠️  DEPRECATED — this formula is no longer maintained.
+
+      workflow v0.1.0's plugin.json fails Claude Code's manifest schema
+      (`author` must be an object, `repository` a string), so
+      `claude plugin install workflow@local-plugins` is rejected, and no
+      marketplace carries the plugin.
+
+      To remove it:
+        brew uninstall data-wise/tap/workflow
+        rm -rf ~/.claude/plugins/workflow ~/.claude/local-marketplace/workflow
+        claude plugin marketplace remove local-plugins   # if workflow-install added it
+
+      ──────────────────────────────────────────────────────
+
+      Legacy info:
       The plugin includes:
         - 3 auto-activating skills (backend, frontend, devops)
         - Enhanced /brainstorm command (8 modes)
         - Workflow orchestrator agent
         - 60+ proven design patterns
-
-      Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):
-        workflow-install
-      Then restart Claude Code.
 
       For more information:
         https://github.com/Data-Wise/claude-plugins

@@ -326,8 +326,13 @@
           "type": "file"
         }
       ],
-      "caveats_extra": "The plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns",
-      "revision": 2
+      "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 this formula is no longer maintained.\n\nworkflow v0.1.0's plugin.json fails Claude Code's manifest schema\n(`author` must be an object, `repository` a string), so\n`claude plugin install workflow@local-plugins` is rejected, and no\nmarketplace carries the plugin.\n\nTo remove it:\n  brew uninstall data-wise/tap/workflow\n  rm -rf ~/.claude/plugins/workflow ~/.claude/local-marketplace/workflow\n  claude plugin marketplace remove local-plugins   # if workflow-install added it\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy info:\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns",
+      "revision": 3,
+      "deprecate": {
+        "date": "2026-09-23",
+        "reason": "is unmaintained; its plugin.json fails Claude Code's manifest schema and no marketplace ships it"
+      },
+      "claude_setup": false
     },
     "agy": {
       "type": "python-virtualenv",

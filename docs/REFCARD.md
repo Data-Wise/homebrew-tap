@@ -22,7 +22,7 @@
 | himalaya-mcp | marketplace, schema-cleanup, build, copy-map, cli-wrapper | Email MCP server via himalaya |
 | rforge | marketplace, schema-cleanup (head-only) | R package ecosystem orchestrator |
 | rforge-orchestrator | marketplace, schema-cleanup | Auto-delegation orchestrator |
-| workflow | marketplace, schema-cleanup | ADHD-friendly workflow automation |
+| workflow | marketplace (deprecated 2026-09-23) | ADHD-friendly workflow automation — unmaintained |
 
 ### Casks
 
