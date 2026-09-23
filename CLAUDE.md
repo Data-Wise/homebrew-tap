@@ -34,7 +34,7 @@ There are three distinct formula patterns in use:
 Plugin formulas share a complex install pattern — when editing one, keep them consistent:
 
 - Files install to `libexec` (including hidden `.claude-plugin` dir)
-- A `<name>-install` script handles: symlink creation (3 fallback methods), marketplace manifest registration via `jq`, auto-enable in `settings.json`, Claude-running detection (`lsof`/`pgrep`) to skip file modifications
+- A user-run `<name>-install` script copies the plugin into `~/.claude/plugins/<name>` (tar pipe, never a symlink) and registers it with Claude Code via the CLI through the marketplace it is loaded from: the manifest's `claude_plugin` id (e.g. `rforge@data-wise`: `marketplace update` + `plugin install`/`update`), else `<name>@local-plugins`, creating `~/.claude/local-marketplace`'s manifest and `marketplace add`-ing it on first use. Only the direct `settings.json` edit is skipped while Claude Code runs
 - A `<name>-uninstall` script reverses the install
 - `post_install` does only what Homebrew's sandbox allows: the optional plugin.json key strip inside `libexec`. The sandbox gives post_install a throwaway `HOME` and denies reading the real one (`formula.rb` `run_post_install`, `sandbox.rb` `add_install_hook_rules`), so nothing there can reach `~/.claude` — never add install-script spawns, `claude plugin` calls or `Dir.home` paths to it. Claude Code setup goes in the caveats via the manifest's `claude_plugin` field (`tests/test_post_install_sandbox_safe.sh`).
 - Use `$(brew --prefix)/opt/<name>/libexec` (stable path) not versioned Cellar paths

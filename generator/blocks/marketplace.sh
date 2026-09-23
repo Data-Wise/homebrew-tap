@@ -11,6 +11,12 @@
 
     # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
     MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
+    # Create the local-plugins manifest if this is the first plugin mirrored here;
+    # without it the directory is not a marketplace and `marketplace add` rejects it.
+    if [ ! -f "$MANIFEST_FILE" ]; then
+        mkdir -p "$MARKETPLACE_DIR/.claude-plugin" 2>/dev/null || true
+        echo '{"name": "local-plugins", "owner": {"name": "data-wise/tap"}, "plugins": []}' > "$MANIFEST_FILE" 2>/dev/null || true
+    fi
     PLUGIN_DESC="{install_script_desc}"
     if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
         # Check if plugin already exists in manifest

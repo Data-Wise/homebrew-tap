@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Contract: claude-plugin formulas never try to reach ~/.claude from
-# post_install, and their caveats give the Claude Code setup commands instead.
+# post_install, their caveats give the Claude Code setup commands instead, and
+# the user-run <name>-install script registers via the plugin's real marketplace.
 #
 # Why: Homebrew runs post_install in a sandbox with an isolated temporary HOME
 # (formula.rb run_post_install: Dir.mktmpdir) plus deny_read_home, allowing
@@ -43,6 +44,17 @@ while read -r name ref setup; do
             fail=1
         fi
     done
+
+    # 1b. the user-run <name>-install script registers the plugin through the
+    #     marketplace Claude Code loads it from, never a hardcoded local-plugins
+    want_ref="$ref"; [ "$ref" = "-" ] && want_ref="${name}@local-plugins"
+    inst=$(awk "/\"${name}-install\"\\).write <<~EOS/,/^    EOS\$/" "$f")
+    if ! printf '%s\n' "$inst" | grep -qF "PLUGIN_REF=\"${want_ref}\""; then
+        echo "FAIL ${name}: ${name}-install does not target ${want_ref}"; fail=1
+    fi
+    if [ "$ref" != "-" ] && printf '%s\n' "$inst" | grep -qE '@local-plugins"|MARKETPLACE_DIR='; then
+        echo "FAIL ${name}: ${name}-install still registers/mirrors via local-plugins"; fail=1
+    fi
 
     # Deprecated formulas (claude_setup: false) keep their legacy caveats verbatim
     [ "$setup" = "yes" ] || continue

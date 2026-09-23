@@ -1,18 +1,26 @@
-    echo "✅ {display_name} plugin installed successfully!"
+    echo "✅ {display_name} plugin files copied to $TARGET_DIR"
 
-    # Register plugin in Claude Code if not already installed
-    if [ "$CLAUDE_RUNNING" = false ] && command -v claude &>/dev/null; then
-        if ! claude plugin list 2>/dev/null | grep -q "{plugin_name}@local-plugins"; then
-            claude plugin install "{plugin_name}@local-plugins" 2>/dev/null || true
+    # Register with Claude Code through the marketplace it actually loads the
+    # plugin from. CLI registration is safe while Claude Code is running (the
+    # CLAUDE_RUNNING guard above only protects the direct settings.json edit).
+    REGISTERED=false
+    if command -v claude &>/dev/null; then
+{register_marketplace}
+        claude plugin marketplace update "$MARKETPLACE" >/dev/null 2>&1 || true
+        if claude plugin list 2>/dev/null | grep -qF "$PLUGIN_REF"; then
+            claude plugin update "$PLUGIN_REF" >/dev/null 2>&1 && REGISTERED=true
+        else
+            claude plugin install "$PLUGIN_REF" >/dev/null 2>&1 && REGISTERED=true
         fi
     fi
 
     echo ""
-    if [ "$AUTO_ENABLED" = true ]; then
-        echo "Plugin auto-enabled in Claude Code."
-    elif [ "$CLAUDE_RUNNING" = true ]; then
-        echo "Claude Code is running - skipped auto-enable to avoid conflicts."
-        echo "After restarting Claude Code, the {plugin_name} plugin will be available."
+    if [ "$REGISTERED" = true ]; then
+        echo "Registered $PLUGIN_REF with Claude Code. Restart Claude Code to load it."
+    else
+        echo "Could not register $PLUGIN_REF automatically. Run:"
+        echo "  claude plugin marketplace update $MARKETPLACE"
+        echo "  claude plugin install $PLUGIN_REF"
     fi
 {hook_message}
     echo ""

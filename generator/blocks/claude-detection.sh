@@ -10,7 +10,7 @@
 
     if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
         TEMP_FILE=$(mktemp)
-        if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+        if jq --arg plugin "$PLUGIN_REF" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
             mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
         fi
         [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null

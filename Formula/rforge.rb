@@ -8,7 +8,7 @@ class Rforge < Formula
   url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.20.1.tar.gz"
   sha256 "99877e0349c9200b5907835885bfe1eb833a4be0f9e8f18f0fc343cc6f8b4ed4"
   license "MIT"
-  revision 1
+  revision 2
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
   depends_on "jq"
@@ -21,9 +21,13 @@ class Rforge < Formula
       # NOTE: Not using set -e to handle permission errors gracefully
 
       PLUGIN_NAME="rforge"
+      # Claude Code plugin id and the marketplace it is installed from (manifest
+      # `claude_plugin`; `<name>@local-plugins` when the plugin is in no marketplace).
+      PLUGIN_REF="rforge@data-wise"
+      MARKETPLACE="data-wise"
       TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
-      # Copy from the stable opt path — Homebrew repoints opt/<name> across upgrades,
-      # and post_install re-runs this installer to refresh the real copy.
+      # Copy from the stable opt path — Homebrew repoints opt/<name> across upgrades.
+      # Run by the user (Homebrew's sandboxed post_install cannot reach ~/.claude).
       SOURCE_DIR="$(brew --prefix)/opt/rforge/libexec"
 
       echo "Installing RForge plugin to Claude Code..."
@@ -54,33 +58,6 @@ class Rforge < Formula
       fi
 
       if [ "$LINK_SUCCESS" = true ]; then
-          # Mirror into local-marketplace for plugin discovery — a REAL copy, not a
-          # symlink (also migrates a legacy symlink here). Costs ~2x disk per plugin;
-          # accepted tradeoff for the no-symlinks install policy.
-          MARKETPLACE_DIR="$HOME/.claude/local-marketplace"
-          mkdir -p "$MARKETPLACE_DIR" 2>/dev/null || true
-          if [ -d "$TARGET_DIR" ]; then
-              rm -rf "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || rm -f "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
-              mkdir -p "$MARKETPLACE_DIR/$PLUGIN_NAME" 2>/dev/null || true
-              ( cd "$TARGET_DIR" && tar cf - . ) 2>/dev/null | ( cd "$MARKETPLACE_DIR/$PLUGIN_NAME" && tar xf - ) 2>/dev/null || true
-          fi
-
-          # Add to marketplace.json manifest (required for 'claude plugin install' discovery)
-          MANIFEST_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
-          PLUGIN_DESC="R package ecosystem orchestrator - analyze, test, release, cascade changes"
-          if command -v jq &>/dev/null && [ -f "$MANIFEST_FILE" ]; then
-              # Check if plugin already exists in manifest
-              if ! jq -e --arg name "$PLUGIN_NAME" '.plugins[] | select(.name == $name)' "$MANIFEST_FILE" >/dev/null 2>&1; then
-                  TEMP_FILE=$(mktemp)
-                  if jq --arg name "$PLUGIN_NAME" --arg desc "$PLUGIN_DESC" \
-                      '.plugins = [{"name": $name, "source": ("./"+$name), "description": $desc}] + .plugins' \
-                      "$MANIFEST_FILE" > "$TEMP_FILE" 2>/dev/null; then
-                      mv "$TEMP_FILE" "$MANIFEST_FILE"
-                  else
-                      rm -f "$TEMP_FILE" 2>/dev/null
-                  fi
-              fi
-          fi
 
           # Try to auto-enable via jq if available
           # Skip if Claude Code is running (holds file locks that can block mv)
@@ -94,27 +71,35 @@ class Rforge < Formula
 
           if [ "$CLAUDE_RUNNING" = false ] && command -v jq &>/dev/null && [ -f "$SETTINGS_FILE" ]; then
               TEMP_FILE=$(mktemp)
-              if jq --arg plugin "${PLUGIN_NAME}@local-plugins" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
+              if jq --arg plugin "$PLUGIN_REF" '.enabledPlugins[$plugin] = true' "$SETTINGS_FILE" > "$TEMP_FILE" 2>/dev/null; then
                   mv "$TEMP_FILE" "$SETTINGS_FILE" 2>/dev/null && AUTO_ENABLED=true
               fi
               [ -f "$TEMP_FILE" ] && rm -f "$TEMP_FILE" 2>/dev/null
           fi
 
-          echo "✅ RForge plugin installed successfully!"
+          echo "✅ RForge plugin files copied to $TARGET_DIR"
 
-          # Register plugin in Claude Code if not already installed
-          if [ "$CLAUDE_RUNNING" = false ] && command -v claude &>/dev/null; then
-              if ! claude plugin list 2>/dev/null | grep -q "rforge@local-plugins"; then
-                  claude plugin install "rforge@local-plugins" 2>/dev/null || true
+          # Register with Claude Code through the marketplace it actually loads the
+          # plugin from. CLI registration is safe while Claude Code is running (the
+          # CLAUDE_RUNNING guard above only protects the direct settings.json edit).
+          REGISTERED=false
+          if command -v claude &>/dev/null; then
+
+              claude plugin marketplace update "$MARKETPLACE" >/dev/null 2>&1 || true
+              if claude plugin list 2>/dev/null | grep -qF "$PLUGIN_REF"; then
+                  claude plugin update "$PLUGIN_REF" >/dev/null 2>&1 && REGISTERED=true
+              else
+                  claude plugin install "$PLUGIN_REF" >/dev/null 2>&1 && REGISTERED=true
               fi
           fi
 
           echo ""
-          if [ "$AUTO_ENABLED" = true ]; then
-              echo "Plugin auto-enabled in Claude Code."
-          elif [ "$CLAUDE_RUNNING" = true ]; then
-              echo "Claude Code is running - skipped auto-enable to avoid conflicts."
-              echo "After restarting Claude Code, the rforge plugin will be available."
+          if [ "$REGISTERED" = true ]; then
+              echo "Registered $PLUGIN_REF with Claude Code. Restart Claude Code to load it."
+          else
+              echo "Could not register $PLUGIN_REF automatically. Run:"
+              echo "  claude plugin marketplace update $MARKETPLACE"
+              echo "  claude plugin install $PLUGIN_REF"
           fi
 
           echo ""

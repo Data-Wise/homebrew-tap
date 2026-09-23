@@ -86,12 +86,20 @@ def generate_install_script(formula_name, config):
     plugin_name = formula_name
     display_name = ruby_class_name(formula_name).replace("Mcp", " MCP").replace("Rforge", "RForge")
     features = config.get("features", {})
+    # Claude Code plugin id: the manifest's `claude_plugin` (a marketplace the
+    # user has registered, e.g. rforge@data-wise), else the local-plugins
+    # marketplace this script creates and registers from ~/.claude/local-marketplace.
+    plugin_ref = config.get("claude_plugin") or f"{plugin_name}@local-plugins"
+    marketplace = plugin_ref.split("@", 1)[1]
+    uses_local_marketplace = marketplace == "local-plugins"
 
     # Header
     script = format_block(
         load_block("header.sh"),
         plugin_name=plugin_name,
         formula_name=formula_name,
+        plugin_ref=plugin_ref,
+        marketplace=marketplace,
     )
 
     # Schema cleanup (optional)
@@ -107,8 +115,9 @@ def generate_install_script(formula_name, config):
     # Success path (if LINK_SUCCESS)
     script += "\nif [ \"$LINK_SUCCESS\" = true ]; then\n"
 
-    # Marketplace registration (optional)
-    if features.get("marketplace"):
+    # Local-marketplace mirror — only for plugins with no registered marketplace;
+    # Claude Code never reads it for a plugin installed from e.g. data-wise
+    if features.get("marketplace") and uses_local_marketplace:
         script += format_block(
             load_block("marketplace.sh"),
             install_script_desc=config.get("install_script_desc", config["desc"]),
@@ -136,6 +145,12 @@ def generate_install_script(formula_name, config):
         plugin_name=plugin_name,
         hook_message=hook_msg,
         summary_lines=summary_echo,
+        register_marketplace=(
+            '        # Register ~/.claude/local-marketplace as "local-plugins" on first use\n'
+            '        if ! claude plugin marketplace list 2>/dev/null | grep -qF "local-plugins"; then\n'
+            '            claude plugin marketplace add "$HOME/.claude/local-marketplace" >/dev/null 2>&1 || true\n'
+            '        fi'
+        ) if uses_local_marketplace else "",
     )
 
     # Else (fallback)
