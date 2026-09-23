@@ -5,6 +5,31 @@ milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred bra
 progress: 100
 # progress-note (moved out of the machine field): SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
+📋 Session 2026-09-23 (cont. — install scripts, revision-bump fixtures, workflow deprecated; PRs #231, #232):
+- PR #231 (squash 457e8a4) closes follow-up (1): the user-run `<name>-install` registers via the
+  manifest's `claude_plugin` id (`marketplace update` + `plugin install`/`update` through the
+  claude CLI, also while Claude Code runs; no local-marketplace mirror for those plugins). Plugins
+  in no marketplace get a `local-plugins` marketplace the script creates (manifest) and registers
+  (`marketplace add`). Messages say "files copied" + "Registered <ref>" or the manual commands.
+  Real run: `rforge-install` → "Registered rforge@data-wise with Claude Code" (rforge 2.20.1_2).
+  E2E in a throwaway HOME: workflow registered + enabled from scratch; planted defect (manifest
+  step removed) → "Could not register …", 0 marketplaces.
+- PR #231 also closes follow-up (2): Case 6 derives craft's url tag instead of hardcoding v4.2.0;
+  every fixture sed fails loudly on a no-op (this exposed Case 3 passing as a no-op, and Case 4
+  losing its target line once folio dropped the marketplace mirror); the suite exits 2 on a
+  dirty tree. `test_revision_bump_check.sh` 7/7.
+- PR #232 (squash 550b140): workflow deprecated (deprecate! 2026-09-23, claude_setup off,
+  removal steps in caveats, revision 3). `workflow-install` on the real machine registered
+  `local-plugins` but `claude plugin install` rejected v0.1.0's plugin.json: `author` is a
+  string (Claude Code wants an object) and `repository` an npm-style object (wants a string);
+  schema_cleanup would not help (it keeps `author`). Maintainer removed the marketplace and
+  uninstalled workflow instead of fixing the plugin.
+- Upgrade note: running two `brew upgrade` processes at once (terminal + agent) produced
+  "already locked", "Will not overwrite …/bin/himalaya-mcp" and kegs with no opt/ link; one
+  `brew reinstall` each fixed it. `craft` alone resolves to a cask — use `data-wise/tap/craft`.
+- Also: `git worktree prune` dropped 3 stale records under /Users/dt/.git-worktrees (their
+  branches remain: caveats-prose-drift, fix-revision-check-url-tag-version, folio-manifest-entry).
+
 📋 Session 2026-09-23 (honest post_install — Homebrew sandbox can't reach ~/.claude; PR #229, squash 2d07cc7):
 - Root cause of every "Marketplace 'local-plugins' not found" on brew upgrade/reinstall
   (seen again on rforge 2.20.0→2.20.1): Homebrew 7 runs post_install sandboxed with an
@@ -27,7 +52,7 @@ progress: 100
   merge: `brew update && brew reinstall data-wise/tap/rforge` → 2.20.1_1, no post_install, no
   "installed successfully", no local-plugins error, caveats show the rforge@data-wise setup.
   Same session: rforge v2.20.1 formula+manifest bump via PR #228 (squash cfb8df1).
-- Follow-ups: (1) user-run `<name>-install` scripts still enable/install `<name>@local-plugins`
+- Follow-ups (both closed by PR #231, see entry above): (1) user-run `<name>-install` scripts still enable/install `<name>@local-plugins`
   (no such marketplace registered here) — workflow, in no marketplace, depends on it;
   (2) tests/test_revision_bump_check.sh Case 6 fails on main too — its sed targets craft's
   `v4.2.0` tarball but craft.rb is on v4.6.1; the test also checks out scratch branches in the
