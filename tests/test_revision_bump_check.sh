@@ -66,7 +66,7 @@ fi
 # --- Case 3: cosmetic-only synthetic change passes without a bump ---
 
 git checkout --quiet -b "$SCRATCH_BRANCH"
-sed -i.bak 's/— a REAL copy, not a/-- a REAL copy, not a/' Formula/folio.rb
+sed -i.bak 's/# Install a REAL copy of the Homebrew-managed files/# Install a REAL copy of the Homebrew managed files/' Formula/folio.rb
 rm -f Formula/folio.rb.bak
 if git diff --quiet -- Formula/folio.rb; then
   echo "❌ Case 3 setup: the comment-only sed matched nothing in Formula/folio.rb"
