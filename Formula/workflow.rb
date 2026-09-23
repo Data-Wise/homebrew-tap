@@ -10,7 +10,7 @@ class Workflow < Formula
   license "MIT"
   revision 3
 
-  deprecate! date: "2026-09-23", because: "is unmaintained; its plugin.json fails Claude Code's manifest schema and no marketplace ships it"
+  deprecate! date: "2026-09-23", because: "is unmaintained; its plugin.json fails Claude Code's schema"
 
   depends_on "jq"
 
