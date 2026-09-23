@@ -4,7 +4,22 @@
 **Context:** homebrew-tap `generator/manifest.json`'s `caveats_extra` prose (shown on `brew
 install`/`brew upgrade`) hardcodes counts/feature lists in some formulas — same staleness class
 craft's `docs-staleness-check.sh` Phase 7 just fixed inside craft's own docs.
-**Status:** brainstormed 2026-08-15 (default depth, arch focus). Not yet grilled.
+**Status:** brainstormed 2026-08-15 (default depth, arch focus). Not yet grilled. Saved to `main`
+2026-09-23 (it had lived only on a local branch); brainstorm at
+`docs/brainstorm/BRAINSTORM-caveats-prose-drift-2026-08-15.md`.
+
+> **Update 2026-09-23 — scope shrank; read before grilling.**
+> - **workflow is out of scope.** PR #232 deprecated the formula: v0.1.0's `plugin.json` fails
+>   Claude Code's manifest schema (string `author`, object `repository`), and no marketplace
+>   ships it. Its caveats now open with a deprecation notice; the old counts survive only under
+>   "Legacy info:". D3 and the workflow acceptance criterion and risk below are moot.
+> - **Caveats layout changed (PR #229).** The generator now appends a "Claude Code setup" section
+>   from the manifest's `claude_plugin` field, and the `@local-plugins` / "installed to" / "if the
+>   automatic copy failed" lines are gone from every `caveats_extra`. The remaining drift is only
+>   the hardcoded counts in `caveats_extra` itself.
+> - **Still drifted:** himalaya-mcp (`15 email skills` / `22 MCP tools`, untouched by #229–#232)
+>   and rforge-orchestrator's deprecated legacy text. Re-verify both counts against the live repos
+>   at implementation time, as the criteria below already require.
 
 ---
 
@@ -53,8 +68,8 @@ Scan of all 15 formulas' `caveats_extra` found:
 - [ ] himalaya-mcp's caveats state the verified current MCP-tool and skill counts (re-checked
       against the live repo at fix time, not the "29" figure quoted here — that itself could be
       stale by the time this is implemented)
-- [ ] workflow's caveats are re-verified against the live `claude-plugins` workflow plugin
-      state, not just old-numbers-for-new-numbers
+- [x] ~~workflow's caveats are re-verified against the live `claude-plugins` workflow plugin
+      state~~ — moot: formula deprecated in PR #232 (2026-09-23)
 - [ ] rforge-orchestrator's deprecation notice carries corrected counts
 - [ ] Every formula with non-empty `caveats_extra` has a `caveats_verified` date field
 - [ ] `scripts/audit-caveats.sh` flags a planted-stale fixture and passes a fresh one (positive
