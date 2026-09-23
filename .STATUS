@@ -5,6 +5,25 @@ milestone: release-drift-gates plan complete (Tasks 1-10 shipped) + deferred bra
 progress: 100
 # progress-note (moved out of the machine field): SPEC-release-drift-gates-2026-07-16.md fully implemented and merged to main; both new CI gates live-verified; the SPEC's deferred open question (main had no required_status_checks, so CI red didn't block merge) is now closed; required-checks list corrected after PR #162 exposed a structural bug; SPEC-required-checks-self-skip-2026-07-19.md (brainstorm+grill'd) fully driven — both status-guard.yml (PR #170) and formula-drift.yml (this PR) now self-skip instead of permanently BLOCKING PRs that don't touch their path
 
+📋 Session 2026-09-23 (honest post_install — Homebrew sandbox can't reach ~/.claude):
+- Root cause of every "Marketplace 'local-plugins' not found" on brew upgrade/reinstall
+  (seen again on rforge 2.20.0→2.20.1): Homebrew 7 runs post_install sandboxed with an
+  isolated temporary HOME (`formula.rb` run_post_install: Dir.mktmpdir) and `deny_read_home`
+  (`sandbox.rb` add_install_hook_rules); writes only to Cellar/prefix/temp/cache. The claude
+  CLI there saw ZERO marketplaces, and the auto-install "succeeded" into the throwaway HOME.
+  PR #134's race diagnosis (2026-07-02) was wrong — standalone re-runs worked because they
+  had the real HOME. Corrected here; the old entry is left as the historical record.
+- Generator: post_install keeps only the in-Cellar plugin.json schema cleanup (formulas
+  without schema_cleanup have none); dropped the install-script spawn, registry sync, cache
+  prune and version-drift steps. Caveats append a Claude Code setup section from a new
+  manifest field `claude_plugin` (craft/rforge/folio @data-wise, himalaya-mcp →
+  himalaya@data-wise); workflow (no marketplace) points to `workflow-install`;
+  rforge-orchestrator (deprecated) sets `claude_setup: false`. Stale local-plugins /
+  "has been installed to" caveats removed. Revisions bumped on all 6.
+- tests/test_marketplace_sync_resilience.sh (locked in the retry) replaced by
+  tests/test_post_install_sandbox_safe.sh, wired into formula-drift.yml.
+- Not changed: the user-run `<name>-install` scripts still target local-plugins — follow-up.
+
 📋 Session 2026-07-29 (remove scholar formula — repo went private):
 - Data-Wise/scholar flipped to a private GitHub repo, so `Formula/scholar.rb`'s public tarball
   URL 404s for every user (`brew upgrade` reported `curl: (56) ... 404` on the v3.2.0 tag) —

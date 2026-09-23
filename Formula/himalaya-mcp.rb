@@ -8,6 +8,7 @@ class HimalayaMcp < Formula
   url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v2.1.2.tar.gz"
   sha256 "81e273ad3f39764d43418d3afbb1fde9e9184af73e596468207ff1ca235854b7"
   license "MIT"
+  revision 1
 
   depends_on "himalaya"
   depends_on "jq"
@@ -197,7 +198,7 @@ class HimalayaMcp < Formula
   end
 
   def post_install
-    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
+    # Strip keys not recognized by Claude Code's strict plugin.json schema
     begin
       require "json"
       plugin_json = libexec/".claude-plugin/plugin.json"
@@ -206,71 +207,6 @@ class HimalayaMcp < Formula
         data = JSON.parse(plugin_json.read)
         cleaned = data.slice(*allowed_keys)
         plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
-      end
-    rescue
-      nil
-    end
-
-    # Step 2: Auto-install plugin with 30s timeout
-    begin
-      require "timeout"
-      pid = Process.spawn(bin/"himalaya-mcp-install")
-      Timeout.timeout(30) { Process.waitpid(pid) }
-    rescue Timeout::Error
-      begin
-        Process.kill("TERM", pid)
-      rescue
-        nil
-      end
-      begin
-        Process.waitpid(pid)
-      rescue
-        nil
-      end
-      opoo "himalaya-mcp-install timed out after 30 seconds (skipping)"
-    rescue
-      nil
-    end
-
-    # Step 3: Sync Claude Code plugin registry (optional)
-    begin
-      if which("claude")
-        synced = false
-        2.times do |attempt|
-          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
-          break if synced
-
-          sleep 1 if attempt.zero?
-        end
-        if synced
-          system "claude", "plugin", "install", "himalaya-mcp@local-plugins"
-        else
-          opoo "marketplace sync didn't settle in time - run: " \
-               "claude plugin marketplace update local-plugins && " \
-               "claude plugin update himalaya-mcp@local-plugins"
-        end
-      else
-        opoo "claude not on PATH - run: claude plugin install himalaya-mcp@local-plugins to finish"
-      end
-    rescue
-      nil
-    end
-
-    # Prune old cached plugin versions (keep newest 3)
-    begin
-      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/himalaya-mcp")
-      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
-    rescue
-      nil
-    end
-
-    # Warn if the installed copy's version drifts from this formula
-    begin
-      require "json"
-      installed = Pathname.new("#{Dir.home}/.claude/plugins/himalaya-mcp/.claude-plugin/plugin.json")
-      if installed.file?
-        iv = JSON.parse(installed.read)["version"]
-        opoo "installed himalaya-mcp v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
       end
     rescue
       nil
@@ -297,11 +233,11 @@ class HimalayaMcp < Formula
       Requires himalaya CLI with at least one configured account.
       See: https://github.com/Data-Wise/himalaya-mcp
 
-      After upgrades, sync Claude Code registry:
-        claude plugin update himalaya-mcp@local-plugins
-
-      If the automatic copy failed (macOS permissions), run manually:
-        mkdir -p ~/.claude/plugins/himalaya-mcp && ( cd /opt/homebrew/opt/himalaya-mcp/libexec && tar cf - . ) | ( cd ~/.claude/plugins/himalaya-mcp && tar xf - )
+      Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):
+        claude plugin marketplace update data-wise
+        claude plugin install himalaya@data-wise   # first install
+        claude plugin update himalaya@data-wise    # after upgrades
+      Then restart Claude Code.
 
       Man pages installed to share/man/man1/:
         man himalaya-mcp

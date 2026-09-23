@@ -11,17 +11,14 @@ flowchart TD
     Files + .claude-plugin`"]
     B --> C["`**Generate scripts**
     craft-install, craft-uninstall`"]
-    C --> D["`**post_install**
-    Schema cleanup + run install script`"]
-    D --> E{"`**Claude running?**
-    pgrep -x claude`"}
-    E -->|No| F["`**Auto-enable**
-    Real copy + marketplace + settings.json`"]
-    E -->|Yes| G["`**Copy only**
-    Skip settings.json modification`"]
+    C --> D["`**post_install** (sandboxed)
+    Schema cleanup in libexec only`"]
+    D --> E["`**Caveats**
+    claude plugin marketplace update + install/update`"]
+    E --> F["`**You run the commands**
+    then restart Claude Code`"]
     F --> H["`**Ready to use**
     Plugin active in Claude Code`"]
-    G --> H
 ```
 
 ## Install Pattern

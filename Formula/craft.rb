@@ -8,7 +8,7 @@ class Craft < Formula
   url "https://github.com/Data-Wise/craft/archive/refs/tags/v4.6.1.tar.gz"
   sha256 "24b034f3771e0fc9b7766e35f3208140274c0edc84f115346bdf0db37b4ff05d"
   license "MIT"
-  revision 1
+  revision 2
 
   depends_on "jq"
 
@@ -201,7 +201,7 @@ class Craft < Formula
   end
 
   def post_install
-    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema
+    # Strip keys not recognized by Claude Code's strict plugin.json schema
     begin
       require "json"
       plugin_json = libexec/".claude-plugin/plugin.json"
@@ -210,71 +210,6 @@ class Craft < Formula
         data = JSON.parse(plugin_json.read)
         cleaned = data.slice(*allowed_keys)
         plugin_json.write("#{JSON.pretty_generate(cleaned)}\n") if cleaned.size < data.size
-      end
-    rescue
-      nil
-    end
-
-    # Step 2: Auto-install plugin with 30s timeout
-    begin
-      require "timeout"
-      pid = Process.spawn(bin/"craft-install")
-      Timeout.timeout(30) { Process.waitpid(pid) }
-    rescue Timeout::Error
-      begin
-        Process.kill("TERM", pid)
-      rescue
-        nil
-      end
-      begin
-        Process.waitpid(pid)
-      rescue
-        nil
-      end
-      opoo "craft-install timed out after 30 seconds (skipping)"
-    rescue
-      nil
-    end
-
-    # Step 3: Sync Claude Code plugin registry (optional)
-    begin
-      if which("claude")
-        synced = false
-        2.times do |attempt|
-          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
-          break if synced
-
-          sleep 1 if attempt.zero?
-        end
-        if synced
-          system "claude", "plugin", "install", "craft@local-plugins"
-        else
-          opoo "marketplace sync didn't settle in time - run: " \
-               "claude plugin marketplace update local-plugins && " \
-               "claude plugin update craft@local-plugins"
-        end
-      else
-        opoo "claude not on PATH - run: claude plugin install craft@local-plugins to finish"
-      end
-    rescue
-      nil
-    end
-
-    # Prune old cached plugin versions (keep newest 3)
-    begin
-      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/craft")
-      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
-    rescue
-      nil
-    end
-
-    # Warn if the installed copy's version drifts from this formula
-    begin
-      require "json"
-      installed = Pathname.new("#{Dir.home}/.claude/plugins/craft/.claude-plugin/plugin.json")
-      if installed.file?
-        iv = JSON.parse(installed.read)["version"]
-        opoo "installed craft v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
       end
     rescue
       nil
@@ -301,11 +236,11 @@ class Craft < Formula
       Try: /craft:do "your task"
       Or:  /brainstorm
 
-      After upgrades, sync Claude Code registry:
-        claude plugin update craft@local-plugins
-
-      If the automatic copy failed (macOS permissions), run manually:
-        mkdir -p ~/.claude/plugins/craft && ( cd $(brew --prefix)/opt/craft/libexec && tar cf - . ) | ( cd ~/.claude/plugins/craft && tar xf - )
+      Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):
+        claude plugin marketplace update data-wise
+        claude plugin install craft@data-wise   # first install
+        claude plugin update craft@data-wise    # after upgrades
+      Then restart Claude Code.
 
       For more information:
         https://github.com/Data-Wise/craft

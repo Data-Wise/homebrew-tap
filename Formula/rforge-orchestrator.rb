@@ -18,6 +18,7 @@ class RforgeOrchestrator < Formula
   url "https://github.com/Data-Wise/claude-plugins/archive/refs/tags/rforge-orchestrator-v0.1.0.tar.gz"
   sha256 "8c065681864b18c9bea41996aa33bec17b95697ed8330846c8b510bd81bbad2e"
   license "MIT"
+  revision 1
 
   deprecate! date: "2026-05-10", because: "renamed; use `brew install --HEAD data-wise/tap/rforge`"
 
@@ -161,73 +162,6 @@ class RforgeOrchestrator < Formula
 
     chmod "+x", bin/"rforge-orchestrator-install"
     chmod "+x", bin/"rforge-orchestrator-uninstall"
-  end
-
-  def post_install
-    # Step 1: Auto-install plugin with 30s timeout
-    begin
-      require "timeout"
-      pid = Process.spawn(bin/"rforge-orchestrator-install")
-      Timeout.timeout(30) { Process.waitpid(pid) }
-    rescue Timeout::Error
-      begin
-        Process.kill("TERM", pid)
-      rescue
-        nil
-      end
-      begin
-        Process.waitpid(pid)
-      rescue
-        nil
-      end
-      opoo "rforge-orchestrator-install timed out after 30 seconds (skipping)"
-    rescue
-      nil
-    end
-
-    # Step 2: Sync Claude Code plugin registry (optional)
-    begin
-      if which("claude")
-        synced = false
-        2.times do |attempt|
-          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
-          break if synced
-
-          sleep 1 if attempt.zero?
-        end
-        if synced
-          system "claude", "plugin", "install", "rforge-orchestrator@local-plugins"
-        else
-          opoo "marketplace sync didn't settle in time - run: " \
-               "claude plugin marketplace update local-plugins && " \
-               "claude plugin update rforge-orchestrator@local-plugins"
-        end
-      else
-        opoo "claude not on PATH - run: claude plugin install rforge-orchestrator@local-plugins to finish"
-      end
-    rescue
-      nil
-    end
-
-    # Prune old cached plugin versions (keep newest 3)
-    begin
-      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/rforge-orchestrator")
-      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
-    rescue
-      nil
-    end
-
-    # Warn if the installed copy's version drifts from this formula
-    begin
-      require "json"
-      installed = Pathname.new("#{Dir.home}/.claude/plugins/rforge-orchestrator/.claude-plugin/plugin.json")
-      if installed.file?
-        iv = JSON.parse(installed.read)["version"]
-        opoo "installed rforge-orchestrator v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
-      end
-    rescue
-      nil
-    end
   end
 
   def post_uninstall

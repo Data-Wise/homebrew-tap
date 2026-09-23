@@ -53,7 +53,7 @@ python3 generator/generate.py --list
 | workflow | Monorepo tarball URL |
 | folio | Standard plugin pattern, `revision`-tracked |
 
-All generated plugin formulas use a 3-step `post_install` pattern: (1) JSON schema cleanup, (2) auto-install with 30s timeout, (3) registry sync — each in its own `begin/rescue/end` block.
+Generated plugin formulas keep `post_install` to what Homebrew's sandbox allows — the optional `plugin.json` schema cleanup inside the Cellar. Claude Code setup is printed in the caveats from the `claude_plugin` field, because `post_install` cannot reach `~/.claude` (see [manifest](manifest.md#post_install-pattern)).
 
 The other 9 formulas are hand-crafted (Python virtualenv, Node npm, Shell, Swift patterns that differ enough from the plugin template).
 
