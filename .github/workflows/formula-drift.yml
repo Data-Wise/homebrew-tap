@@ -108,6 +108,10 @@ jobs:
         if: steps.drift_inputs.outputs.run_check == 'true'
         run: bash tests/test_no_symlink_install.sh
 
+      - name: Sandbox-safe post_install contract (claude-plugin formulas)
+        if: steps.drift_inputs.outputs.run_check == 'true'
+        run: bash tests/test_post_install_sandbox_safe.sh
+
       - name: Revision-drift check (formula content changed without version/revision bump)
         if: steps.drift_inputs.outputs.run_check == 'true' && steps.drift_inputs.outputs.revision_bump_runnable == 'true'
         env:

@@ -8,7 +8,7 @@ class Folio < Formula
   url "https://github.com/Data-Wise/folio/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "d0cb30e26ba620a78fc3da3737102407816b9a1b7331d9156a0e1a6c996255cb"
   license "MIT"
-  revision 1
+  revision 2
 
   depends_on "jq"
 
@@ -151,81 +151,17 @@ class Folio < Formula
     chmod "+x", bin/"folio-uninstall"
   end
 
-  def post_install
-    # Step 1: Auto-install plugin with 30s timeout
-    begin
-      require "timeout"
-      pid = Process.spawn(bin/"folio-install")
-      Timeout.timeout(30) { Process.waitpid(pid) }
-    rescue Timeout::Error
-      begin
-        Process.kill("TERM", pid)
-      rescue
-        nil
-      end
-      begin
-        Process.waitpid(pid)
-      rescue
-        nil
-      end
-      opoo "folio-install timed out after 30 seconds (skipping)"
-    rescue
-      nil
-    end
-
-    # Step 2: Sync Claude Code plugin registry (optional)
-    begin
-      if which("claude")
-        synced = false
-        2.times do |attempt|
-          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
-          break if synced
-
-          sleep 1 if attempt.zero?
-        end
-        if synced
-          system "claude", "plugin", "install", "folio@local-plugins"
-        else
-          opoo "marketplace sync didn't settle in time - run: " \
-               "claude plugin marketplace update local-plugins && " \
-               "claude plugin update folio@local-plugins"
-        end
-      else
-        opoo "claude not on PATH - run: claude plugin install folio@local-plugins to finish"
-      end
-    rescue
-      nil
-    end
-
-    # Prune old cached plugin versions (keep newest 3)
-    begin
-      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/folio")
-      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
-    rescue
-      nil
-    end
-
-    # Warn if the installed copy's version drifts from this formula
-    begin
-      require "json"
-      installed = Pathname.new("#{Dir.home}/.claude/plugins/folio/.claude-plugin/plugin.json")
-      if installed.file?
-        iv = JSON.parse(installed.read)["version"]
-        opoo "installed folio v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
-      end
-    rescue
-      nil
-    end
-  end
-
   def post_uninstall
     system bin/"folio-uninstall" if (bin/"folio-uninstall").exist?
   end
 
   def caveats
     <<~EOS
-      The Folio plugin has been installed to:
-        ~/.claude/plugins/folio
+      Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):
+        claude plugin marketplace update data-wise
+        claude plugin install folio@data-wise   # first install
+        claude plugin update folio@data-wise    # after upgrades
+      Then restart Claude Code.
 
       For more information:
         https://github.com/Data-Wise/folio

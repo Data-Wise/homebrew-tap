@@ -211,15 +211,16 @@ def generate_formula(formula_name, config, defaults):
         lines.append(f'  sha256 "{config["sha256"]}"')
         lines.append(f'  license "{defaults["license"]}"')
 
+        # Revision — bump when install-script/post_install logic changes with no
+        # version change, so `brew upgrade` detects it (plain content edits are
+        # otherwise invisible to upgrade's version-only comparison). Emitted
+        # before head, per Homebrew's FormulaAudit/ComponentsOrder.
+        if config.get("revision"):
+            lines.append(f'  revision {config["revision"]}')
+
         # Head (if present — i.e., formula has both url and head)
         if "head" in config:
             lines.append(f'  head "{config["head"]}", branch: "main"')
-
-        # Revision — bump when install-script/post_install logic changes with no
-        # version change, so `brew upgrade` detects it (plain content edits are
-        # otherwise invisible to upgrade's version-only comparison).
-        if config.get("revision"):
-            lines.append(f'  revision {config["revision"]}')
 
     # deprecate! directive — after license/head (matches Homebrew convention)
     # Emits a blank line before deprecate! to match standard formatting
@@ -335,113 +336,32 @@ def generate_formula(formula_name, config, defaults):
     lines.append(f'    chmod "+x", bin/"{formula_name}-uninstall"')
     lines.append("  end")
 
-    # post_install — 3-step pattern for all claude-plugin formulas
-    lines.append("")
-    lines.append("  def post_install")
-
-    # Step 1: JSON schema cleanup (only if schema_cleanup feature enabled)
-    if features.get("schema_cleanup"):
-        lines.append("    # Step 1: Strip keys not recognized by Claude Code's strict plugin.json schema")
-        lines.append("    begin")
-        lines.append('      require "json"')
-        lines.append('      plugin_json = libexec/".claude-plugin/plugin.json"')
-        lines.append("      if plugin_json.exist?")
-        lines.append('        allowed_keys = %w[name version description author]')
-        lines.append("        data = JSON.parse(plugin_json.read)")
-        lines.append("        cleaned = data.slice(*allowed_keys)")
-        lines.append('        plugin_json.write("#{JSON.pretty_generate(cleaned)}\\n") if cleaned.size < data.size')
-        lines.append("      end")
-        lines.append("    rescue")
-        lines.append("      nil")
-        lines.append("    end")
-        lines.append("")
-
-    # Step 2: Auto-install plugin with 30s timeout (always)
-    lines.append(f'    # Step {"2" if features.get("schema_cleanup") else "1"}: Auto-install plugin with 30s timeout')
-    lines.append("    begin")
-    lines.append('      require "timeout"')
-    lines.append(f'      pid = Process.spawn(bin/"{formula_name}-install")')
-    lines.append("      Timeout.timeout(30) { Process.waitpid(pid) }")
-    lines.append("    rescue Timeout::Error")
-    lines.append("      begin")
-    lines.append('        Process.kill("TERM", pid)')
-    lines.append("      rescue")
-    lines.append("        nil")
-    lines.append("      end")
-    lines.append("      begin")
-    lines.append("        Process.waitpid(pid)")
-    lines.append("      rescue")
-    lines.append("        nil")
-    lines.append("      end")
-    lines.append(f'      opoo "{formula_name}-install timed out after 30 seconds (skipping)"')
-    lines.append("    rescue")
-    lines.append("      nil")
-    lines.append("    end")
-    lines.append("")
-
-    # Step 3: Sync Claude Code plugin registry (always)
-    # Refresh the local-plugins marketplace index BEFORE updating, so the
-    # update reads the freshly-installed version rather than a stale cached
-    # manifest (otherwise `plugin update` no-ops on the prior version).
+    # post_install — sandbox-safe steps only.
     #
-    # Retry the marketplace-update call once: Step 2's spawned install script
-    # can return (Process.waitpid) slightly before its marketplace-mirror
-    # write (blocks/marketplace.sh) is fully visible to a freshly-spawned
-    # `claude` CLI process, causing a spurious "marketplace not found" on the
-    # first attempt even though the manifest is actually correct. If both
-    # attempts fail, degrade to an advisory `opoo` with the manual fix-it
-    # command rather than a raw failed-system-call trace.
-    lines.append(f'    # Step {"3" if features.get("schema_cleanup") else "2"}: Sync Claude Code plugin registry (optional)')
-    lines.append("    begin")
-    lines.append('      if which("claude")')
-    lines.append("        synced = false")
-    lines.append("        2.times do |attempt|")
-    lines.append('          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")')
-    lines.append("          break if synced")
-    lines.append("")
-    lines.append("          sleep 1 if attempt.zero?")
-    lines.append("        end")
-    lines.append("        if synced")
-    lines.append(f'          system "claude", "plugin", "install", "{formula_name}@local-plugins"')
-    lines.append("        else")
-    lines.append('          opoo "marketplace sync didn\'t settle in time - run: " \\')
-    lines.append('               "claude plugin marketplace update local-plugins && " \\')
-    lines.append(f'               "claude plugin update {formula_name}@local-plugins"')
-    lines.append("        end")
-    lines.append("      else")
-    lines.append(f'        opoo "claude not on PATH - run: claude plugin install {formula_name}@local-plugins to finish"')
-    lines.append("      end")
-    lines.append("    rescue")
-    lines.append("      nil")
-    lines.append("    end")
-    lines.append("")
-
-    # Cache GC: prune old cached plugin versions, keep newest 3 (unbounded growth otherwise)
-    lines.append("    # Prune old cached plugin versions (keep newest 3)")
-    lines.append("    begin")
-    lines.append(f'      cache = Pathname.new("#{{Dir.home}}/.claude/plugins/cache/local-plugins/{formula_name}")')
-    lines.append("      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?")
-    lines.append("    rescue")
-    lines.append("      nil")
-    lines.append("    end")
-
-    # Version-drift self-check (advisory). Skipped for head-only formulas where
-    # `version` is not a released semver and would false-positive.
-    if not head_only:
+    # Homebrew runs post_install in a sandbox with an isolated temporary HOME
+    # (formula.rb run_post_install: Dir.mktmpdir) and deny_read_home, allowing
+    # writes only to the Cellar, the prefix link dirs, temp and cache
+    # (formula_installer.rb post_install / sandbox.rb add_install_hook_rules).
+    # Nothing here can reach the user's ~/.claude, so the former auto-install,
+    # registry sync, cache prune and version-drift steps ran against a throwaway
+    # HOME: the copy "succeeded" into a dir that was then deleted, and
+    # `claude plugin marketplace update` saw zero marketplaces. Claude Code
+    # setup is the user's step, printed in caveats (claude_plugin manifest field).
+    if features.get("schema_cleanup"):
         lines.append("")
-        lines.append("    # Warn if the installed copy's version drifts from this formula")
-        lines.append("    begin")
-        lines.append('      require "json"')
-        lines.append(f'      installed = Pathname.new("#{{Dir.home}}/.claude/plugins/{formula_name}/.claude-plugin/plugin.json")')
-        lines.append("      if installed.file?")
-        lines.append('        iv = JSON.parse(installed.read)["version"]')
-        lines.append(f'        opoo "installed {formula_name} v#{{iv}} != formula v#{{version}}" if iv && iv.to_s != version.to_s')
-        lines.append("      end")
-        lines.append("    rescue")
-        lines.append("      nil")
-        lines.append("    end")
-
-    lines.append("  end")
+        lines.append("  def post_install")
+        lines.append("    # Strip keys not recognized by Claude Code's strict plugin.json schema")
+        lines.append('    require "json"')
+        lines.append('    plugin_json = libexec/".claude-plugin/plugin.json"')
+        lines.append("    return unless plugin_json.exist?")
+        lines.append("")
+        lines.append('    allowed_keys = %w[name version description author]')
+        lines.append("    data = JSON.parse(plugin_json.read)")
+        lines.append("    cleaned = data.slice(*allowed_keys)")
+        lines.append('    plugin_json.write("#{JSON.pretty_generate(cleaned)}\\n") if cleaned.size < data.size')
+        lines.append("  rescue")
+        lines.append("    nil")
+        lines.append("  end")
 
     # post_uninstall
     lines.append("")
@@ -453,8 +373,25 @@ def generate_formula(formula_name, config, defaults):
     lines.append("")
     lines.append("  def caveats")
     lines.append("    <<~EOS")
-    caveats_text = config.get("caveats_extra", f"The {class_name} plugin has been installed to:\n  ~/.claude/plugins/{formula_name}")
-    for line in caveats_text.split("\n"):
+    caveats_lines = []
+    caveats_text = config.get("caveats_extra")
+    if caveats_text:
+        caveats_lines.extend(caveats_text.split("\n"))
+    # Claude Code setup — the user's step (post_install cannot reach ~/.claude)
+    if config.get("claude_setup", True):
+        if caveats_lines:
+            caveats_lines.append("")
+        caveats_lines.append("Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):")
+        plugin_ref = config.get("claude_plugin")
+        if plugin_ref:
+            marketplace = plugin_ref.split("@", 1)[1]
+            caveats_lines.append(f"  claude plugin marketplace update {marketplace}")
+            caveats_lines.append(f"  claude plugin install {plugin_ref}   # first install")
+            caveats_lines.append(f"  claude plugin update {plugin_ref}    # after upgrades")
+        else:
+            caveats_lines.append(f"  {formula_name}-install")
+        caveats_lines.append("Then restart Claude Code.")
+    for line in caveats_lines:
         lines.append(f"      {line}" if line.strip() else "")
     if config.get("man_pages"):
         man_section = config.get("man_section", 1)

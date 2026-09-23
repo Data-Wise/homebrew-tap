@@ -118,7 +118,7 @@ flowchart LR
     - Generate uninstall script
     - Process `libexec_copy_map` / `libexec_copy_map_optional` for directory layout and `libexec_copy_files` for individual files
     - Generate `extra_scripts` as CLI wrapper scripts in `bin/`
-    - Compose full Ruby formula (class, install, post_install with 3-step pattern, test, caveats)
+    - Compose full Ruby formula (class, install, sandbox-safe post_install, test, caveats with Claude Code setup)
 4. **Write** to `Formula/<name>.rb` (or diff/validate)
 
 ---

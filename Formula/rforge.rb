@@ -8,6 +8,7 @@ class Rforge < Formula
   url "https://github.com/Data-Wise/rforge/archive/refs/tags/v2.20.1.tar.gz"
   sha256 "99877e0349c9200b5907835885bfe1eb833a4be0f9e8f18f0fc343cc6f8b4ed4"
   license "MIT"
+  revision 1
   head "https://github.com/Data-Wise/rforge.git", branch: "main"
 
   depends_on "jq"
@@ -152,89 +153,19 @@ class Rforge < Formula
     chmod "+x", bin/"rforge-uninstall"
   end
 
-  def post_install
-    # Step 1: Auto-install plugin with 30s timeout
-    begin
-      require "timeout"
-      pid = Process.spawn(bin/"rforge-install")
-      Timeout.timeout(30) { Process.waitpid(pid) }
-    rescue Timeout::Error
-      begin
-        Process.kill("TERM", pid)
-      rescue
-        nil
-      end
-      begin
-        Process.waitpid(pid)
-      rescue
-        nil
-      end
-      opoo "rforge-install timed out after 30 seconds (skipping)"
-    rescue
-      nil
-    end
-
-    # Step 2: Sync Claude Code plugin registry (optional)
-    begin
-      if which("claude")
-        synced = false
-        2.times do |attempt|
-          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
-          break if synced
-
-          sleep 1 if attempt.zero?
-        end
-        if synced
-          system "claude", "plugin", "install", "rforge@local-plugins"
-        else
-          opoo "marketplace sync didn't settle in time - run: " \
-               "claude plugin marketplace update local-plugins && " \
-               "claude plugin update rforge@local-plugins"
-        end
-      else
-        opoo "claude not on PATH - run: claude plugin install rforge@local-plugins to finish"
-      end
-    rescue
-      nil
-    end
-
-    # Prune old cached plugin versions (keep newest 3)
-    begin
-      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/rforge")
-      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
-    rescue
-      nil
-    end
-
-    # Warn if the installed copy's version drifts from this formula
-    begin
-      require "json"
-      installed = Pathname.new("#{Dir.home}/.claude/plugins/rforge/.claude-plugin/plugin.json")
-      if installed.file?
-        iv = JSON.parse(installed.read)["version"]
-        opoo "installed rforge v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
-      end
-    rescue
-      nil
-    end
-  end
-
   def post_uninstall
     system bin/"rforge-uninstall" if (bin/"rforge-uninstall").exist?
   end
 
   def caveats
     <<~EOS
-      The RForge plugin has been installed to:
-        ~/.claude/plugins/rforge
-
-      If not auto-enabled, run:
-        claude plugin install rforge@local-plugins
-
       44 commands for R package ecosystem management.
 
-      If the automatic copy failed (macOS permissions), run manually:
-        mkdir -p ~/.claude/plugins/rforge && ( cd $(brew --prefix)/opt/rforge/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge && tar xf - )
+      Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):
+        claude plugin marketplace update data-wise
+        claude plugin install rforge@data-wise   # first install
+        claude plugin update rforge@data-wise    # after upgrades
+      Then restart Claude Code.
 
       For more information:
         https://github.com/Data-Wise/rforge

@@ -19,7 +19,7 @@ These are [generated](../generator/index.md) from a single manifest. They share 
 - Files install to `libexec`
 - A `<name>-install` script handles symlinks, marketplace registration, and settings modification
 - A `<name>-uninstall` script reverses the install
-- `post_install` strips unrecognized `plugin.json` keys then calls the install script
+- `post_install` only strips unrecognized `plugin.json` keys (Homebrew's sandbox blocks `~/.claude`); the caveats print the `claude plugin` commands to run
 
 ### 3. Simple Install Formulas
 

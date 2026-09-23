@@ -8,6 +8,7 @@ class Workflow < Formula
   url "https://github.com/Data-Wise/claude-plugins/releases/download/workflow-v0.1.0/workflow-v0.1.0.tar.gz"
   sha256 "cf155a7ad9855d5c5f4180847b3c62dbda6c99b410485b681b7148f270338783"
   license "MIT"
+  revision 1
 
   depends_on "jq"
 
@@ -152,93 +153,21 @@ class Workflow < Formula
     chmod "+x", bin/"workflow-uninstall"
   end
 
-  def post_install
-    # Step 1: Auto-install plugin with 30s timeout
-    begin
-      require "timeout"
-      pid = Process.spawn(bin/"workflow-install")
-      Timeout.timeout(30) { Process.waitpid(pid) }
-    rescue Timeout::Error
-      begin
-        Process.kill("TERM", pid)
-      rescue
-        nil
-      end
-      begin
-        Process.waitpid(pid)
-      rescue
-        nil
-      end
-      opoo "workflow-install timed out after 30 seconds (skipping)"
-    rescue
-      nil
-    end
-
-    # Step 2: Sync Claude Code plugin registry (optional)
-    begin
-      if which("claude")
-        synced = false
-        2.times do |attempt|
-          synced = system("claude", "plugin", "marketplace", "update", "local-plugins")
-          break if synced
-
-          sleep 1 if attempt.zero?
-        end
-        if synced
-          system "claude", "plugin", "install", "workflow@local-plugins"
-        else
-          opoo "marketplace sync didn't settle in time - run: " \
-               "claude plugin marketplace update local-plugins && " \
-               "claude plugin update workflow@local-plugins"
-        end
-      else
-        opoo "claude not on PATH - run: claude plugin install workflow@local-plugins to finish"
-      end
-    rescue
-      nil
-    end
-
-    # Prune old cached plugin versions (keep newest 3)
-    begin
-      cache = Pathname.new("#{Dir.home}/.claude/plugins/cache/local-plugins/workflow")
-      cache.children.select(&:directory?).sort_by(&:mtime).reverse.drop(3).each(&:rmtree) if cache.directory?
-    rescue
-      nil
-    end
-
-    # Warn if the installed copy's version drifts from this formula
-    begin
-      require "json"
-      installed = Pathname.new("#{Dir.home}/.claude/plugins/workflow/.claude-plugin/plugin.json")
-      if installed.file?
-        iv = JSON.parse(installed.read)["version"]
-        opoo "installed workflow v#{iv} != formula v#{version}" if iv && iv.to_s != version.to_s
-      end
-    rescue
-      nil
-    end
-  end
-
   def post_uninstall
     system bin/"workflow-uninstall" if (bin/"workflow-uninstall").exist?
   end
 
   def caveats
     <<~EOS
-      The Workflow plugin has been installed to:
-        ~/.claude/plugins/workflow
-
-      If not auto-enabled, run:
-        claude plugin install workflow@local-plugins
-
       The plugin includes:
         - 3 auto-activating skills (backend, frontend, devops)
         - Enhanced /brainstorm command (8 modes)
         - Workflow orchestrator agent
         - 60+ proven design patterns
 
-      If the automatic copy failed (macOS permissions), run manually:
-        mkdir -p ~/.claude/plugins/workflow && ( cd $(brew --prefix)/opt/workflow/libexec && tar cf - . ) | ( cd ~/.claude/plugins/workflow && tar xf - )
+      Claude Code setup (Homebrew's sandbox can't write to ~/.claude, so run these yourself):
+        workflow-install
+      Then restart Claude Code.
 
       For more information:
         https://github.com/Data-Wise/claude-plugins

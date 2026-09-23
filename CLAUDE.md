@@ -36,7 +36,7 @@ Plugin formulas share a complex install pattern — when editing one, keep them 
 - Files install to `libexec` (including hidden `.claude-plugin` dir)
 - A `<name>-install` script handles: symlink creation (3 fallback methods), marketplace manifest registration via `jq`, auto-enable in `settings.json`, Claude-running detection (`lsof`/`pgrep`) to skip file modifications
 - A `<name>-uninstall` script reverses the install
-- `post_install` uses 3-step pattern: (1) strip unrecognized plugin.json keys in own begin/rescue/end, (2) run install script with 30s timeout, (3) claude plugin update registry sync. Each step is independently error-isolated.
+- `post_install` does only what Homebrew's sandbox allows: the optional plugin.json key strip inside `libexec`. The sandbox gives post_install a throwaway `HOME` and denies reading the real one (`formula.rb` `run_post_install`, `sandbox.rb` `add_install_hook_rules`), so nothing there can reach `~/.claude` — never add install-script spawns, `claude plugin` calls or `Dir.home` paths to it. Claude Code setup goes in the caveats via the manifest's `claude_plugin` field (`tests/test_post_install_sandbox_safe.sh`).
 - Use `$(brew --prefix)/opt/<name>/libexec` (stable path) not versioned Cellar paths
 
 ## Commands

@@ -44,7 +44,9 @@ The manifest (`generator/manifest.json`) is the single source of truth for all f
 | `libexec_paths` | array | Explicit files to install to libexec |
 | `libexec_subdir` | string | Install all files from subdirectory |
 | `test_paths` | array | Files/dirs to verify in test block |
-| `caveats_extra` | string | Additional caveats text |
+| `caveats_extra` | string | Additional caveats text (plugin-specific; the Claude Code setup section is appended automatically) |
+| `claude_plugin` | string | Claude Code plugin id `<plugin>@<marketplace>` (e.g. `rforge@data-wise`, `himalaya@data-wise`). Caveats print `claude plugin marketplace update <marketplace>` + `claude plugin install/update <id>`. Omit when the plugin is in no marketplace — caveats then point to `<name>-install` |
+| `claude_setup` | boolean | Default `true`. `false` suppresses the Claude Code setup section (deprecated formulas that keep legacy caveats) |
 
 ## Install Layout Fields
 
@@ -60,13 +62,11 @@ These fields replace the older `libexec_paths` approach with a more flexible lay
 
 ## post_install Pattern
 
-All generated plugin formulas use a 3-step `post_install` pattern, with each step in its own `begin/rescue/end` block for independent error isolation:
+Homebrew runs `post_install` in a sandbox with an isolated temporary `HOME` and `deny_read_home`; it may write only to the Cellar, the prefix link dirs, temp and cache. Nothing in `post_install` can reach the user's `~/.claude`, so generated formulas keep only the step that stays inside the Cellar:
 
-1. **JSON schema cleanup** (conditional on `features.schema_cleanup`) — strips unrecognized keys from `plugin.json`
-2. **Auto-install** — runs the `<name>-install` script with a 30-second timeout using `Process.spawn` + `Timeout`
-3. **Registry sync** — runs `claude plugin update` to refresh the plugin registry
+- **JSON schema cleanup** (only when `features.schema_cleanup` is set) — strips unrecognized keys from `libexec/.claude-plugin/plugin.json`. Formulas without it have no `post_install`.
 
-If any step fails, the remaining steps still execute.
+Claude Code setup is the user's step, printed in the caveats (see `claude_plugin` below). The former auto-install, registry-sync, cache-prune and version-drift steps ran against the throwaway `HOME` — the copy "succeeded" into a directory Homebrew then deleted, and `claude plugin marketplace update local-plugins` saw no marketplaces at all. `tests/test_post_install_sandbox_safe.sh` gates this in CI.
 
 ## Special Fields
 
