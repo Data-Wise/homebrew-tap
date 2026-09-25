@@ -16,7 +16,7 @@ class ObsidianCliOps < Formula
   url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v4.5.0.tar.gz"
   sha256 "0c1553b401c7591a9a9fa7bbaee97f769ba15d1e7c9361b4a180dd5e4dae7b12"
   license "MIT"
-  revision 1
+  revision 2
   head "https://github.com/Data-Wise/obsidian-cli-ops.git", branch: "main"
 
   depends_on "rust" => :build
@@ -238,6 +238,12 @@ class ObsidianCliOps < Formula
 
     # Build the isolated venv and install ONLY the pinned deps (resources above).
     venv = virtualenv_create(libexec/"venv", "python3.12")
+    # Build the Rust sdists (pydantic-core, rpds-py) unstripped. rustc strips
+    # Mach-O output with its bundled rust-objcopy, which on macOS 27 (ld-27037,
+    # rust 1.98.1) writes a mis-aligned LINKEDIT string pool that dyld refuses
+    # to load -- `import mcp` then fails and the MCP server cannot start.
+    ENV["CARGO_PROFILE_RELEASE_STRIP"] = "false"
+    ENV.append "RUSTFLAGS", "-C strip=none"
     venv.pip_install resources
 
     # Bundle the backend, schema, and zsh wrapper.
@@ -331,9 +337,11 @@ class ObsidianCliOps < Formula
     assert_path_exists libexec/"schema/vault_db.sql"
     assert_path_exists libexec/"scripts/configure_mcp.py"
 
-    # Isolated venv has the deps (the v3.2.0 regression guard).
+    # Isolated venv has the deps (the v3.2.0 regression guard). mcp,
+    # pydantic_core and rpds load the Rust-built extensions, so a corrupt
+    # Mach-O (the rust-objcopy strip bug above) fails here, not at MCP startup.
     system libexec/"venv/bin/python", "-c",
-           "import frontmatter, yaml, networkx, rich, requests, click"
+           "import frontmatter, yaml, networkx, rich, requests, click, mcp, pydantic_core, rpds"
 
     # Version output through the real launcher.
     assert_match version.to_s, shell_output("#{bin}/obs version 2>&1")
