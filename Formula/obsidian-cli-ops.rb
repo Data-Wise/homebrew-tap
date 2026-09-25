@@ -304,7 +304,7 @@ class ObsidianCliOps < Formula
         obs ai setup           # Interactive AI setup wizard
         obs ai status          # Check provider status
 
-      Claude Desktop / Claude Code (MCP server "obsidian-ops", 38 tools):
+      Claude Desktop / Claude Code (MCP server "obsidian-ops", 42 tools):
         Install or update the MCP registration (safe to re-run):
           python3 #{opt_libexec}/scripts/configure_mcp.py
         Check status:
