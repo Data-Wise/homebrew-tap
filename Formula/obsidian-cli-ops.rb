@@ -16,7 +16,6 @@ class ObsidianCliOps < Formula
   url "https://github.com/Data-Wise/obsidian-cli-ops/archive/refs/tags/v4.6.0.tar.gz"
   sha256 "5c825b0f6eed7436662ab9226e8369a8db362f50e231c2ddd224f844ef80f56a"
   license "MIT"
-  revision 2
   head "https://github.com/Data-Wise/obsidian-cli-ops.git", branch: "main"
 
   depends_on "rust" => :build
@@ -310,7 +309,7 @@ class ObsidianCliOps < Formula
         obs ai setup           # Interactive AI setup wizard
         obs ai status          # Check provider status
 
-      Claude Desktop / Claude Code (MCP server "obsidian-ops", 42 tools):
+      Claude Desktop / Claude Code (MCP server "obsidian-ops", 44 tools):
         Install or update the MCP registration (safe to re-run):
           python3 #{opt_libexec}/scripts/configure_mcp.py
         Check status:
