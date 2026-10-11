@@ -185,8 +185,8 @@
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
-      "version": "2.20.1",
-      "sha256": "99877e0349c9200b5907835885bfe1eb833a4be0f9e8f18f0fc343cc6f8b4ed4",
+      "version": "2.21.0",
+      "sha256": "f376d0da96fb5f7885988ca15f12c00b8903dda8d82e03af9194dea0317edc91",
       "head": "https://github.com/Data-Wise/rforge.git",
       "command_count": 44,
       "dependencies": {
@@ -223,8 +223,7 @@
         }
       ],
       "caveats_extra": "{command_count} commands for R package ecosystem management.",
-      "claude_plugin": "rforge@data-wise",
-      "revision": 2
+      "claude_plugin": "rforge@data-wise"
     },
     "rforge-orchestrator": {
       "type": "claude-plugin",
