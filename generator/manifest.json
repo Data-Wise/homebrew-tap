@@ -185,8 +185,8 @@
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
-      "version": "2.22.1",
-      "sha256": "b487da8bb071761d38ffd02c793ea92f3f3d83302c63b48bf837ecafe0ca87e8",
+      "version": "2.22.2",
+      "sha256": "ad9016e24e9a36813122baad3fea3f2ca466e054c9b76b3dc689384691c83ff9",
       "head": "https://github.com/Data-Wise/rforge.git",
       "command_count": 44,
       "dependencies": {
