@@ -5,8 +5,8 @@
 class HimalayaMcp < Formula
   desc "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI"
   homepage "https://github.com/Data-Wise/himalaya-mcp"
-  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v2.1.3.tar.gz"
-  sha256 "378bc6c6113b7ed6aeb69ec883be8cdb3ee5702222c066a60fdda1a5e4b4580c"
+  url "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v2.2.0.tar.gz"
+  sha256 "fdeab1952d98220f1241445706bdc7753e345c5708d69b2da2602f5cecf0219d"
   license "MIT"
   revision 2
 
