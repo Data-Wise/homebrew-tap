@@ -63,8 +63,8 @@
       "homepage": "https://github.com/Data-Wise/himalaya-mcp",
       "source": "github",
       "repo": "Data-Wise/himalaya-mcp",
-      "version": "2.1.2",
-      "sha256": "81e273ad3f39764d43418d3afbb1fde9e9184af73e596468207ff1ca235854b7",
+      "version": "2.1.3",
+      "sha256": "378bc6c6113b7ed6aeb69ec883be8cdb3ee5702222c066a60fdda1a5e4b4580c",
       "revision": 2,
       "bin_mkpath": true,
       "dependencies": {
@@ -181,7 +181,7 @@
     },
     "rforge": {
       "type": "claude-plugin",
-      "desc": "R package ecosystem orchestrator \u2014 44 commands \u2014 Claude Code plugin",
+      "desc": "R package ecosystem orchestrator — 44 commands — Claude Code plugin",
       "homepage": "https://github.com/Data-Wise/rforge",
       "source": "github",
       "repo": "Data-Wise/rforge",
@@ -274,7 +274,7 @@
           "type": "directory"
         }
       ],
-      "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge",
+      "caveats_extra": "⚠️  DEPRECATED — This formula is no longer maintained.\n\nThe plugin has been renamed to `rforge` and now lives in its own\nrepository. Migrate with:\n\n    brew uninstall data-wise/tap/rforge-orchestrator\n    rm -rf ~/.claude/plugins/rforge-orchestrator\n    brew install --HEAD data-wise/tap/rforge\n\nThe new formula installs to ~/.claude/plugins/rforge and ships\nv1.2.0 features (R-aware PreToolUse hook, marketplace install,\nvalidation skills, 15 commands).\n\n──────────────────────────────────────────────────────\n\nLegacy install info (for users on this deprecated formula):\n\nThe RForge Orchestrator plugin has been installed to:\n  ~/.claude/plugins/rforge-orchestrator\n\nIf not auto-enabled, run:\n  claude plugin install rforge-orchestrator@local-plugins\n\nRequirements:\n  - Claude Code CLI must be installed\n  - RForge MCP server must be configured in ~/.claude/settings.json\n\nAvailable commands (v0.1.0 had only these three):\n  /rforge:analyze  - Analyze R project and recommend tools\n  /rforge:quick    - Quick project analysis\n  /rforge:thorough - Thorough multi-stage analysis\n\nIf the automatic copy failed (macOS permissions), run manually:\n  mkdir -p ~/.claude/plugins/rforge-orchestrator && ( cd $(brew --prefix)/opt/rforge-orchestrator/libexec && tar cf - . ) | ( cd ~/.claude/plugins/rforge-orchestrator && tar xf - )\n\nFor the new plugin and full v1.2.0 docs:\n  https://github.com/Data-Wise/rforge",
       "claude_setup": false,
       "revision": 2
     },
@@ -325,7 +325,7 @@
           "type": "file"
         }
       ],
-      "caveats_extra": "\u26a0\ufe0f  DEPRECATED \u2014 this formula is no longer maintained.\n\nworkflow v0.1.0's plugin.json fails Claude Code's manifest schema\n(`author` must be an object, `repository` a string), so\n`claude plugin install workflow@local-plugins` is rejected, and no\nmarketplace carries the plugin.\n\nTo remove it:\n  brew uninstall data-wise/tap/workflow\n  rm -rf ~/.claude/plugins/workflow ~/.claude/local-marketplace/workflow\n  claude plugin marketplace remove local-plugins   # if workflow-install added it\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nLegacy info:\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns",
+      "caveats_extra": "⚠️  DEPRECATED — this formula is no longer maintained.\n\nworkflow v0.1.0's plugin.json fails Claude Code's manifest schema\n(`author` must be an object, `repository` a string), so\n`claude plugin install workflow@local-plugins` is rejected, and no\nmarketplace carries the plugin.\n\nTo remove it:\n  brew uninstall data-wise/tap/workflow\n  rm -rf ~/.claude/plugins/workflow ~/.claude/local-marketplace/workflow\n  claude plugin marketplace remove local-plugins   # if workflow-install added it\n\n──────────────────────────────────────────────────────\n\nLegacy info:\nThe plugin includes:\n  - 3 auto-activating skills (backend, frontend, devops)\n  - Enhanced /brainstorm command (8 modes)\n  - Workflow orchestrator agent\n  - 60+ proven design patterns",
       "revision": 3,
       "deprecate": {
         "date": "2026-09-23",
