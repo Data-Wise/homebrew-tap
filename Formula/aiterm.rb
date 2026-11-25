@@ -11,6 +11,8 @@ class Aiterm < Formula
   sha256 "14a8c8453cd5186a8fc1d5a2fbc4bf7bd2a3e67a546ecbee7644c32df2e1bc50"
   license "MIT"
 
+  deprecate! date: "2026-11-25", because: :unmaintained
+
   depends_on "python@3.12"
 
   def install
